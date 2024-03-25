@@ -12,14 +12,13 @@
 #' @return a transformed vector
 #' @export
 h <- function(x, a, d){
-  for (i in 3:d){
-    if ((i %% 2 == 1)){
-      x[(0:(d - i)) + a[i]] <-  abs(x[(0:(d - i)) + a[i]]) ^ (1 / (i - 1))
+  for(i in 3:d){
+    if(i %% 2 == 1){
+      x[(0:(d - i)) + a[i]] <- abs( x[(0:(d - i)) + a[i]] )^(1/(i - 1))
     }
-    if ((i %% 2 == 0)){
-      x[(0:(d - i)) + a[i]] <-  (x[(0:(d - i)) + a[i]] <= 0) * (-abs(x[(0:(d - i)) +
-                                  a[i]]) ^ (1 / (i - 1))) + (x[(0:(d - i)) + a[i]] > 0) * (abs(x[(0:(d - i)) +
-                                 a[i]]) ^ (1 / (i - 1)))
+    if((i %% 2 == 0)){
+      x[(0:(d - i)) + a[i]] <- (x[(0:(d - i)) + a[i]] <= 0) * (-abs(x[(0:(d - i)) + a[i]])^(1/(i - 1))) +
+                                  (x[(0:(d - i)) + a[i]] > 0) * (abs(x[(0:(d - i)) + a[i]])^(1/(i - 1)))
     }
   }
   return(x)
@@ -29,21 +28,21 @@ h <- function(x, a, d){
 #' @title  Transformation of the vectorised covariance matrix by quotients of means
 #'
 #' @description A function which calculates the mean of the secondary diagonals
-#' and divide them through the next one.Since the elements can be negative, for
-#' the denominator absolute valued are used.
-#' @param x vectorised covariance matrix which should be transformed
+#' and divide them through the next one. Since the elements can be negative, for
+#' the denominator absolute values are used.
+#' @param v vectorised covariance matrix which should be transformed
 #' @param a vector containing the indices which belong to the diagonal of the
 #' covariance matrix
 #' @param d dimension of the covariance matrix
 #' @return a transformed vector
 #' @export
 g <- function(v, a, d){
-  Ratio <-  rep(0, d - 1)
+  ratio <- rep(0, d - 1)
   ae <-  c(a, a[d] + 1)
   for(l in 2:(d)){
-    Ratio[l - 1] = mean(v[ae[l]:(ae[l + 1] - 1)]) / mean(abs(v[ae[l - 1]:(ae[l] - 1)]))
+    ratio[l - 1] <-  mean(v[ae[l]:(ae[l + 1] - 1)]) / mean(abs(v[ae[l - 1]:(ae[l] - 1)]))
   }
-  return(c(v, Ratio))
+  return(c(v, ratio))
 }
 
 #' @title Jacobian matrix for the function h
@@ -58,13 +57,13 @@ g <- function(v, a, d){
 #' @return the Jacobian matrix applied for the given vector
 #' @export
 Jacobianh <- function(x, a, d, p){
-  E <-  rep(1, p)
-  for (i in 3:d){
-    if ((i %% 2 == 1)){
-      E[(0:(d - i)) + a[i]] <-  x[(0:(d - i)) + a[i]] / ((i - 1) * abs(x[(0:(d - i)) + a[i]]) ^ (2 - 1 / (i - 1)))
+  E <- rep(1, p)
+  for(i in 3:d){
+    if(i %% 2 == 1){
+      E[(0:(d - i)) + a[i]] <-  x[(0:(d - i)) + a[i]] / ((i - 1) * abs(x[(0:(d - i)) + a[i]])^(2 - 1/(i - 1)))
     }
-    if ((i %% 2 == 0)){
-      E[(0:(d - i)) + a[i]] <-  1 / ((i - 1) * abs(x[(0:(d - i)) + a[i]]) ^ (1 - (1 / (i - 1))))
+    if(i %% 2 == 0){
+      E[(0:(d - i)) + a[i]] <-  1/((i - 1) * abs(x[(0:(d - i)) + a[i]])^(1 - (1/(i - 1))))
     }
   }
   return(diag(E, p, p))
@@ -86,11 +85,11 @@ Jacobianh <- function(x, a, d, p){
 Jacobiang <- function(X, a, d, p){
   J <-  matrix(0, d - 1, p)
   for (l in 1:(d - 1)){
-    S1 <-  sum(abs(X[a[l]:(a[l] + d - l)]))
-    S2 <-  sum(X[a[l + 1]:(a[l + 1] + d - l - 1)])
+    S1 <- sum(abs(X[a[l]:(a[l] + d - l)]))
+    S2 <- sum(X[a[l + 1]:(a[l + 1] + d - l - 1)])
 
-    J[l, a[l + 1] + 0:(d - l - 1)] <-  (d - l + 1) / (d - l) / S1
-    J[l, a[l] + 0:(d - l)] <-  (d - l + 1) / (d - l) * sign(X[a[l] + 0:(d - l)]) * (-S2 / (S1) ^ 2)
+    J[l, a[l + 1] + 0:(d - l - 1)] <- (d - l + 1) / (d - l) / S1
+    J[l, a[l] + 0:(d - l)] <- (d - l + 1) / (d - l) * sign(X[a[l] + 0:(d - l)]) * (-S2 / (S1) ^ 2)
   }
   return(rbind(diag(1, p, p), J))
 }
@@ -135,11 +134,11 @@ ATSh <- function(N, X, C, v, a, d, p){
 #' @return a scalar, the value of the ATS
 #' @export
 ATSg <- function(N, X, C, v, a, d, p){
-  Xmean <-  rowMeans(X)
-  CDiff <-  C %*% (g(Xmean, a, d) - g(v, a, d))
-  Jacobi <-  Jacobiang(Xmean, a, d, p)
-  HatCov <-  tvar(X)
-  Trace <-  sum(diag(QF(C %*% Jacobi, HatCov)))
+  Xmean <- rowMeans(X)
+  CDiff <- C %*% (g(Xmean, a, d) - g(v, a, d))
+  Jacobi <- Jacobiang(Xmean, a, d, p)
+  HatCov <- tvar(X)
+  Trace <- sum(diag(QF(C %*% Jacobi, HatCov)))
   return(c(N * crossprod(CDiff) / Trace))
 }
 
@@ -187,7 +186,7 @@ Bootstraph <- function(N.sim, n1, a, d, p, C, MSrootHatCov, vX){
 #' @return a scalar, the value of the ATS
 #' @export
 Bootstrapg <- function(N.sim, n1, a, d, p, C, MSrootHatCov, vX){
-  XPB <-  gData(MSrootHatCov, n1) + vX
+  XPB <- gData(MSrootHatCov, n1) + vX
   return(ATSg(n1, XPB, C, vX, a, d, p))
 }
 
@@ -205,8 +204,8 @@ Bootstrapg <- function(N.sim, n1, a, d, p, C, MSrootHatCov, vX){
 #' @return a scalar, the value of the ATS
 #' @export
 Bootstrap1G <- function(N.sim, n1, C, MSrootHatCov){
-  XPB <-  gData(MSrootHatCov, n1)
-  PBHatCov <-  tvar(XPB)
+  XPB <- gData(MSrootHatCov, n1)
+  PBHatCov <- tvar(XPB)
   return(ATS(n1, rowMeans(XPB), C, PBHatCov))
 }
 
@@ -228,7 +227,7 @@ Bootstrap1G <- function(N.sim, n1, C, MSrootHatCov){
 #' @export
 BootstrapMG <- function(N.sim, nv, N, kappainvv, C, MSrootHatCov){
   DataPB <- mapply(gData, MSrootHatCov, nv, SIMPLIFY = FALSE)
-  PBHatCov <-  WDirect.sumL(lapply(DataPB, tvar), kappainvv)
+  PBHatCov <- WDirect.sumL(lapply(DataPB, tvar), kappainvv)
   return(ATS(N, unlist(lapply(DataPB, rowMeans)), C, PBHatCov))
 }
 
@@ -247,7 +246,7 @@ BootstrapMG <- function(N.sim, nv, N, kappainvv, C, MSrootHatCov){
 #' @param repetitions a scalar,  indicate the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed A seed, if it should be set for reproducibility. Predefined values
-#' is 0, which means no seed is set. A chosen seed is deleted at the end.
+#' is NULL, which means no seed is set. A chosen seed is deleted at the end.
 #' @return a list containing the p-value, the value of the test statistic and the
 #' value of the estimated covariance matrix used in the test
 #' @examples
@@ -256,8 +255,10 @@ BootstrapMG <- function(N.sim, nv, N, kappainvv, C, MSrootHatCov){
 #' Xi=rep(0,d)
 #' TestCovariance1G(X,C,Xi,method="MC")
 #' @export
-TestCovariance1G <- function(X, C, Xi, method, repetitions = 1000, seed = 0){
-  if (seed != 0){
+TestCovariance1G <- function(X, C, Xi, method, repetitions = 1000, seed = NULL){
+  if(!is.null(seed)){
+    old_seed <- .Random.seed
+    on.exit({ .Random.seed <<- old_seed })
     set.seed(seed)
   }
   n1 <- dim(X)[2]
@@ -269,11 +270,9 @@ TestCovariance1G <- function(X, C, Xi, method, repetitions = 1000, seed = 0){
 
   Teststatistic <- ATS(n1,vX,C,HatCov,Xi)
   pvalue <- mean(ResamplingResult<Teststatistic)
-  if(seed!=0){ set.seed(NULL) }
 
   return(list("pvalue"=pvalue, "Teststatistic"=Teststatistic, "CovarianceMatrix"=HatCov))
 }
-
 
 
 #' @title Inner function for test regarding covariance matrices for multiple groups.
@@ -292,12 +291,16 @@ TestCovariance1G <- function(X, C, Xi, method, repetitions = 1000, seed = 0){
 #' @param repetitions a scalar,  indicate the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed A seed, if it should be set for reproducibility. Predefined values
-#' is 0, which means no seed is set. A chosen seed is deleted at the end.
+#' is NULL, which means no seed is set. A chosen seed is deleted at the end.
 #' @return a list containing the p-value, the value of the test statistic and the
 #' value of the estimated covariance matrix used in the test
 #' @export
-TestCovarianceMGinner <- function(Data, nv, C, Xi, method, repetitions = 1000, seed = 0){
-  if(seed != 0){ set.seed(seed) }
+TestCovarianceMGinner <- function(Data, nv, C, Xi, method, repetitions = 1000, seed = NULL){
+  if(!is.null(seed)){
+    old_seed <- .Random.seed
+    on.exit({ .Random.seed <<- old_seed })
+    set.seed(seed)
+  }
   N <-  sum(nv)
   kappainvv <-  N / nv
 
@@ -319,7 +322,6 @@ TestCovarianceMGinner <- function(Data, nv, C, Xi, method, repetitions = 1000, s
 
   Teststatistic <- ATS(N, vVarData, C, HatCovCombined, Xi)
   pvalue <- mean(ResamplingResult < Teststatistic)
-  if(seed != 0){ set.seed(NULL) }
   return(list("pvalue" = pvalue,"Teststatistic" = Teststatistic,"CovarianceMatrix" = HatCov))
 
 }
@@ -342,7 +344,7 @@ TestCovarianceMGinner <- function(Data, nv, C, Xi, method, repetitions = 1000, s
 #' @param repetitions a scalar,  indicate the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed A seed, if it should be set for reproducibility. Predefined values
-#' is 0, which means no seed is set. A chosen seed is deleted at the end.
+#' is NULL, which means no seed is set. A chosen seed is deleted at the end.
 #' @return a list containing the p-value, the value of the test statistic and the
 #' value of the estimated covariance matrix used in the test
 #' #' @examples
@@ -352,7 +354,7 @@ TestCovarianceMGinner <- function(Data, nv, C, Xi, method, repetitions = 1000, s
 #' TestCovariance1Gsimple(X,hypothesis="equal-variances")
 #' @export
 TestCovariance1Gsimple <- function(X, hypothesis, Xi = 0, method = "BT",
-                                    repetitions = 1000, seed = 0){
+                                    repetitions = 1000, seed = NULL){
   d <-  dim(X)[1]
   p <-  d * (d + 1) / 2 #dimension vectorized covariance matrix
   if (d > 1){
@@ -361,7 +363,7 @@ TestCovariance1Gsimple <- function(X, hypothesis, Xi = 0, method = "BT",
   else{
     a <-  1
   }
-  if((1 - (hypothesis %in% c("equal-variances","uncorrelated","given-trace","given-matrix"))) == 1){
+  if( !(hypothesis %in% c("equal-variances","uncorrelated","given-trace","given-matrix"))){
     stop("no predefined hypothesis")
   }
   else{
@@ -432,7 +434,7 @@ TestCovariance1Gsimple <- function(X, hypothesis, Xi = 0, method = "BT",
 #' @param repetitions a scalar,  indicate the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed A seed, if it should be set for reproducibility. Predefined values
-#' is 0, which means no seed is set. A chosen seed is deleted at the end.
+#' is NULL, which means no seed is set. A chosen seed is deleted at the end.
 #' @return a list containing the p-value, the value of the test statistic and the
 #' value of the estimated covariance matrix used in the test
 #' @examples
@@ -443,7 +445,7 @@ TestCovariance1Gsimple <- function(X, hypothesis, Xi = 0, method = "BT",
 #' TestCovarianceMGsimple(XY,nv,hypothesis="equality",method="MC")
 #' @export
 TestCovarianceMGsimple <- function(X, nv, hypothesis, method = "BT",
-                                    repetitions = 1000, seed = 0){
+                                    repetitions = 1000, seed = NULL){
   Data <-  Listcheck(X, nv)
   dimensions <-  sapply(Data, dim)[1,]
   if(max(dimensions) != mean(dimensions)){
@@ -459,7 +461,7 @@ TestCovarianceMGsimple <- function(X, nv, hypothesis, method = "BT",
       a <-1
     }
     groups <- length(nv)
-    if((1 - (hypothesis %in% c("equal", "equal-trace", "equal-diagonals"))) == 1){
+    if(!(hypothesis %in% c("equal", "equal-trace", "equal-diagonals"))){
       stop("no predefined hypothesis")
     }
     else{
@@ -504,7 +506,7 @@ TestCovarianceMGsimple <- function(X, nv, hypothesis, method = "BT",
 #' @param repetitions a scalar,  indicate the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed A seed, if it should be set for reproducibility. Predefined values
-#' is 0, which means no seed is set. A chosen seed is deleted at the end.
+#' is NULL, which means no seed is set. A chosen seed is deleted at the end.
 #' @return a list containing the p-value, the value of the test statistic and the
 #' value of the estimated covariance matrix used in the test
 #'
@@ -516,7 +518,7 @@ TestCovarianceMGsimple <- function(X, nv, hypothesis, method = "BT",
 #' Xi=matrix(0,30,1)
 #' TestCovarianceMG(XY,nv,C,Xi,method="MC")
 #' @export
-TestCovarianceMG <- function(X, nv, C, Xi, method = "BT", repetitions = 1000, seed = 0){
+TestCovarianceMG <- function(X, nv, C, Xi, method = "BT", repetitions = 1000, seed = NULL){
   Data <-  Listcheck(X, nv)
   dimensions <-  sapply(Data, dim)[1,]
   if(max(dimensions) != mean(dimensions)){
@@ -545,19 +547,23 @@ TestCovarianceMG <- function(X, nv, C, Xi, method = "BT", repetitions = 1000, se
 #' @param repetitions a scalar,  indicate the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed A seed, if it should be set for reproducibility. Predefined values
-#' is 0, which means no seed is set. A chosen seed is deleted at the end.
+#' is NULL, which means no seed is set. A chosen seed is deleted at the end.
 #' @return a list containing the p-value, the value of the test statistic and the
 #' value of the estimated covariance matrix used in the test
 #' @examples
 #' X=matrix(rnorm(5*20),5,20)
 #' TestCovStructure(X,structure="toeplitz",method="MC")
 #' @export
-TestCovStructure <- function(X, structure, method, repetitions = 1000, seed = 0){
-  if(seed != 0){ set.seed(seed)}
+TestCovStructure <- function(X, structure, method, repetitions = 1000, seed = NULL){
+  if(!is.null(seed)){
+    old_seed <- .Random.seed
+    on.exit({ .Random.seed <<- old_seed })
+    set.seed(seed)
+  }
   n1 <- dim(X)[2]
   d <- dim(X)[1]
   if(d==1){ stop("Structures can be only investigated for more than one dimension") }
-  if((1-(structure %in% c("autoregressive", "FO-autoregressive", "diagonal", "sphericity", "compoundsymmetry", "toeplitz") ))==1){
+  if(!(structure %in% c("autoregressive", "FO-autoregressive", "diagonal", "sphericity", "compoundsymmetry", "toeplitz") )){
     stop("no predefined hypothesis")
   }
   else{
@@ -565,7 +571,7 @@ TestCovStructure <- function(X, structure, method, repetitions = 1000, seed = 0)
       p <- d*(d+1)/2#dimension vectorized covariance matrix
       a <- cumsum(c(1,(d):2))
 
-      vX <- dvech(tvar(X),a,d,p)
+      vX <- dvech(tvar(X),a,d,p, inc_diag = TRUE)
       Xq <- apply(X-rowMeans(X),2,vdtcrossprod,a,d,p)
       HatCov <- tvar(Xq)
       if(structure %in% c("autoregressive","FO-autoregressive")){
@@ -628,8 +634,8 @@ TestCovStructure <- function(X, structure, method, repetitions = 1000, seed = 0)
 
         Teststatistic <- ATS(n1,vX,C,HatCov,Xi)
         pvalue <- mean(ResamplingResult<Teststatistic)
-        if(seed!=0){ set.seed(NULL) }
-          return(list("pvalue"=pvalue, "Teststatistic"=Teststatistic, "CovarianceMatrix"=HatCov))
+
+        return(list("pvalue"=pvalue, "Teststatistic"=Teststatistic, "CovarianceMatrix"=HatCov))
       }
     }
   }

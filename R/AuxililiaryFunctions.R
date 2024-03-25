@@ -66,51 +66,36 @@ MSroot <- function(X){
   return(MSroot)
 }
 
-#' @title Diagonal vectorisation excluding the diagonal
-#' @description  Diagonal vectorisation of the upper triangular matrix without the
-#' diagonal elements.
-#' @param X quadratic matrix which should be diagonalized
-#' @param a vector containing the indices which belong to the diagonal of the
-#' matrix
-#' @param d dimension of the matrix which should be vectorised
-#' @param pu dimension of the vectorised matrix
-#'
-#' @return vector
-#' @export
-dvechp <- function(X, a, d, pu){
-  if(!is.square.matrix(X)){
-    stop("argument X is not a square numeric matrix")
-  }
-  else{
-    E <- rep(X[1,d],pu)
-    for(i in 2:(d-1)){
-      E[(a[i]-d):(a[i+1]-1-d)] <- diag(X[1:(d-i+1),i:d])
-    }
-  return(E)
-  }
-}
 
-#' @title Diagonal vectorisation including the diagonal
-#' @description Diagonal vectorisation of the upper triangular matrix containing
-#' the diagonal elements.
+
+#' @title Diagonal vectorisation
+#' @description  Diagonal vectorisation of the upper triangular matrix
 #' @param X quadratic matrix which should be diagonalized
 #' @param a vector containing the indices which belong to the diagonal of the
 #' matrix
 #' @param d dimension of the matrix which should be vectorised
 #' @param p dimension of the vectorised matrix
+#' @param inc_diag TRUE or FALSE: should the diagonal be included?
 #'
 #' @return vector
 #' @export
-dvech <- function(X, a, d, p){
+dvech <- function(X, a, d, p, inc_diag){
   if(!is.square.matrix(X)){
     stop("argument X is not a square numeric matrix")
   }
   else{
     E <- rep(X[1,d],p)
-    for(i in 1:(d-1)){
-      E[a[i]:(a[i+1]-1)] <- diag(X[1:(d-i+1),i:d])
+    if(inc_diag){ # with the diagonal
+      for(i in 1:(d-1)){
+        E[a[i]:(a[i+1]-1)] <- diag(X[1:(d-i+1),i:d])
+      }
     }
-  return(E)
+    else{ # without the diagonal
+      for(i in 2:(d-1)){
+        E[(a[i]-d):(a[i+1]-1-d)] <- diag(X[1:(d-i+1),i:d])
+      }
+    }
+    return(E)
   }
 }
 
@@ -177,7 +162,7 @@ centering <- function(X){
 #' @param X matrix
 #' @return matrix
 tvar <- function(X){
-  return(var(t(X)))
+  return(stats::var(t(X)))
 }
 
 
