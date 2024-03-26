@@ -45,60 +45,53 @@ g <- function(v, a, d){
   return(c(v, ratio))
 }
 
-#' @title Jacobian matrix for the function h
+#' @title Jacobian matrix for transformation functions
 #'
-#' @description A function which calculates the Jacobian matrix for the root
-#' transformation h  applied for a given vector
-#' @param x vectorised covariance matrix  for which the Jacobian matrix is applied
-#' @param a vector containing the indices which belong to the diagonal of the
-#' covariance matrix
-#' @param d dimension of the covariance matrix
-#' @param p dimension of the vectorised matrix
-#' @return the Jacobian matrix applied for the given vector
-#' @export
-Jacobianh <- function(x, a, d, p){
-  E <- rep(1, p)
-  for(i in 3:d){
-    if(i %% 2 == 1){
-      E[(0:(d - i)) + a[i]] <-  x[(0:(d - i)) + a[i]] / ((i - 1) * abs(x[(0:(d - i)) + a[i]])^(2 - 1/(i - 1)))
-    }
-    if(i %% 2 == 0){
-      E[(0:(d - i)) + a[i]] <-  1/((i - 1) * abs(x[(0:(d - i)) + a[i]])^(1 - (1/(i - 1))))
-    }
-  }
-  return(diag(E, p, p))
-}
-
-
-#' @title Jacobian matrix for the function g
-#'
-#' @description A function which calculates the Jacobian matrix for
-#' transformation function based on quotients of means. This Jacobian matrix is
-#' applied for a given vector
+#' @description A function which calculates the Jacobian matrix for a given
+#' transformation function h or g
 #' @param x vectorised covariance matrix for which the Jacobian matrix is applied
 #' @param a vector containing the indices which belong to the diagonal of the
 #' covariance matrix
 #' @param d dimension of the covariance matrix
 #' @param p dimension of the vectorised matrix
+#' @param fun transformation function, that should be used. 'g' or 'h'
 #' @return the Jacobian matrix applied for the given vector
 #' @export
-Jacobiang <- function(X, a, d, p){
-  J <-  matrix(0, d - 1, p)
-  for (l in 1:(d - 1)){
-    S1 <- sum(abs(X[a[l]:(a[l] + d - l)]))
-    S2 <- sum(X[a[l + 1]:(a[l + 1] + d - l - 1)])
-
-    J[l, a[l + 1] + 0:(d - l - 1)] <- (d - l + 1) / (d - l) / S1
-    J[l, a[l] + 0:(d - l)] <- (d - l + 1) / (d - l) * sign(X[a[l] + 0:(d - l)]) * (-S2 / (S1) ^ 2)
+Jacobian <- function(x, a, d, p, fun){
+  if(fun == "h"){
+    E <- rep(1, p)
+    for(i in 3:d){
+      if(i %% 2 == 1){
+        E[(0:(d - i)) + a[i]] <-  x[(0:(d - i)) + a[i]] / ((i - 1) * abs(x[(0:(d - i)) + a[i]])^(2 - 1/(i - 1)))
+      }
+      if(i %% 2 == 0){
+        E[(0:(d - i)) + a[i]] <-  1/((i - 1) * abs(x[(0:(d - i)) + a[i]])^(1 - (1/(i - 1))))
+      }
+    }
+    return(diag(E, p, p))
   }
-  return(rbind(diag(1, p, p), J))
+  else{
+    if(fun == "g"){
+      J <-  matrix(0, d - 1, p)
+      for (l in 1:(d - 1)){
+        S1 <- sum(abs(X[a[l]:(a[l] + d - l)]))
+        S2 <- sum(X[a[l + 1]:(a[l + 1] + d - l - 1)])
+
+        J[l, a[l + 1] + 0:(d - l - 1)] <- (d - l + 1) / (d - l) / S1
+        J[l, a[l] + 0:(d - l)] <- (d - l + 1) / (d - l) * sign(X[a[l] + 0:(d - l)]) * (-S2 / (S1) ^ 2)
+      }
+      return(rbind(diag(1, p, p), J))
+    }
+    else{
+      stop("fun must be 'g' or 'h'")
+    }
+  }
 }
 
-
-#' @title ATS for vectors transformed with the function h
+#' @title ATS for transformed vectors
 #'
 #' @description A function which calculates the Anova type statistic based on
-#' the transformation h
+#' a transformation function
 #' @param N sample size
 #' @param X matrix containing the bootstrap observations as columns
 #' @param C the hypothesis matrix
@@ -107,48 +100,25 @@ Jacobiang <- function(X, a, d, p){
 #' covariance matrix
 #' @param d dimension of the covariance matrix
 #' @param p dimension of the vectorised matrix
+#' @param fun transformation function, that should be used. 'g' or 'h'
 #' @return a scalar, the value of the ATS
 #' @export
-ATSh <- function(N, X, C, v, a, d, p){
+ATS_fun <- function(N, X, C, v, a, d, p, fun){
   Xmean <-  rowMeans(X)
-  CDiff <-  C %*% (h(Xmean, a, d) - h(v, a, d))
-  Jacobi <-  Jacobianh(Xmean, a, d, p)
+  CDiff <- C %*% (do.call(fun, list(Xmean, a, d)) - do.call(fun, list(v, a, d)))
+  Jacobi <-  Jacobian(Xmean, a, d, p, fun)
   HatCov <-  tvar(X)
   Trace <-  sum(diag(QF(C %*% Jacobi, HatCov)))
   return(c(N * crossprod(CDiff) / Trace))
 }
 
 
-#' @title ATS for vectors transformed with the function g
-#'
-#' @description A function which calculates the Anova type statistic based on
-#' the transformation g
-#' @param N sample size
-#' @param X matrix containing the bootstrap observations as columns
-#' @param C the hypothesis matrix
-#' @param v vectorised empirical covariance matrix of the original data
-#' @param a vector containing the indices which belong to the diagonal of the
-#' covariance matrix
-#' @param d dimension of the covariance matrix
-#' @param p dimension of the vectorised matrix
-#' @return a scalar, the value of the ATS
-#' @export
-ATSg <- function(N, X, C, v, a, d, p){
-  Xmean <- rowMeans(X)
-  CDiff <- C %*% (g(Xmean, a, d) - g(v, a, d))
-  Jacobi <- Jacobiang(Xmean, a, d, p)
-  HatCov <- tvar(X)
-  Trace <- sum(diag(QF(C %*% Jacobi, HatCov)))
-  return(c(N * crossprod(CDiff) / Trace))
-}
-
-
-#' @title Bootstrap using the transformation h for one group
+#' @title Bootstrap using transformation for one group
 #'
 #' @description This function generates n1 normal distributed random vectors
 #' with covariance matrix HatCov, which matrix root MSrootHatCov is given and
 #' expectation vector vX. For the generated bootstrap sample the value of the
-#' ATS based on transformation h is calculated
+#' ATS based on a transformation is calculated
 #' @param N.sim control variable for using sapply
 #' @param n1 a scalar, declaring the sample size for the bootstrap sample
 #' @param a vector containing the indices which belong to the diagonal of the
@@ -159,76 +129,46 @@ ATSg <- function(N, X, C, v, a, d, p){
 #' @param MSrootHatCov matrix root of the covariance matrix HatCov, to generate
 #' the bootstrap sample
 #' @param vX the expectation vector for the bootstrap sample
+#' @param fun transformation function, that should be used. 'g' or 'h'
 #' @return a scalar, the value of the ATS
 #' @export
-Bootstraph <- function(N.sim, n1, a, d, p, C, MSrootHatCov, vX){
-  XPB <-  gData(MSrootHatCov, n1) + vX
-  return(ATSh(n1, XPB, C, vX, a, d, p))
-}
-
-
-#' @title Bootstrap using the transformation g for one group
-#'
-#' @description This function generates n1 normal distributed random vectors
-#' with covariance matrix HatCov, which matrix root MSrootHatCov is given and
-#' expectation vector vX. For the generated bootstrap sample the value of the
-#' ATS based on transformation g is calculated
-#' @param N.sim control variable for using sapply
-#' @param n1 a scalar, declaring the sample size for the bootstrap sample
-#' @param a vector containing the indices which belong to the diagonal of the
-#' covariance matrix
-#' @param d dimension of the covariance matrix
-#' @param p dimension of the vectorised matrix
-#' @param C a hypothesis matrix for calculating the ATS
-#' @param MSrootHatCov matrix root of the covariance matrix HatCov, to generate
-#' the bootstrap sample
-#' @param vX the expectation vector for the bootstrap sample
-#' @return a scalar, the value of the ATS
-#' @export
-Bootstrapg <- function(N.sim, n1, a, d, p, C, MSrootHatCov, vX){
+Bootstrap_trans <- function(N.sim, n1, a, d, p, C, MSrootHatCov, vX, fun){
   XPB <- gData(MSrootHatCov, n1) + vX
-  return(ATSg(n1, XPB, C, vX, a, d, p))
+  return(ATS_fun(n1, XPB, C, vX, a, d, p, fun))
 }
 
 
-#' @title Bootstrap for one group
+#' @title Bootstrap for one and multiple groups
 #'
-#' @description This function generates n1 normal distributed random vectors
-#' with covariance matrix HatCov, which matrix root MSrootHatCov is given. For
-#' the generated bootstrap sample the value of the ATS is calculated
+#' @description This function generates normal distributed random vectors. For one group,
+#' nv random vectors with covariance matrix HatCov are generated and the corresponding value
+#' of the ATS is generated. For multiple groups the corresponding sample sizes from nv are used.
+#' The weighted sum of covariance matrices is calculated and used to calculate the value
+#' of the ATS.
 #' @param N.sim control variable for using sapply
-#' @param n1 a scalar, declaring the sample size for the bootstrap sample
-#' @param C a hypothesis matrix for calculating the ATS
-#' @param MSrootHatCov matrix root of the covariance matrix HatCov, to generate
-#' the bootstrap sample
-#' @return a scalar, the value of the ATS
-#' @export
-Bootstrap1G <- function(N.sim, n1, C, MSrootHatCov){
-  XPB <- gData(MSrootHatCov, n1)
-  PBHatCov <- tvar(XPB)
-  return(ATS(n1, rowMeans(XPB), C, PBHatCov))
-}
-
-#' @title Bootstrap for multiple Groups
-#'
-#' @description This function generates normal distributed random vectors, with
-#' corresponding sample size and matrix root of the covariance matrix are given
-#' in nv resp. MSrootHatCov. For the generated bootstrap sample the weighted sum
-#' of covariance matrices is calculated and with this the value of the ATS is
-#' calculated.
-#' @param N.sim control variable for using sapply
-#' @param nv vector of sample sizes for the bootstrap samples
+#' @param nv scalar (one group) or vector (multiple groups) of sample sizes for the bootstrap samples
 #' @param C hypothesis matrix for calculating the ATS
-#' @param kappainv vector with the inverse of the kappas, which are
-#' the weights for the weighted direct sum
-#' @param MSrootHatCov list containing matrix roots of the covariance matrices, to generate
+#' @param MSrootHatCov matrix (one group) or list of matrices (multiple groups) of roots of the covariance matrices, to generate
 #' the bootstrap sample
 #' @return a scalar, the value of the ATS
 #' @export
-BootstrapMG <- function(N.sim, nv, N, kappainvv, C, MSrootHatCov){
-  DataPB <- mapply(gData, MSrootHatCov, nv, SIMPLIFY = FALSE)
-  PBHatCov <- WDirect.sumL(lapply(DataPB, tvar), kappainvv)
-  return(ATS(N, unlist(lapply(DataPB, rowMeans)), C, PBHatCov))
+Bootstrap <- function(N.sim, nv, C, MSrootHatCov){
+  # one group
+  if(length(nv) == 1){
+    XPB <- gData(MSrootHatCov, nv)
+    PBHatCov <- tvar(XPB)
+    return(ATS(nv, rowMeans(XPB), C, PBHatCov))
+  }
+  # multiple groups
+  else{
+    N <- sum(nv)
+    kappainvv <- N / nv
+
+    DataPB <- mapply(gData, MSrootHatCov, nv, SIMPLIFY = FALSE)
+    PBHatCov <- WDirect.sumL(lapply(DataPB, tvar), kappainvv)
+    return(ATS(N, unlist(lapply(DataPB, rowMeans)), C, PBHatCov))
+
+  }
 }
 
 
@@ -306,7 +246,7 @@ TestCovarianceMGinner <- function(Data, nv, C, Xi, method, repetitions = 1000, s
 
   Datac <-  lapply(Data, centering) #Centered random variables
   VarData <-  lapply(Data, tvar)
-  vVarData <-  unlist(lapply(VarData, vech))
+  vVarData <-  unlist(lapply(VarData, matrixcalc::vech))
   DataQ <- mapply(Qvech, Datac, nv, SIMPLIFY = FALSE)
   HatCov <- lapply(DataQ, tvar)
 
@@ -317,7 +257,7 @@ TestCovarianceMGinner <- function(Data, nv, C, Xi, method, repetitions = 1000, s
     ResamplingResult <- ATSwS(QF(C, HatCovCombined), repetitions)
   }
   if(method == "BT"){
-    ResamplingResult <- sapply(1:repetitions, BootstrapMG, nv, N, kappainvv, C, MSrootHatCov)
+    ResamplingResult <- sapply(1:repetitions, Bootstrap, nv, C, MSrootHatCov)
   }
 
   Teststatistic <- ATS(N, vVarData, C, HatCovCombined, Xi)
@@ -392,7 +332,7 @@ TestCovariance1Gsimple <- function(X, hypothesis, Xi = 0, method = "BT",
       if (max(abs(Xi)) == 0 &
           length(Xi) == 1) {
         CHECK <-  1
-        Xi <- vech(diag(1, d, d))
+        Xi <- matrixcalc::vech(diag(1, d, d))
       }
       if(max(abs(Xi)) != 0 & length(Xi) == 1 & d == 1){
         CHECK <- 1
@@ -400,7 +340,7 @@ TestCovariance1Gsimple <- function(X, hypothesis, Xi = 0, method = "BT",
       if(is.matrix(Xi)){
         if(is.square.matrix(Xi) & dim(Xi)[1] == d){
           CHECK <-  1
-          Xi <- vech(Xi)
+          Xi <- matrixcalc::vech(Xi)
         }
       }
 
@@ -568,7 +508,7 @@ TestCovStructure <- function(X, structure, method, repetitions = 1000, seed = NU
   }
   else{
     if(d>1){
-      p <- d*(d+1)/2#dimension vectorized covariance matrix
+      p <- d*(d+1)/2 #dimension vectorized covariance matrix
       a <- cumsum(c(1,(d):2))
 
       vX <- dvech(tvar(X),a,d,p, inc_diag = TRUE)
@@ -576,14 +516,14 @@ TestCovStructure <- function(X, structure, method, repetitions = 1000, seed = NU
       HatCov <- tvar(Xq)
       if(structure %in% c("autoregressive","FO-autoregressive")){
         if(structure == "autoregressive"){
-          C <- direct.sum(diag(1,d,d),Pd(p-d))
+          C <- matrixcalc::direct.sum(diag(1,d,d),Pd(p-d))
           Xi <- c(rep(1,times=d),rep(0,times=p-d))
-          Jacobi <- Jacobianh(vX,a,d,p)
+          Jacobi <- Jacobian(vX,a,d,p, 'h')
           HatCovh <- QF(Jacobi,HatCov)
 
           if(method == "MC"){ ResamplingResult=ATSwS(QF(C,HatCovh),repetitions) }
           if(method == "BT"){
-            ResamplingResult <- sapply(1:repetitions,Bootstraph,n1,a,d,p,C,MSroot(HatCov),vX)
+            ResamplingResult <- sapply(1:repetitions,Bootstrap_trans,n1,a,d,p,C,MSroot(HatCov),vX,"h")
           }
           Teststatistic <- ATS(n1,h(vX,a,d),C,HatCovh,Xi)
           pvalue <- mean(ResamplingResult < Teststatistic)
@@ -592,16 +532,16 @@ TestCovStructure <- function(X, structure, method, repetitions = 1000, seed = NU
         if(structure=="FO-autoregressive"){
           C <- Pd(d)
           for(l in 2:d){
-            C <- direct.sum(C,Pd(d-l+1))
+            C <- matrixcalc::direct.sum(C,Pd(d-l+1))
             }
-          C <- direct.sum(C,Pd(d-1))
+          C <- matrixcalc::direct.sum(C,Pd(d-1))
           Xi <- rep(0,times=p+d-1)
-          Jacobi <- Jacobiang(vX,a,d,p)
+          Jacobi <- Jacobian(vX,a,d,p, 'g')
           HatCovg <- QF(Jacobi,HatCov)
 
           if(method=="MC"){ ResamplingResult <- ATSwS(QF(C,HatCovg),repetitions) }
           if(method=="BT"){
-            ResamplingResult=sapply(1:repetitions,Bootstrapg,n1,a,d,p,C,MSroot(HatCov),vX)
+            ResamplingResult=sapply(1:repetitions,Bootstrap_trans,n1,a,d,p,C,MSroot(HatCov),vX,"g")
           }
           Teststatistic <- ATS(n1,g(vX,a,d),C,HatCovg,Xi)
             pvalue <- mean(ResamplingResult<Teststatistic)
@@ -611,18 +551,18 @@ TestCovStructure <- function(X, structure, method, repetitions = 1000, seed = NU
       else{
           Xi <- rep(0,p)
         if(structure=="diagonal"){
-          C <- direct.sum(matrix(0,d,d),diag(1,p-d,p-d))
+          C <- matrixcalc::direct.sum(matrix(0,d,d),diag(1,p-d,p-d))
         }
           if(structure=="sphericity"){
-          C <- direct.sum(Pd(d),diag(1,p-d,p-d))
+          C <- matrixcalc::direct.sum(Pd(d),diag(1,p-d,p-d))
         }
         if(structure=="compoundsymmetry"){
-          C <- direct.sum(Pd(d),Pd(p-d))
+          C <- matrixcalc::direct.sum(Pd(d),Pd(p-d))
           }
         if(structure=="toeplitz"){
           C <- Pd(d)
           for(l in 2:d){
-              C <- direct.sum(C,Pd(d-l+1))
+              C <- matrixcalc::direct.sum(C,Pd(d-l+1))
           }
         }
         if(method=="MC"){

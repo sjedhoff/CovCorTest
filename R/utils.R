@@ -3,7 +3,8 @@
 #' @description matrix Pd for testing equality of the d components of a vector
 #' @param d a scalar, characterizing the matrix and set its dimension
 #' @return a matrix
-#' @export
+#'
+#
 #'
 Pd <- function(d){
   return( diag(1,d,d) - matrix(1/d,d,d) )
@@ -14,8 +15,8 @@ Pd <- function(d){
 #' @param X object that should be checked
 #' @param nv
 #' @return list
-#' @export
 #'
+#' @noRd
 Listcheck <- function(X,nv){
   if(typeof(X) != "list"){
     v <- cumsum(c(1,nv))
@@ -34,7 +35,7 @@ Listcheck <- function(X,nv){
 #'
 #' @param X,M matrices that will be multiplied
 #' @return matrix
-#' @export
+#' @noRd
 #'
 MprodBackward <- function(X,M){
   return(M%*%X)
@@ -45,7 +46,7 @@ MprodBackward <- function(X,M){
 #'
 #' @param A,B matrices or vectors
 #' @return
-#' @export
+#' @noRd
 QF <- function(A, B){
   return( A %*% B %*% t(A) )
 }
@@ -117,10 +118,10 @@ WDirect.sumL <- function(X,w){
     Result <- X*w
   }
   else{
-    Result <- direct.sum(w[1]*X[[1]], w[2]*X[[2]])
+    Result <- matrixcalc::direct.sum(w[1]*X[[1]], w[2]*X[[2]])
     if(groups>2){
       for (i in 3:groups){
-        Result <- direct.sum(Result, w[i]*X[[i]])
+        Result <-  matrixcalc::direct.sum(Result, w[i]*X[[i]])
       }
     }
   }
