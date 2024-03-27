@@ -9,8 +9,7 @@ Description: A compilation of tests for hypotheses regarding covariance and corr
  the structure test, only the latter works. Thereby Monte-Carlo and Bootstrap-techniques are used, and the respective method must be chosen, 
  and the functions provide p-values and mostly also estimators of calculated covariance matrices of test statistics.
 Imports: matrixcalc
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: GPL (>=3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1

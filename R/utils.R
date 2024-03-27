@@ -13,7 +13,7 @@ Pd <- function(d){
 #' @title Function to transform the data into a list, if there are not already
 #'
 #' @param X object that should be checked
-#' @param nv
+#' @param nv number of subjects per group
 #' @return list
 #'
 #' @noRd
@@ -45,7 +45,7 @@ MprodBackward <- function(X,M){
 #' @title Quadratic form for vectors and matrices
 #'
 #' @param A,B matrices or vectors
-#' @return
+#' @return a metrix or vector
 #' @noRd
 QF <- function(A, B){
   return( A %*% B %*% t(A) )
@@ -81,7 +81,7 @@ MSroot <- function(X){
 #' @return vector
 #' @export
 dvech <- function(X, a, d, p, inc_diag){
-  if(!is.square.matrix(X)){
+  if(!matrixcalc::is.square.matrix(X)){
     stop("argument X is not a square numeric matrix")
   }
   else{
@@ -147,7 +147,7 @@ vtcrossprod <- function(X){
 #'
 #' @return vector
 vdtcrossprod <- function(X,a,d,p){
-  return(dvech(tcrossprod(X,X),a,d,p))
+  return(dvech(tcrossprod(X,X),a,d,p, inc_diag = TRUE))
 }
 
 #' @title Function to center observations

@@ -49,7 +49,7 @@ g <- function(v, a, d){
 #'
 #' @description A function which calculates the Jacobian matrix for a given
 #' transformation function h or g
-#' @param x vectorised covariance matrix for which the Jacobian matrix is applied
+#' @param X vectorised covariance matrix for which the Jacobian matrix is applied
 #' @param a vector containing the indices which belong to the diagonal of the
 #' covariance matrix
 #' @param d dimension of the covariance matrix
@@ -57,15 +57,15 @@ g <- function(v, a, d){
 #' @param fun transformation function, that should be used. 'g' or 'h'
 #' @return the Jacobian matrix applied for the given vector
 #' @export
-Jacobian <- function(x, a, d, p, fun){
+Jacobian <- function(X, a, d, p, fun){
   if(fun == "h"){
     E <- rep(1, p)
     for(i in 3:d){
       if(i %% 2 == 1){
-        E[(0:(d - i)) + a[i]] <-  x[(0:(d - i)) + a[i]] / ((i - 1) * abs(x[(0:(d - i)) + a[i]])^(2 - 1/(i - 1)))
+        E[(0:(d - i)) + a[i]] <-  X[(0:(d - i)) + a[i]] / ((i - 1) * abs(X[(0:(d - i)) + a[i]])^(2 - 1/(i - 1)))
       }
       if(i %% 2 == 0){
-        E[(0:(d - i)) + a[i]] <-  1/((i - 1) * abs(x[(0:(d - i)) + a[i]])^(1 - (1/(i - 1))))
+        E[(0:(d - i)) + a[i]] <-  1/((i - 1) * abs(X[(0:(d - i)) + a[i]])^(1 - (1/(i - 1))))
       }
     }
     return(diag(E, p, p))
@@ -178,21 +178,24 @@ Bootstrap <- function(N.sim, nv, C, MSrootHatCov){
 #' covariance matrix for one group. Depending on the chosen method a bootstrap or
 #' Monte-Carlo-technique is used to calculate p-value of the ATS based on a
 #' specified number of runs.
-#' @param X  a matrix containing the observation vectors as columns
+#' @param X a matrix containing the observation vectors as columns
 #' @param C hypothesis matrix for calculating the ATS
 #' @param Xi a vector defining together with C the investigated hypothesis
 #' @param method a character, to chose whether bootstrap("BT") or Monte-Carlo-technique("MC")
 #' is used.
-#' @param repetitions a scalar,  indicate the number of runs for the chosen method.
+#' @param repetitions a scalar, indicates the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed A seed, if it should be set for reproducibility. Predefined values
 #' is NULL, which means no seed is set. A chosen seed is deleted at the end.
 #' @return a list containing the p-value, the value of the test statistic and the
 #' value of the estimated covariance matrix used in the test
 #' @examples
-#' X=matrix(rnorm(5*20),5,20)
-#' C=diag(1,p,p)[a,]
-#' Xi=rep(0,d)
+#' X <- matrix(rnorm(5*20),5,20)
+#' d <- dim(X)[1]
+#' p <- d*(d+1)/2
+#' a <- 1
+#' C <- diag(1,p,p)[(1:d),]
+#' Xi <- rep(0,d)
 #' TestCovariance1G(X,C,Xi,method="MC")
 #' @export
 TestCovariance1G <- function(X, C, Xi, method, repetitions = 1000, seed = NULL){
@@ -202,14 +205,14 @@ TestCovariance1G <- function(X, C, Xi, method, repetitions = 1000, seed = NULL){
     set.seed(seed)
   }
   n1 <- dim(X)[2]
-  vX <- vech(tvar(X))
+  vX <- matrixcalc::vech(tvar(X))
   Xq <- matrix(apply(X-rowMeans(X),2,vtcrossprod),ncol=n1)
   HatCov <- tvar(Xq)
   if(method=="MC"){  ResamplingResult <- ATSwS(QF(C,HatCov),repetitions) }
-  if(method=="BT"){  ResamplingResult <- sapply(1:repetitions,Bootstrap1G,n1,C,MSroot(HatCov)) }
+  if(method=="BT"){  ResamplingResult <- sapply(1:repetitions,Bootstrap,n1,C,MSroot(HatCov)) }
 
-  Teststatistic <- ATS(n1,vX,C,HatCov,Xi)
-  pvalue <- mean(ResamplingResult<Teststatistic)
+  Teststatistic <- ATS(n1, vX, C, HatCov, Xi)
+  pvalue <- mean(ResamplingResult < Teststatistic)
 
   return(list("pvalue"=pvalue, "Teststatistic"=Teststatistic, "CovarianceMatrix"=HatCov))
 }
@@ -235,17 +238,17 @@ TestCovariance1G <- function(X, C, Xi, method, repetitions = 1000, seed = NULL){
 #' @return a list containing the p-value, the value of the test statistic and the
 #' value of the estimated covariance matrix used in the test
 #' @export
-TestCovarianceMGinner <- function(Data, nv, C, Xi, method, repetitions = 1000, seed = NULL){
+TestCovarianceMGinner <- function(X, nv, C, Xi, method, repetitions = 1000, seed = NULL){
   if(!is.null(seed)){
     old_seed <- .Random.seed
     on.exit({ .Random.seed <<- old_seed })
     set.seed(seed)
   }
-  N <-  sum(nv)
-  kappainvv <-  N / nv
+  N <- sum(nv)
+  kappainvv <- N / nv
 
-  Datac <-  lapply(Data, centering) #Centered random variables
-  VarData <-  lapply(Data, tvar)
+  Datac <- lapply(X, centering) #Centered random variables
+  VarData <- lapply(X, tvar)
   vVarData <-  unlist(lapply(VarData, matrixcalc::vech))
   DataQ <- mapply(Qvech, Datac, nv, SIMPLIFY = FALSE)
   HatCov <- lapply(DataQ, tvar)
@@ -272,7 +275,7 @@ TestCovarianceMGinner <- function(Data, nv, C, Xi, method, repetitions = 1000, s
 #' @description This function is for more applied users so no hypothesis matrix or
 #' corresponding vector is necessary. This is replaced by predefined hypotheses,
 #' from which is chosen. From this C and Xi are built and the function
-#' Testcovariance1G is used.
+#'  \code{\link{Testcovariance1G}} is used.
 #' @param X a matrix containing the observation vectors as columns
 #' @param hypothesis a character to choose one of the predefined hypotheses which are
 #' "equal-variances", "uncorrelated", "given-trace" and "given-matrix".
@@ -288,20 +291,23 @@ TestCovarianceMGinner <- function(Data, nv, C, Xi, method, repetitions = 1000, s
 #' @return a list containing the p-value, the value of the test statistic and the
 #' value of the estimated covariance matrix used in the test
 #' #' @examples
-#' X=matrix(rnorm(5*20),5,20)
-#' C=diag(1,p,p)[a,]
-#' Xi=rep(0,d)
-#' TestCovariance1Gsimple(X,hypothesis="equal-variances")
+#' X <- matrix(rnorm(5*20),5,20)
+#' d <- dim(X)[1]
+#' p <- d*(d+1)/2
+#' a <- 1
+#' C <- diag(1,p,p)[a ,]
+#' Xi <- rep(0,d)
+#' TestCovariance1Gsimple(X, hypothesis="equal-variances")
 #' @export
 TestCovariance1Gsimple <- function(X, hypothesis, Xi = 0, method = "BT",
                                     repetitions = 1000, seed = NULL){
   d <-  dim(X)[1]
   p <-  d * (d + 1) / 2 #dimension vectorized covariance matrix
   if (d > 1){
-    a <-  cumsum(c(1, (d):2))
+    a <- cumsum(c(1, (d):2))
   }
   else{
-    a <-  1
+    a <- 1
   }
   if( !(hypothesis %in% c("equal-variances","uncorrelated","given-trace","given-matrix"))){
     stop("no predefined hypothesis")
@@ -315,7 +321,7 @@ TestCovariance1Gsimple <- function(X, hypothesis, Xi = 0, method = "BT",
     if(hypothesis == "given-trace"){
       Tracevector <-  matrix(0, 1, p)
       Tracevector[1, a] <-  1
-      C <-  Tracevector
+      C <- Tracevector
       if(Xi == 0){
         Xi <-  1
       }
@@ -338,7 +344,7 @@ TestCovariance1Gsimple <- function(X, hypothesis, Xi = 0, method = "BT",
         CHECK <- 1
       }
       if(is.matrix(Xi)){
-        if(is.square.matrix(Xi) & dim(Xi)[1] == d){
+        if(matrixcalc::is.square.matrix(Xi) & dim(Xi)[1] == d){
           CHECK <-  1
           Xi <- matrixcalc::vech(Xi)
         }
@@ -382,7 +388,7 @@ TestCovariance1Gsimple <- function(X, hypothesis, Xi = 0, method = "BT",
 #' Y=matrix(rnorm(5*30),5,30)
 #' XY=cbind(X,Y)
 #' nv=c(20,30)
-#' TestCovarianceMGsimple(XY,nv,hypothesis="equality",method="MC")
+#' TestCovarianceMGsimple(XY,nv,hypothesis="equal",method="MC")
 #' @export
 TestCovarianceMGsimple <- function(X, nv, hypothesis, method = "BT",
                                     repetitions = 1000, seed = NULL){
@@ -439,8 +445,8 @@ TestCovarianceMGsimple <- function(X, nv, hypothesis, method = "BT",
 #' each matrix in this list is another group, where the observation vectors are the
 #' columns. For a matrix, all groups are together in one matrix
 #' @param nv vector of sample sizes for the bootstrap samples
-#' @param hypothesis a character to choose one of the predefined hypotheses which are
-#' "equal-variances", "uncorrelated", "given-trace" and "given-matrix".
+#' @param C hypothesis matrix for calculating the ATS
+#' @param Xi a vector defining together with C the investigated hypothesis
 #' @param method a character, to chose whether bootstrap("BT") or
 #' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.
 #' @param repetitions a scalar,  indicate the number of runs for the chosen method.
@@ -450,12 +456,12 @@ TestCovarianceMGsimple <- function(X, nv, hypothesis, method = "BT",
 #' @return a list containing the p-value, the value of the test statistic and the
 #' value of the estimated covariance matrix used in the test
 #'
-#' X=matrix(rnorm(5*20),5,20)
-#' Y=matrix(rnorm(5*30),5,30)
-#' XY=cbind(X,Y)
-#' nv=c(20,30)
-#' C=Pd(2)%x%diag(1,15,15)
-#' Xi=matrix(0,30,1)
+#' X <- matrix(rnorm(5*20),5,20)
+#' Y <- matrix(rnorm(5*30),5,30)
+#' XY <- cbind(X,Y)
+#' nv <- c(20,30)
+#' C <- Pd(2)%x%diag(1,15,15)
+#' Xi <- matrix(0,30,1)
 #' TestCovarianceMG(XY,nv,C,Xi,method="MC")
 #' @export
 TestCovarianceMG <- function(X, nv, C, Xi, method = "BT", repetitions = 1000, seed = NULL){
@@ -569,7 +575,7 @@ TestCovStructure <- function(X, structure, method, repetitions = 1000, seed = NU
           ResamplingResult <- ATSwS(QF(C,HatCov),repetitions)
           }
         if(method=="BT"){
-          ResamplingResult <- sapply(1:repetitions,Bootstrap1G,n1,C,MSroot(HatCov))
+          ResamplingResult <- sapply(1:repetitions,Bootstrap,n1,C,MSroot(HatCov))
           }
 
         Teststatistic <- ATS(n1,vX,C,HatCov,Xi)

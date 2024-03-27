@@ -13,4 +13,4 @@
 # Xmean <-  rowMeans(X)
 #
 # h(Xmean, a, d)
-#
+
