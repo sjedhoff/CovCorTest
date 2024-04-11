@@ -4,7 +4,7 @@
 #' @param d a scalar, characterizing the matrix and set its dimension
 #' @return a matrix
 #'
-#
+#'
 #'
 Pd <- function(d){
   return( diag(1,d,d) - matrix(1/d,d,d) )
@@ -17,7 +17,10 @@ Pd <- function(d){
 #' @return list
 #'
 #' @noRd
-Listcheck <- function(X,nv){
+Listcheck <- function(X, nv){
+  if(is.null(nv)){
+    return(X)
+  }
   if(typeof(X) != "list"){
     v <- cumsum(c(1,nv))
     Data <- list()

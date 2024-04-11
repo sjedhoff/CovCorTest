@@ -367,7 +367,7 @@ TestCovariance1Gsimple <- function(X, hypothesis, Xi = 0, method = "BT",
 #' or corresponding vector is necessary. This is replaced by predefined hypotheses,
 #' from which is chosen. From this C and Xi are built and the function
 #' TestcovarianceMGinner is used. Previously in case data are given as a list it
-#' is checked whether all dimensions coincide,#' and in case data is given as
+#' is checked whether all dimensions coincide, and in case data is given as
 #' matrix it is transferred to a list.
 #' @param X a list or matrix containing the observation vectors. In case of a list,
 #' each matrix in this list is another group, where the observation vectors are the
