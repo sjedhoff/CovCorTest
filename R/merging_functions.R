@@ -1,4 +1,5 @@
-TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000, seed = NULL){
+TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
+                                seed = NULL, hypothesis = NULL){
   if(!is.null(seed)){
     old_seed <- .Random.seed
     on.exit({ .Random.seed <<- old_seed })
@@ -41,12 +42,24 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
   Teststatistic <- ATS(sum(nv), vX, C, HatCov, Xi)
   pvalue <- mean(ResamplingResult < Teststatistic)
 
-  return(list("pvalue"=pvalue, "Teststatistic"=Teststatistic, "CovarianceMatrix"=HatCov))
+
+  CovTest <- list("pvalue" = pvalue,
+                  "Teststatistic" = Teststatistic,
+                  "CovarianceMatrix" = HatCov,
+                  "C" = C,
+                  "Xi" = Xi,
+                  "method" = method,
+                  "repetitions" = repetitions,
+                  "hypothesis" = hypothesis)
+
+  class(CovTest) <- "CovTest"
+
+  return(CovTest)
 
 }
 
 
-TestCovariance_simple <- function(X, nv = NULL, hypothesis, method = "MC",
+TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "MC",
                                   repetitions = 1000, seed = NULL){
 
   X <- Listcheck(X,nv)
@@ -68,8 +81,12 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, method = "MC",
   p <- d * (d+1) / 2
   ifelse(d > 1, a <- cumsum(c(1, d:2)), a <- 1)
 
-  if(!(hypothesis %in% c("equal", "equal-trace", "equal-diagonals"))){
+  if(!(hypothesis %in%
+       c("equal", "equal-trace", "equal-diagonals", "given-trace", "given-matrix", "uncorrelated"))){
     stop("no predefined hypothesis")
+  }
+  if(!is.null(A) & !(hypothesis %in% c("given-trace", "given-matrix"))){
+    warning(paste0("the input argument A is not used, since the selected hypothesis is '", hypothesis, "'"))
   }
 
   if(hypothesis == "equal"){
@@ -82,9 +99,72 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, method = "MC",
       Xi <- rep(0, p*d)
     }
     return(TestCovariance_base(X, nv = nv, C = C, Xi = Xi, method = method,
-                               repetitions = repetitions, seed = seed))
-
-
+                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+  }
+  if(hypothesis == "given-trace"){
+    if(groups > 1){
+      stop("the hypothesis 'given-trace' can only be tested for one group")
+    }
+    tracevec <- matrix(0, 1, p)
+    tracevec[1,a] <- 1
+    C <- tracevec
+    if(is.null(A)){
+      A <- 1
+    }
+    return(TestCovariance_base(X, nv = nv, C = C, Xi = A, method = method,
+                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+  }
+  if(hypothesis == "given-matrix"){
+    if(groups > 1){
+      stop("the hypothesis 'given-matrix' can only be tested for one group")
+    }
+    C <- diag(1, p, p)
+    if(is.null(A)){
+      Xi <- matrixcalc::vech(diag(1, d, d))
+    }
+    else{
+      if(!is.matrix(A)){
+        stop("the given matrix A must be a matrix with dimensions d x d")
+      }
+      if(matrixcalc::is.square.matrix(A) & dim(A)[1] == d){
+        Xi <- matrixcalc::vech(A)
+      }
+      else{
+        stop("the given matrix A must be a square matrix with dimensions d x d")
+      }
+    }
+    return(TestCovariance_base(X, nv = nv, C = C, Xi = Xi, method = method,
+                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+  }
+  if(hypothesis == "uncorrelated"){
+    if(groups > 1){
+      stop("the hypothesis 'uncorrelated' can only be tested for one group")
+    }
+    C <- diag(1, p, p)[-a,]
+    Xi <- rep(0, p - d)
+    return(TestCovariance_base(X = X, nv = nv, C = C, Xi = Xi, method = method,
+                            repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+  }
+  if(hypothesis == "equal-trace"){
+    if(groups == 1){
+      stop("the hypothesis 'equal-trace' can only be tested for multiple groups")
+    }
+    tracevec <- matrix(0, 1, p)
+    tracevec[1, a] <- 1
+    C <- Pd(groups) %x% tracevec
+    Xi <- rep(0, groups)
+    return(TestCovariance_base(X = X, nv = nv, C = C, Xi = Xi, method = method,
+                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+  }
+  if(hypothesis == "equal-diagonals"){
+    if(groups == 1){
+      stop("the hypothesis 'equal-trace' can only be tested for multiple groups")
+    }
+    C <- Pd(groups) %x% diag(1, p, p)[a,]
+    Xi <- rep(0, times = groups * d)
+    return(TestCovariance_base(X = X, nv = nv, C = C, Xi = Xi, method = method,
+                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
   }
 
 }
+
