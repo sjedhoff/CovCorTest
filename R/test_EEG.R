@@ -26,7 +26,7 @@ X_list <- list(t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars]),
           t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "SCC",vars]))
 nv <- c(12,27,20,24,30,47)
 
-TestCovariance_simple(X = X, nv = nv, hypothesis = "equal", method = "MC",
+TestCovariance_simple(X = X, nv = nv, hypothesis = "uncorrelated", method = "MC",
                                    repetitions = 1000, seed = NULL)
 # $pvalue
 # [1] 0.954
@@ -41,20 +41,22 @@ TestCovariance_simple(X = X_list[[1]], hypothesis = "equal")
 # $Teststatistic
 # [1] 3.518496
 
-TestCovariance1Gsimple(X_list[[1]], hypothesis = "given-trace", Xi = 1)
-# $pvalue
-# [1] 0.969
-#
-# $Teststatistic
-# [1] 6.321903
 
-TestCovariance_simple(X, nv = nv, hypothesis = "given-trace")
+TestCovariance_simple(X_list[[1]], hypothesis = "given-trace", A = 3)
 
 
 A <- matrix(rnorm(d*d), ncol = d, nrow = d)
 TestCovariance_simple(X_list[[1]], hypothesis = "given-matrix", A = A )
-TestCovariance1Gsimple(X_list[[1]], hypothesis = "given-matrix", Xi = A)
 
 
 TestCovariance_simple(X_list[[1]], hypothesis = "uncorrelated", A = A)
-TestCovariance1Gsimple(X_list[[1]], hypothesis = "uncorrelated", Xi = A)
+
+
+TestCovariance_structure(X = X_list[[1]], structure = "sphericity", method = "MC")
+
+TestCovariance_structure(X = X_list, structure = "sphericity", method = "MC")
+
+X_one <- as.matrix(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",
+                           c("brainrate_temporal", "brainrate_frontal","brainrate_central",
+                             "complexity_temporal","complexity_frontal", "complexity_central")])
+TestCovariance_structure(X = X_one, structure = "autoregressive", method = "MC")

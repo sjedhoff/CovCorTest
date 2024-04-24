@@ -1,26 +1,16 @@
-## bekannt aus dem Teil zu linearen Modellen:
-Baum.lm <- lm(Volume ~ Girth, data = datasets::trees)
-## neues Objekt (und Objektklasse) konstruieren:
-object <- list(data = datasets::trees[, c("Girth" , "Volume" )],
-               lm.obj = Baum.lm)
-class(object) <- "nurSoEinName"
-print.nurSoEinName <- function(x, ...){
-  cat(" Data:\n=====\n\n" )
-  print(x$data, ...)
-  cat(" \n\nEstimated model:\n================\n" )
-  print(x$lm.obj, ...)
-  invisible(x)
-}
-object
 
+
+#' @exportS3Method
 print.CovTest <- function(x, ...){
-  cat("Hypothesis:")
-  print(x$hypothesis)
-  cat("p-Value:")
-  print(x$pvalue)
+  method_print <- ifelse(x$method == "MC", "Monte-Carlo-technique", "Bootstrap")
+  group_text <- ifelse(length(x$nv) == 1, "one group", paste0("",length(x$nv), "  groups"))
+
+  cat("\n
+       \t Covariance Test \n \t    ",group_text,"\n\n Hypothesis: \t\t",
+  x$hypothesis,
+  "\n Teststatistic value: \t",
+  round(x$Teststatistic, digits = 4),
+  "\n p-value: \t \t",
+  round(x$pvalue, digits = 4),
+  "\n \n p-value computed using ", method_print, " and n=", x$repetitions, "\n", sep = "")
 }
-
-x <- TestCovariance_simple(X_list[[1]], hypothesis = "uncorrelated")
-
-x_test <- t.test(rnorm(10))
-str(x_test)

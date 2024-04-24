@@ -1,0 +1,384 @@
+#' @title Base function for testing covariance matrices
+#'
+#' @description This function conducts the test for hypotheses regarding the
+#' covariance matrix. Depending on the chosen method a
+#' bootstrap  or Monte-Carlo-technique is used to calculate p-value of the ATS
+#' based on a specified number of runs.
+#' @param X a list or matrix containing the observation vectors. In case of a list,
+#' each matrix in this list is another group, where the observation vectors are the
+#' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
+#' the group sizes. For one group, nv is not necessary
+#' @param nv vector of sample sizes for the bootstrap samples per group
+#' @param C hypothesis matrix for calculating the ATS
+#' @param Xi a vector defining together with C the investigated hypothesis
+#' @param method a character, to chose whether bootstrap("BT") or
+#' Monte-Carlo-technique("MC") is used.
+#' @param repetitions a scalar,  indicate the number of runs for the chosen method.
+#' The predefined value is 1,000, and the number should not be below 500.
+#' @param seed A seed, if it should be set for reproducibility. Predefined values
+#' is NULL, which means no seed is set. A chosen seed is deleted at the end.
+#' @param hypothesis character or NULL, will be displayed in the print call
+#' @return an object of the class 'CovTest'
+#'
+#' @export
+TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
+                                seed = NULL, hypothesis = NULL){
+  if(!is.null(seed)){
+    old_seed <- .Random.seed
+    on.exit({ .Random.seed <<- old_seed })
+    set.seed(seed)
+  }
+
+  # just one group is nv = NULL or nv has length 1
+  if(is.null(nv) | (length(nv) == 1)){
+    nv <- dim(X)[2]
+    vX <- matrixcalc::vech(tvar(X))
+    Xq <- matrix(apply(X-rowMeans(X),2,vtcrossprod),ncol=nv)
+    HatCov <- tvar(Xq)
+    MSrootHatCov <- MSroot(HatCov)
+  }
+  # multiple groups
+  else{
+    N  <- sum(nv)
+    kappainvv <- N / nv
+
+    Datac <- lapply(X, centering) #Centered random variables
+    VarData <- lapply(X, tvar)
+    vX <-  unlist(lapply(VarData, matrixcalc::vech))
+    DataQ <- mapply(Qvech, Datac, nv, SIMPLIFY = FALSE)
+    HatCov_list <- lapply(DataQ, tvar)
+
+    MSrootHatCov <- lapply(HatCov_list, MSroot)
+    HatCov <- WDirect.sumL(HatCov_list, kappainvv)
+  }
+
+  if(method == "MC"){
+    ResamplingResult <- ATSwS(QF(C, HatCov), repetitions)
+  }
+  else if(method == "BT"){
+    ResamplingResult <- sapply(1:repetitions, Bootstrap, nv, C, MSrootHatCov)
+  }
+  else{
+    stop("method must be 'MC' or 'BT'")
+  }
+
+  Teststatistic <- ATS(sum(nv), vX, C, HatCov, Xi)
+  pvalue <- mean(ResamplingResult < Teststatistic)
+
+  if(is.null(hypothesis)){
+    hypothesis <- "C * v = Xi"
+  }
+
+  CovTest <- list("pvalue" = pvalue,
+                  "Teststatistic" = Teststatistic,
+                  "CovarianceMatrix" = HatCov,
+                  "C" = C,
+                  "Xi" = Xi,
+                  "method" = method,
+                  "repetitions" = repetitions,
+                  "hypothesis" = hypothesis,
+                  "nv" = nv)
+
+  class(CovTest) <- "CovTest"
+
+  return(CovTest)
+
+}
+
+
+
+#' @title Simplified call for test regarding covariance matrices
+#'
+#' @description This function is for more applied users so no hypothesis matrix or
+#' corresponding vector is necessary. This is replaced by predefined hypotheses,
+#' from which is chosen. From this C and Xi are built and the function
+#'  \code{\link{TestCovariance_base}} is used.
+#' @param X a list or matrix containing the observation vectors. In case of a list,
+#' each matrix in this list is another group, where the observation vectors are the
+#' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
+#' the group sizes. For one group, nv is not necessary
+#' @param nv vector of sample sizes for the bootstrap samples per group
+#' @param hypothesis a character to choose one of the predefined hypotheses which are
+#' "equal", "equal-trace", "equal-diagonals", "given-trace", "given-matrix" and "uncorrelated"
+#' @param A a scalar or square matrix to specify the hypothesis in case of
+#' "given-trace" or "given-matrix". The value is predefined as NULL, which means
+#' trace of 1 resp the identity as given matrix.
+#' @param method a character, to chose whether bootstrap("BT") or
+#' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.
+#' @param repetitions a scalar,  indicate the number of runs for the chosen method.
+#' The predefined value is 1,000, and the number should not be below 500.
+#' @param seed A seed, if it should be set for reproducibility. Predefined values
+#' is NULL, which means no seed is set. A chosen seed is deleted at the end.
+#' @return an object of the class 'CovTest'
+#'
+#' @examples
+#' # Load the data
+#' data("EEGwide", package = "MANOVA.RM")
+#'
+#' # Part the data into six groups of sex and diagnosis
+#' X_list <- list(t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars]),
+#'                t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "MCI",vars]),
+#'                t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "SCC",vars]),
+#'                t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",vars]),
+#'                t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "MCI",vars]),
+#'                t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "SCC",vars]))
+#'
+#' nv <- c(12,27,20,24,30,47)
+#'
+#' TestCovariance_simple(X = X, nv = nv, hypothesis = "equal-trace", method = "MC",
+#'                      repetitions = 1000, seed = NULL)
+#'
+#' TestCovariance_simple(X_list[[1]], hypothesis = "given-trace", A = 3)
+#'
+#' @export
+TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "MC",
+                                  repetitions = 1000, seed = NULL){
+
+  X <- Listcheck(X,nv)
+  # multiple groups
+  if(!is.null(nv)){
+    dimensions <- sapply(X, dim)[1,]
+    if(max(dimensions) != mean(dimensions)){
+      stop("dimensions do not accord")
+    }
+    groups <- length(nv)
+  }
+  # one group
+  else{
+    dimensions <- dim(X)[1]
+    groups <- 1
+  }
+
+  d <- dimensions[1]
+  p <- d * (d+1) / 2
+  ifelse(d > 1, a <- cumsum(c(1, d:2)), a <- 1)
+
+  if(!(hypothesis %in%
+       c("equal", "equal-trace", "equal-diagonals", "given-trace", "given-matrix", "uncorrelated"))){
+    stop("no predefined hypothesis")
+  }
+  if(!is.null(A) & !(hypothesis %in% c("given-trace", "given-matrix"))){
+    warning(paste0("the input argument A is not used, since the selected hypothesis is '", hypothesis, "'"))
+  }
+
+  if(hypothesis == "equal"){
+    if(groups == 1){
+      C <- diag(1, p, p)[a,]
+      Xi <- rep(0, d)
+    }
+    else{
+      C <- Pd(groups) %x% diag(1, p, p)
+      Xi <- rep(0, p*d)
+    }
+    return(TestCovariance_base(X, nv = nv, C = C, Xi = Xi, method = method,
+                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+  }
+  if(hypothesis == "given-trace"){
+    if(groups > 1){
+      stop("the hypothesis 'given-trace' can only be tested for one group")
+    }
+    tracevec <- matrix(0, 1, p)
+    tracevec[1,a] <- 1
+    C <- tracevec
+    if(is.null(A)){
+      A <- 1
+    }
+    return(TestCovariance_base(X, nv = nv, C = C, Xi = A, method = method,
+                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+  }
+  if(hypothesis == "given-matrix"){
+    if(groups > 1){
+      stop("the hypothesis 'given-matrix' can only be tested for one group")
+    }
+    C <- diag(1, p, p)
+    if(is.null(A)){
+      Xi <- matrixcalc::vech(diag(1, d, d))
+    }
+    else{
+      if(!is.matrix(A)){
+        stop("the given matrix A must be a matrix with dimensions d x d")
+      }
+      if(matrixcalc::is.square.matrix(A) & dim(A)[1] == d){
+        Xi <- matrixcalc::vech(A)
+      }
+      else{
+        stop("the given matrix A must be a square matrix with dimensions d x d")
+      }
+    }
+    return(TestCovariance_base(X, nv = nv, C = C, Xi = Xi, method = method,
+                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+  }
+  if(hypothesis == "uncorrelated"){
+    if(groups > 1){
+      stop("the hypothesis 'uncorrelated' can only be tested for one group")
+    }
+    C <- diag(1, p, p)[-a,]
+    Xi <- rep(0, p - d)
+    return(TestCovariance_base(X = X, nv = nv, C = C, Xi = Xi, method = method,
+                            repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+  }
+  if(hypothesis == "equal-trace"){
+    if(groups == 1){
+      stop("the hypothesis 'equal-trace' can only be tested for multiple groups")
+    }
+    tracevec <- matrix(0, 1, p)
+    tracevec[1, a] <- 1
+    C <- Pd(groups) %x% tracevec
+    Xi <- rep(0, groups)
+    return(TestCovariance_base(X = X, nv = nv, C = C, Xi = Xi, method = method,
+                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+  }
+  if(hypothesis == "equal-diagonals"){
+    if(groups == 1){
+      stop("the hypothesis 'equal-trace' can only be tested for multiple groups")
+    }
+    C <- Pd(groups) %x% diag(1, p, p)[a,]
+    Xi <- rep(0, times = groups * d)
+    return(TestCovariance_base(X = X, nv = nv, C = C, Xi = Xi, method = method,
+                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+  }
+
+}
+
+#' @title Test for structure of data's covariance matrix
+#'
+#' @description With this function the covariance matrix of data can be checked
+#' for one of the usual structures. Depending on the chosen method a bootstrap or
+#' Monte-Carlo-technique is used to calculate p-value of the ATS based on a
+#' specified number of runs.
+#' @param X  a matrix containing the observation vectors as columns
+#' @param structure a character specifying the structure regarding them the
+#' covariance matrix should be checked. Options are "autoregressive", "FO-autoregressive"
+#' "diagonal", "sphericity", "compoundsymmetry" and "toeplitz".
+#' @param method a character, to chose whether bootstrap("BT") or
+#' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.
+#' @param repetitions a scalar,  indicate the number of runs for the chosen method.
+#' The predefined value is 1,000, and the number should not be below 500.
+#' @param seed A seed, if it should be set for reproducibility. Predefined values
+#' is NULL, which means no seed is set. A chosen seed is deleted at the end.
+#' @return an object of the class 'CovTest'
+#'
+#' @exampls
+#' # Load the data
+#' data("EEGwide", package = "MANOVA.RM")
+#'
+#' # Select only the males with the diagnosis AF
+#' X <- as.matrix(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",
+#'                           c("brainrate_temporal", "brainrate_frontal","brainrate_central",
+#'                             "complexity_temporal","complexity_frontal", "complexity_central")])
+#'
+#' TestCovariance_structure(X = X, structure = "autoregressive", method = "MC")
+#'
+#' @export
+TestCovariance_structure <- function(X, structure, method, repetitions = 1000, seed = NULL){
+  if(!is.null(seed)){
+    old_seed <- .Random.seed
+    on.exit({ .Random.seed <<- old_seed })
+    set.seed(seed)
+  }
+  if(is.list(X) & (length(X) > 1)){
+    warning("The input X must be a matrix but is a list. Only the first element of the list is used.")
+    X <- X[[1]]
+  }
+
+  n1 <- dim(X)[2]
+  d <- dim(X)[1]
+  if(d==1){ stop("Structures can be only investigated for more than one dimension") }
+  if(!(structure %in% c("autoregressive", "FO-autoregressive", "diagonal", "sphericity", "compoundsymmetry", "toeplitz") )){
+    stop("no predefined hypothesis")
+  }
+
+  if(d > 1){
+    p <- d * (d + 1) / 2
+    a <- cumsum(c(1, (d):2))
+
+    vX <- dvech(tvar(X), a, d, p, inc_diag = TRUE)
+    Xq <- apply(X - rowMeans(X), 2, vdtcrossprod, a, d, p)
+    HatCov <- tvar(Xq)
+
+    if(structure == "autoregressive"){
+      C <- matrixcalc::direct.sum(diag(1, d, d), Pd(p - d))
+      Xi <- c(rep(1, times = d), rep(0, times = p - d))
+      Jacobi <- Jacobian(vX, a, d, p, 'ascending_root_fct')
+      HatCovh <- QF(Jacobi, HatCov)
+
+      if(method == "MC") {
+        ResamplingResult <- ATSwS(QF(C, HatCovh), repetitions)
+      }
+      if(method == "BT") {
+        ResamplingResult <- sapply(1:repetitions, Bootstrap_trans, n1, a ,d, p,
+                                   C, MSroot(HatCov), vX, 'ascending_root_fct')
+      }
+      Teststatistic <- ATS(n1, ascending_root_fct(vX, a, d), C, HatCovh, Xi)
+      pvalue <- mean(ResamplingResult < Teststatistic)
+    }
+
+    if(structure == "FO-autoregressive"){
+      C <- Pd(d)
+      for(l in 2:d){
+        C <- matrixcalc::direct.sum(C, Pd(d - l + 1))
+      }
+      C <- matrixcalc::direct.sum(C, Pd(d - 1))
+      Xi <- rep(0, times = p + d - 1)
+      Jacobi <- Jacobian(vX, a, d, p, 'subdiagonal_mean_ratio_fct')
+      HatCovg <- QF(Jacobi, HatCov)
+
+      if(method == "MC"){
+        ResamplingResult <- ATSwS(QF(C, HatCovg), repetitions)
+      }
+      if(method == "BT"){
+        ResamplingResult <- sapply(1:repetitions, Bootstrap_trans, n1, a, d, p,
+                                   C, MSroot(HatCov), vX, 'subdiagonal_mean_ratio_fct')
+      }
+      Teststatistic <- ATS(n1, subdiagonal_mean_ratio_fct(vX, a, d), C, HatCovg, Xi)
+      pvalue <- mean(ResamplingResult < Teststatistic)
+    }
+
+    if(structure %in% c("diagonal", "sphericity", "compoundsymmetry", "toeplitz")){
+
+      Xi <- rep(0, p)
+
+      if(structure == "diagonal"){
+        C <- matrixcalc::direct.sum(matrix(0, d, d), diag(1, p - d, p - d))
+      }
+      if(structure == "sphericity"){
+        C <- matrixcalc::direct.sum(Pd(d), diag(1, p - d, p - d))
+      }
+      if(structure == "compoundsymmetry"){
+        C <- matrixcalc::direct.sum(Pd(d), Pd(p - d))
+      }
+      if(structure == "toeplitz"){
+        C <- Pd(d)
+        for(l in 2:d){
+          C <- matrixcalc::direct.sum(C, Pd(d - l + 1))
+        }
+      }
+
+      if(method == "MC"){
+        ResamplingResult <- ATSwS(QF(C, HatCov), repetitions)
+      }
+      if(method == "BT"){
+        ResamplingResult <- sapply(1:repetitions, Bootstrap, n1, C, MSroot(HatCov))
+      }
+
+      Teststatistic <- ATS(n1, vX, C, HatCov, Xi)
+      pvalue <- mean(ResamplingResult < Teststatistic)
+
+    }
+  }
+  CovTest <- list("pvalue" = pvalue,
+                  "Teststatistic" = Teststatistic,
+                  "CovarianceMatrix" = HatCov,
+                  "C" = C,
+                  "Xi" = Xi,
+                  "method" = method,
+                  "repetitions" = repetitions,
+                  "hypothesis" = structure,
+                  "nv" = 1)
+
+  class(CovTest) <- "CovTest"
+
+  return(CovTest)
+}
+
+
