@@ -34,16 +34,6 @@ Listcheck <- function(X, nv){
   return(Data)
 }
 
-#' @title Matrix product, where the order is switched
-#'
-#' @param X,M matrices that will be multiplied
-#' @return matrix
-#' @noRd
-#'
-MprodBackward <- function(X,M){
-  return(M%*%X)
-}
-
 
 #' @title Quadratic form for vectors and matrices
 #'
@@ -103,7 +93,7 @@ dvech <- function(X, a, d, p, inc_diag){
   }
 }
 
-vechp<-function(x){+
+vechp<-function(x){
   if(!matrixcalc::is.square.matrix(x)){
     stop("argument x is not a square numeric matrix")
   }
@@ -168,13 +158,7 @@ centering <- function(X){
 }
 
 
-#' @title Function to calculate variance of transposed observations
-#'
-#' @param X matrix
-#' @return matrix
-tvar <- function(X){
-  return(stats::var(t(X)))
-}
+
 
 
 #' @title Auxiliary function to calculate the covariance of the vectorized correlation matrix

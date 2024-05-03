@@ -124,7 +124,7 @@ ATS_fun <- function(N, X, C, v, a, d, p, fun){
   Xmean <-  rowMeans(X)
   CDiff <- C %*% (do.call(fun, list(Xmean, a, d)) - do.call(fun, list(v, a, d)))
   Jacobi <-  Jacobian(Xmean, a, d, p, fun)
-  HatCov <-  tvar(X)
+  HatCov <-  stats::var(t(X))
   Trace <-  sum(diag(QF(C %*% Jacobi, HatCov)))
   return(c(N * crossprod(CDiff) / Trace))
 }
@@ -173,7 +173,7 @@ Bootstrap <- function(N.sim, nv, C, MSrootHatCov){
   # one group
   if(length(nv) == 1){
     XPB <- gData(MSrootHatCov, nv)
-    PBHatCov <- tvar(XPB)
+    PBHatCov <- stats::var(t(XPB))
     return(ATS(nv, rowMeans(XPB), C, PBHatCov))
   }
   # multiple groups
@@ -182,7 +182,7 @@ Bootstrap <- function(N.sim, nv, C, MSrootHatCov){
     kappainvv <- N / nv
 
     DataPB <- mapply(gData, MSrootHatCov, nv, SIMPLIFY = FALSE)
-    PBHatCov <- WDirect.sumL(lapply(DataPB, tvar), kappainvv)
+    PBHatCov <- WDirect.sumL(lapply(DataPB, function(X) stats::var(t(X))), kappainvv)
     return(ATS(N, unlist(lapply(DataPB, rowMeans)), C, PBHatCov))
 
   }

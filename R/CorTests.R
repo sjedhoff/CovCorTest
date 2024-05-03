@@ -49,11 +49,11 @@ TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000
 
   # one group
   if(length(nv) == 1){
-    VarData <- tvar(X)
+    VarData <- stats::var(t(X))
     CorData <- stats::cov2cor(VarData)
     vCorData <- vechp(CorData)
     Xq <- matrix(apply(X-rowMeans(X),2,vtcrossprod),nrow=p,ncol=nv)
-    HatCov <- tvar(Xq)
+    HatCov <- stats::var(t(Xq))
     MvrH1 <- (L-1/2*vCorData*M1)
     MvrH2 <- sqrt(diag(as.vector(1/vtcrossprod(matrix(matrixcalc::vech(VarData)[a]))),p,p))
     Upsi <- QF(MvrH1%*%MvrH2,HatCov)
@@ -64,11 +64,11 @@ TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000
   # multiple groups
   else{
     Datac <- lapply(X, centering)
-    VarData <- lapply(X, tvar)
+    VarData <- lapply(X, function(X) stats::var(t(X)))
     CorData <- lapply(VarData, stats::cov2cor)
     vCorData <- lapply(CorData, vechp)
     DataQ <- mapply(Qvech, Datac, nv, SIMPLIFY = FALSE)
-    HatCov <- lapply(DataQ, tvar)
+    HatCov <- lapply(DataQ, function(X) stats::var(t(X)))
     MvrH <- StUpsi <- list()
 
     for (i in 1:length(nv)){
@@ -235,11 +235,11 @@ TestCorrelation_structure <- function(X, structure, method = "BT", repetitions =
     M[i, c(matrixcalc::vech(t(H))[i], matrixcalc::vech(H)[i])] <- 1
   }
   M1 <- L %*% (M + Q)
-  VarData <- tvar(X)
+  VarData <- stats::var(t(X))
   CorData <- stats::cov2cor(VarData)
   vCorData <- dvech(CorData, a, d, pu, inc_diag = FALSE)
   Xq <- matrix(apply(X - rowMeans(X), 2, vtcrossprod), nrow = p, ncol = n1)
-  HatCov <- tvar(Xq)
+  HatCov <- stats::var(t(Xq))
   MvrH1 <- (L - 1 / 2 * vechp(CorData) * M1)
 
   MvrH2 <- sqrt(diag(as.vector(1 / vtcrossprod(matrix(matrixcalc::vech(VarData)[a]))), p, p))

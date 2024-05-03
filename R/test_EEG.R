@@ -1,4 +1,4 @@
-# ### Test Data
+# # ### Test Data
 # data("EEG", package = "MANOVA.RM")
 #
 # str(EEG)
@@ -25,7 +25,7 @@
 #           t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "MCI",vars]),
 #           t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "SCC",vars]))
 # nv <- c(12,27,20,24,30,47)
-#
+
 # TestCovariance_simple(X = X, nv = nv, hypothesis = "uncorrelated", method = "MC",
 #                                    repetitions = 1000, seed = NULL)
 # # $pvalue

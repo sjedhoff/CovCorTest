@@ -32,9 +32,9 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
   # just one group is nv = NULL or nv has length 1
   if(is.null(nv) | (length(nv) == 1)){
     nv <- dim(X)[2]
-    vX <- matrixcalc::vech(tvar(X))
+    vX <- matrixcalc::vech(stats::var(t(X)))
     Xq <- matrix(apply(X-rowMeans(X),2,vtcrossprod),ncol=nv)
-    HatCov <- tvar(Xq)
+    HatCov <- stats::var(t(Xq))
     MSrootHatCov <- MSroot(HatCov)
   }
   # multiple groups
@@ -43,10 +43,10 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
     kappainvv <- N / nv
 
     Datac <- lapply(X, centering) #Centered random variables
-    VarData <- lapply(X, tvar)
+    VarData <- lapply(X, function(X) stats::var(t(X)))
     vX <-  unlist(lapply(VarData, matrixcalc::vech))
     DataQ <- mapply(Qvech, Datac, nv, SIMPLIFY = FALSE)
-    HatCov_list <- lapply(DataQ, tvar)
+    HatCov_list <- lapply(DataQ, function(X) stats::var(t(X)))
 
     MSrootHatCov <- lapply(HatCov_list, MSroot)
     HatCov <- WDirect.sumL(HatCov_list, kappainvv)
@@ -186,6 +186,7 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
     C <- tracevec
     if(is.null(A)){
       A <- 1
+      warning("since no input A for a trace to be tested is given, a trace of 1 is tested")
     }
     return(TestCovariance_base(X, nv = nv, C = C, Xi = A, method = method,
                                repetitions = repetitions, seed = seed, hypothesis = hypothesis))
@@ -197,6 +198,7 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
     C <- diag(1, p, p)
     if(is.null(A)){
       Xi <- matrixcalc::vech(diag(1, d, d))
+      warning("since no input A for a matrix to be tested is given, the identity matrix is tested")
     }
     else{
       if(!is.matrix(A)){
@@ -296,9 +298,9 @@ TestCovariance_structure <- function(X, structure, method, repetitions = 1000, s
     p <- d * (d + 1) / 2
     a <- cumsum(c(1, (d):2))
 
-    vX <- dvech(tvar(X), a, d, p, inc_diag = TRUE)
+    vX <- dvech(stats::var(t(X)), a, d, p, inc_diag = TRUE)
     Xq <- apply(X - rowMeans(X), 2, vdtcrossprod, a, d, p)
-    HatCov <- tvar(Xq)
+    HatCov <- stats::var(t(Xq))
 
     if(structure == "autoregressive"){
       C <- matrixcalc::direct.sum(diag(1, d, d), Pd(p - d))

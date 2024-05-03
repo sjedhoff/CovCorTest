@@ -119,11 +119,11 @@ TayappMG <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M, L, P
 
   XPB <- mapply(gData, MSrootStUpsi, repetitions, SIMPLIFY = FALSE)
 
-  PUX <- lapply(XPB, MprodBackward, P)
-  MUX0 <- lapply(XPB, MprodBackward, (M %*% Q))
+  PUX <- lapply(XPB, function(X) P %*% X )
+  MUX0 <- lapply(XPB, function(X) (M %*% Q) %*% X )
   HX <- lapply(PUX, Qvech, repetitions, SIMPLIFY = FALSE)
 
-  Part1 <- mapply(MprodBackward, XPB, MvrH, SIMPLIFY = FALSE)
+  Part1 <- mapply(function(A, B) A %*% B, MvrH, XPB, SIMPLIFY = FALSE)
   Part2 <- mapply("*", lapply(vechCorData, as.vector), HX, SIMPLIFY = FALSE)
   Part3 <- mapply("*", XPB, MUX0, SIMPLIFY = FALSE)
   Part4 <- mapply("%*%", DvechCorDataM, HX, SIMPLIFY = FALSE)
