@@ -23,7 +23,7 @@ the group sizes. For one group, nv is not necessary}
 \item{nv}{vector of sample sizes for the bootstrap samples per group}
 
 \item{hypothesis}{a character to choose one of the predefined hypotheses which are
-"equal-variances", "uncorrelated", "given-trace" and "given-matrix".}
+"equal", "equal-trace", "equal-diagonals", "given-trace", "given-matrix" and "uncorrelated"}
 
 \item{A}{a scalar or square matrix to specify the hypothesis in case of
 "given-trace" or "given-matrix". The value is predefined as NULL, which means
@@ -46,4 +46,26 @@ This function is for more applied users so no hypothesis matrix or
 corresponding vector is necessary. This is replaced by predefined hypotheses,
 from which is chosen. From this C and Xi are built and the function
 \code{\link{TestCovariance_base}} is used.
+}
+\examples{
+# Load the data
+data("EEGwide", package = "MANOVA.RM")
+
+vars <- colnames(EEGwide)[1:6]
+
+# Part the data into six groups of sex and diagnosis
+X_list <- list(t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars]),
+               t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "MCI",vars]),
+               t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "SCC",vars]),
+               t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",vars]),
+               t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "MCI",vars]),
+               t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "SCC",vars]))
+
+nv <- unlist(lapply(X_list, ncol))
+
+TestCovariance_simple(X = X_list, nv = nv, hypothesis = "equal-trace", method = "MC",
+                     repetitions = 1000, seed = NULL)
+
+TestCovariance_simple(X_list[[1]], hypothesis = "given-trace", A = 3)
+
 }

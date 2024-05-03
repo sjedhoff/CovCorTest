@@ -31,3 +31,15 @@ for one of the usual structures. Depending on the chosen method a bootstrap or
 Monte-Carlo-technique is used to calculate p-value of the ATS based on a
 specified number of runs.
 }
+\examples{
+# Load the data
+data("EEGwide", package = "MANOVA.RM")
+
+# Select only the males with the diagnosis AF
+X <- as.matrix(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",
+                          c("brainrate_temporal", "brainrate_frontal","brainrate_central",
+                            "complexity_temporal","complexity_frontal", "complexity_central")])
+
+TestCovariance_structure(X = X, structure = "autoregressive", method = "MC")
+
+}

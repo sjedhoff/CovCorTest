@@ -69,12 +69,13 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
     hypothesis <- "C * v = Xi"
   }
 
-  CovTest <- list("pvalue" = pvalue,
+  CovTest <- list("method" = "Covariance",
+                  "pvalue" = pvalue,
                   "Teststatistic" = Teststatistic,
                   "CovarianceMatrix" = HatCov,
                   "C" = C,
                   "Xi" = Xi,
-                  "method" = method,
+                  "resampling_method" = method,
                   "repetitions" = repetitions,
                   "hypothesis" = hypothesis,
                   "nv" = nv)
@@ -111,9 +112,12 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
 #' is NULL, which means no seed is set. A chosen seed is deleted at the end.
 #' @return an object of the class 'CovTest'
 #'
+#' @import MANOVA.RM
 #' @examples
 #' # Load the data
 #' data("EEGwide", package = "MANOVA.RM")
+#'
+#' vars <- colnames(EEGwide)[1:6]
 #'
 #' # Part the data into six groups of sex and diagnosis
 #' X_list <- list(t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars]),
@@ -123,9 +127,9 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
 #'                t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "MCI",vars]),
 #'                t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "SCC",vars]))
 #'
-#' nv <- c(12,27,20,24,30,47)
+#' nv <- unlist(lapply(X_list, ncol))
 #'
-#' TestCovariance_simple(X = X, nv = nv, hypothesis = "equal-trace", method = "MC",
+#' TestCovariance_simple(X = X_list, nv = nv, hypothesis = "equal-trace", method = "MC",
 #'                      repetitions = 1000, seed = NULL)
 #'
 #' TestCovariance_simple(X_list[[1]], hypothesis = "given-trace", A = 3)
@@ -258,7 +262,7 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
 #' is NULL, which means no seed is set. A chosen seed is deleted at the end.
 #' @return an object of the class 'CovTest'
 #'
-#' @exampls
+#' @examples
 #' # Load the data
 #' data("EEGwide", package = "MANOVA.RM")
 #'
@@ -366,12 +370,13 @@ TestCovariance_structure <- function(X, structure, method, repetitions = 1000, s
 
     }
   }
-  CovTest <- list("pvalue" = pvalue,
+  CovTest <- list("method" = "Covariance",
+                  "pvalue" = pvalue,
                   "Teststatistic" = Teststatistic,
                   "CovarianceMatrix" = HatCov,
                   "C" = C,
                   "Xi" = Xi,
-                  "method" = method,
+                  "resampling_method" = method,
                   "repetitions" = repetitions,
                   "hypothesis" = structure,
                   "nv" = 1)

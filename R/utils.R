@@ -103,6 +103,13 @@ dvech <- function(X, a, d, p, inc_diag){
   }
 }
 
+vechp<-function(x){+
+  if(!matrixcalc::is.square.matrix(x)){
+    stop("argument x is not a square numeric matrix")
+  }
+
+  return(as.vector(t(x)[!upper.tri(x,TRUE)]))
+}
 
 
 #' @title Weighted direct sums for lists

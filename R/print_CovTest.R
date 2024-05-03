@@ -2,11 +2,11 @@
 
 #' @exportS3Method
 print.CovTest <- function(x, ...){
-  method_print <- ifelse(x$method == "MC", "Monte-Carlo-technique", "Bootstrap")
+  method_print <- ifelse(x$resampling_method == "MC", "Monte-Carlo-technique", "Bootstrap")
   group_text <- ifelse(length(x$nv) == 1, "one group", paste0("",length(x$nv), "  groups"))
 
   cat("\n
-       \t Covariance Test \n \t    ",group_text,"\n\n Hypothesis: \t\t",
+       \t ",x$method," Test \n \t    ",group_text,"\n\n Hypothesis: \t\t",
   x$hypothesis,
   "\n Teststatistic value: \t",
   round(x$Teststatistic, digits = 4),

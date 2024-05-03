@@ -83,8 +83,25 @@ Jacobian <- function(X, a, d, p, fun){
       return(rbind(diag(1, p, p), J))
     }
     else{
-      stop("fun must be 'subdiagonal_mean_ratio_fct' or 'ascending_root_fct'")
+      if(fun == "ascending_root_fct_cor"){
+        E <- rep(1, p - d)
+        for(i in 3:d){
+          if((i %% 2 == 1)){
+            E[(0:(d - i)) + a[i - 1] - (i - 2)] <-  X[(0:(d - i)) + a[i - 1] - (i - 2)] /
+              ((i - 1) * abs(X[(0:(d - i)) + a[i - 1] - (i - 2)]) ^ (2 - 1 / (i - 1)))
+          }
+          if((i %% 2 == 0)){
+            E[(0:(d - i)) + a[i - 1] - (i - 2)] <- 1 / ((i - 1) * abs(X[(0:(d - i)) +
+                                                                          a[i - 1] - (i - 2)]) ^ (1 - (1 / (i - 1))))
+          }
+        }
+        return(diag(E, p - d, p - d))
+      }
+      else{
+        stop("fun must be 'subdiagonal_mean_ratio_fct' or 'ascending_root_fct'")
+      }
     }
+
   }
 }
 
@@ -100,7 +117,7 @@ Jacobian <- function(X, a, d, p, fun){
 #' covariance matrix
 #' @param d dimension of the covariance matrix
 #' @param p dimension of the vectorised matrix
-#' @param fun transformation function, that should be used. 'subdiagonal_mean_ratio_fct' or 'ascending_root_fct'
+#' @param fun transformation function, that should be used. 'subdiagonal_mean_ratio_fct', 'ascending_root_fct', 'ascending_root_fct_cor'
 #' @return a scalar, the value of the ATS
 #' @export
 ATS_fun <- function(N, X, C, v, a, d, p, fun){
