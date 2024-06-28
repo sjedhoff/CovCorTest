@@ -18,22 +18,69 @@ Pd <- function(d){
 #'
 #' @noRd
 Listcheck <- function(X, nv){
-  if(is.null(nv)){
-    return(X)
+  # no nv
+  if(is.null(nv) | (length(nv) == 1)){
+    # one group
+    if(is.matrix(X)){
+      if(!is.null(nv) && (nv != ncol(X))){
+        warning(paste0("the number of columns of X (", ncol(X), ") and the group size (", nv, ") do not allign"))
+      }
+      data <- X
+      nv_ <- NULL
+    }
+    # list with one element
+    else{
+      if(is.list(X) & (length(X) == 1)){
+        data <- X[[1]]
+        if(!is.null(nv) && (nv != ncol(X))){
+          warning(paste0("the number of columns of X (", ncol(X), ") and the group size (", nv, ") do not allign"))
+        }
+        nv_ <- NULL
+      }
+      # list with more elements
+      else{if(is.list(X) & (length(X) > 1)){
+        data <- X
+        nv_ <- unlist(lapply(X, ncol))
+        warning(paste0("no nv or unfitting nv is given, will procede with nv = c(",paste0(nv_, collapse = " "),")"))
+      }}
+    }
+
   }
-  if(typeof(X) != "list"){
-    v <- cumsum(c(1,nv))
-    Data <- list()
-    for(i in 1:length(nv)){
-      Data[[i]] <- matrix(X[,v[i]:(v[i+1]-1)], ncol=nv[i])
+
+  # with nv
+  else{
+    # list
+    if(is.list(X)){
+      data <- X
+      nv_ <- unlist(lapply(X, ncol))
+      if(!identical(as.numeric(nv), as.numeric(nv_))){
+        warning(paste0("nv does not have the corresponding dimensions to X, will procede with nv = c(", paste0(nv_, collapse = " "),")"))
+      }
+    }
+    # matrix
+    else{
+      if(ncol(X) != sum(nv)){
+        stop(paste0("the number of columns (", ncol(X),") and the sum of group sizes (", sum(nv),") do not allign"))
+      }
+      v <- cumsum(c(1,nv))
+      data <- list()
+      for(i in 1:length(nv)){
+        data[[i]] <- matrix(X[,v[i]:(v[i+1]-1)], ncol=nv[i])
+      }
+      nv_ <- nv
     }
   }
-  else{
-    Data <- X
-  }
-  return(Data)
-}
 
+  ## For multiple groups: check dimensions
+  if(!is.null(nv_)){
+    dimensions <- unlist(lapply(data, nrow))
+    if(max(dimensions) != mean(dimensions)){
+      stop("dimensions do not accord")
+    }
+  }
+
+  return(list(data,nv_))
+}
 
 #' @title Quadratic form for vectors and matrices
 #'

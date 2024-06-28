@@ -138,13 +138,19 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
 TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "MC",
                                   repetitions = 1000, seed = NULL){
 
-  X <- Listcheck(X,nv)
+  hypothesis <- tolower(hypothesis)
+  method <- toupper(method)
+  if(!(method == "MC" | method == "BT")){
+    stop("method must be bootstrap ('BT') or Monte-Carlo-technique('MC')")
+  }
+
+  listcheck <- Listcheck(X,nv)
+  X <- listcheck[[1]]
+  nv <- listcheck[[2]]
+
   # multiple groups
   if(!is.null(nv)){
-    dimensions <- sapply(X, dim)[1,]
-    if(max(dimensions) != mean(dimensions)){
-      stop("dimensions do not accord")
-    }
+    dimensions <- unlist(lapply(X, nrow))
     groups <- length(nv)
   }
   # one group
@@ -167,7 +173,7 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
 
   if(hypothesis == "equal"){
     if(groups == 1){
-      C <- diag(1, p, p)[a,]
+      C <- Pd(d) %*% diag(1, p, p)[a,]
       Xi <- rep(0, d)
     }
     else{
@@ -187,6 +193,9 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
     if(is.null(A)){
       A <- 1
       warning("since no input A for a trace to be tested is given, a trace of 1 is tested")
+    }
+    if(!is.numeric(A) | length(A) != 1){
+      stop("for testing the trace the input A must be a scalar")
     }
     return(TestCovariance_base(X, nv = nv, C = C, Xi = A, method = method,
                                repetitions = repetitions, seed = seed, hypothesis = hypothesis))
@@ -236,7 +245,7 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
   }
   if(hypothesis == "equal-diagonals"){
     if(groups == 1){
-      stop("the hypothesis 'equal-trace' can only be tested for multiple groups")
+      stop("the hypothesis 'equal-diagonals' can only be tested for multiple groups")
     }
     C <- Pd(groups) %x% diag(1, p, p)[a,]
     Xi <- rep(0, times = groups * d)
@@ -254,8 +263,8 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
 #' specified number of runs.
 #' @param X  a matrix containing the observation vectors as columns
 #' @param structure a character specifying the structure regarding them the
-#' covariance matrix should be checked. Options are "autoregressive", "FO-autoregressive"
-#' "diagonal", "sphericity", "compoundsymmetry" and "toeplitz".
+#' covariance matrix should be checked. Options are "autoregressive" ("ar"), "FO-autoregressive" ("FO-ar"),
+#' "diagonal" ("diag"), "sphericity" ("spher"), "compoundsymmetry" ("cs") and "toeplitz" ("toep").
 #' @param method a character, to chose whether bootstrap("BT") or
 #' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.
 #' @param repetitions a scalar,  indicate the number of runs for the chosen method.
@@ -277,20 +286,34 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
 #'
 #' @export
 TestCovariance_structure <- function(X, structure, method, repetitions = 1000, seed = NULL){
+
+  structure <- tolower(structure)
+  method <- toupper(method)
+  if(!(method == "MC" | method == "BT")){
+    stop("method must be bootstrap ('BT') or Monte-Carlo-technique('MC')")
+  }
+
   if(!is.null(seed)){
     old_seed <- .Random.seed
     on.exit({ .Random.seed <<- old_seed })
     set.seed(seed)
   }
-  if(is.list(X) & (length(X) > 1)){
-    warning("The input X must be a matrix but is a list. Only the first element of the list is used.")
-    X <- X[[1]]
+  if(is.list(X)){
+    if(length(X) > 1){
+      warning("The input X must be a matrix but is a list. Only the first element of the list is used.")
+      X <- X[[1]]
+    }
+    if(length(X) == 1){
+      X <- X[[1]]
+    }
+
   }
 
   n1 <- dim(X)[2]
   d <- dim(X)[1]
   if(d==1){ stop("Structures can be only investigated for more than one dimension") }
-  if(!(structure %in% c("autoregressive", "FO-autoregressive", "diagonal", "sphericity", "compoundsymmetry", "toeplitz") )){
+  if(!(structure %in% c("autoregressive", "ar", "fo-autoregressive", "fo-ar", "diagonal",
+                        "diag", "sphericity", "spher", "compoundsymmetry", "cs", "toeplitz", "toep") )){
     stop("no predefined hypothesis")
   }
 
@@ -302,7 +325,7 @@ TestCovariance_structure <- function(X, structure, method, repetitions = 1000, s
     Xq <- apply(X - rowMeans(X), 2, vdtcrossprod, a, d, p)
     HatCov <- stats::var(t(Xq))
 
-    if(structure == "autoregressive"){
+    if(structure == "autoregressive" | structure == "ar"){
       C <- matrixcalc::direct.sum(diag(1, d, d), Pd(p - d))
       Xi <- c(rep(1, times = d), rep(0, times = p - d))
       Jacobi <- Jacobian(vX, a, d, p, 'ascending_root_fct')
@@ -319,7 +342,7 @@ TestCovariance_structure <- function(X, structure, method, repetitions = 1000, s
       pvalue <- mean(ResamplingResult < Teststatistic)
     }
 
-    if(structure == "FO-autoregressive"){
+    if(structure == "fo-autoregressive" | structure == "fo-ar"){
       C <- Pd(d)
       for(l in 2:d){
         C <- matrixcalc::direct.sum(C, Pd(d - l + 1))
@@ -340,20 +363,20 @@ TestCovariance_structure <- function(X, structure, method, repetitions = 1000, s
       pvalue <- mean(ResamplingResult < Teststatistic)
     }
 
-    if(structure %in% c("diagonal", "sphericity", "compoundsymmetry", "toeplitz")){
+    if(structure %in% c("diagonal", "diag", "sphericity", "spher", "compoundsymmetry", "cs", "toeplitz", "toep")){
 
       Xi <- rep(0, p)
 
-      if(structure == "diagonal"){
+      if(structure == "diagonal" | structure == "diag"){
         C <- matrixcalc::direct.sum(matrix(0, d, d), diag(1, p - d, p - d))
       }
-      if(structure == "sphericity"){
+      if(structure == "sphericity" | structure == "spher"){
         C <- matrixcalc::direct.sum(Pd(d), diag(1, p - d, p - d))
       }
-      if(structure == "compoundsymmetry"){
+      if(structure == "compoundsymmetry" | structure == "cs"){
         C <- matrixcalc::direct.sum(Pd(d), Pd(p - d))
       }
-      if(structure == "toeplitz"){
+      if(structure == "toeplitz" | structure == "toep"){
         C <- Pd(d)
         for(l in 2:d){
           C <- matrixcalc::direct.sum(C, Pd(d - l + 1))
