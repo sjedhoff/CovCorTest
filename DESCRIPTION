@@ -1,10 +1,11 @@
-Package: myfirstpackage
+Package: CovCorTest
 Title: Conduct Tests for Covariance Matrices, Correlation Matrices and their Structure
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: 
     c(person("Paavo", "Sattler", , "paavo.sattler@tu-dortmund.de", role = c("aut"),
            comment = (ORCID = "0000-0001-8731-0893")),
     person("Svenja", "Jedhoff", , "svenja.jedhoff@tu-dortmund,de", role = "cre"))
+Maintaines: Svenja Jedhoff <svenja.jedhoff@tu-dortmund.de>
 Description: A compilation of tests for hypotheses regarding covariance and correlation matrices for one or more groups. 
  The hypothesis can be specified through a corresponding hypothesis matrix and a vector or by choosing one of the basic hypotheses, while for 
  the structure test, only the latter works. Thereby Monte-Carlo and Bootstrap-techniques are used, and the respective method must be chosen, 
