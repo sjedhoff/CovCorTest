@@ -2,7 +2,7 @@ Package: myfirstpackage
 Title: Conduct Tests for Covariance Matrices, Correlation Matrices and their Structure
 Version: 0.0.0.9000
 Authors@R: 
-    c(person("Paavo", "Sattler", , "paavo.sattler@tu-dortmund.de", role = c("aut", "cre"),
+    c(person("Paavo", "Sattler", , "paavo.sattler@tu-dortmund.de", role = c("aut"),
            comment = (ORCID = "0000-0001-8731-0893")),
     person("Svenja", "Jedhoff", , "svenja.jedhoff@tu-dortmund,de", role = "cre"))
 Description: A compilation of tests for hypotheses regarding covariance and correlation matrices for one or more groups. 
