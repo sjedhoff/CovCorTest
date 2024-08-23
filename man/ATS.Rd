@@ -9,7 +9,7 @@ ATS(N, vVarData, C, HatCov, Xi = 0)
 \arguments{
 \item{N}{number of observations}
 
-\item{vVarData}{a matrix ?}
+\item{vVarData}{a matrix of vectorized covariance/correlation data}
 
 \item{C}{hypothesis matrix for calculating the ATS}
 
@@ -23,3 +23,4 @@ a vector
 \description{
 Anova-Type-statistic
 }
+\keyword{internal}

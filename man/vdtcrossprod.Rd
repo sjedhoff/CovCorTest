@@ -21,3 +21,4 @@ vector
 \description{
 Function to calculate dvech(X t(X))
 }
+\keyword{internal}

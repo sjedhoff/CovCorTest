@@ -22,12 +22,14 @@ covariance matrix}
 
 \item{p}{dimension of the vectorised matrix}
 
-\item{fun}{transformation function, that should be used. 'subdiagonal_mean_ratio_fct', 'ascending_root_fct', 'ascending_root_fct_cor'}
+\item{fun}{transformation function, that should be used. \code{\link{subdiagonal_mean_ratio_fct}},
+\code{\link{ascending_root_fct}} or \code{\link{ascending_root_fct_cor}}}
 }
 \value{
 a scalar, the value of the ATS
 }
 \description{
-A function which calculates the Anova type statistic based on
+A function which calculates the Anova-type-statistic based on
 a transformation function
 }
+\keyword{internal}

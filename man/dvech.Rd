@@ -24,3 +24,4 @@ vector
 \description{
 Diagonal vectorisation of the upper triangular matrix
 }
+\keyword{internal}

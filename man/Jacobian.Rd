@@ -16,12 +16,14 @@ covariance matrix}
 
 \item{p}{dimension of the vectorised matrix}
 
-\item{fun}{transformation function, that should be used. 'subdiagonal_mean_ratio_fct' or 'ascending_root_fct'}
+\item{fun}{transformation function, that should be used.
+\code{\link{subdiagonal_mean_ratio_fct}} or \code{\link{ascending_root_fct}}}
 }
 \value{
 the Jacobian matrix applied for the given vector
 }
 \description{
 A function which calculates the Jacobian matrix for a given
-transformation function h or g
+transformation function \code{\link{ascending_root_fct}} or \code{\link{subdiagonal_mean_ratio_fct}}
 }
+\keyword{internal}

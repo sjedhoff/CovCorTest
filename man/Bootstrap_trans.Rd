@@ -25,7 +25,8 @@ the bootstrap sample}
 
 \item{vX}{the expectation vector for the bootstrap sample}
 
-\item{fun}{transformation function, that should be used. 'subdiagonal_mean_ratio_fct' or 'ascending_root_fct'}
+\item{fun}{transformation function, that should be used. \code{\link{subdiagonal_mean_ratio_fct}} or
+\code{\link{ascending_root_fct}}}
 }
 \value{
 a scalar, the value of the ATS
@@ -36,3 +37,4 @@ with covariance matrix HatCov, which matrix root MSrootHatCov is given and
 expectation vector vX. For the generated bootstrap sample the value of the
 ATS based on a transformation is calculated
 }
+\keyword{internal}

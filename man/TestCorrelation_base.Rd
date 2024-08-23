@@ -28,22 +28,39 @@ the group sizes. For one group, nv is not necessary}
 \item{Xi}{a vector defining together with C the investigated hypothesis}
 
 \item{method}{a character, to chose whether bootstrap("BT") or
-Monte-Carlo-technique("MC") or Taylor-based Monte-Carlos-approach("Tay") is used.}
+Monte-Carlo-technique("MC") or Taylor-based Monte-Carlo-approach("TAY") is used.}
 
-\item{repetitions}{a scalar,  indicate the number of runs for the chosen method.
+\item{repetitions}{a scalar, indicate the number of runs for the chosen method.
 The predefined value is 1,000, and the number should not be below 500.}
 
 \item{seed}{A seed, if it should be set for reproducibility. Predefined values
-is NULL, which means no seed is set. A chosen seed is deleted at the end.}
+is NULL, which means no seed is set.}
 
 \item{hypothesis}{character or NULL, will be displayed in the print call}
 }
 \value{
-an object of the class 'CovTest'
+an object of the class \code{\link{CovTest}}
 }
 \description{
 This function conducts the test for hypotheses regarding the
 correlation matrix. Depending on the chosen method a
-bootstrap or Monte-Carlo-technique is used to calculate p-value of the ATS
+bootstrap, Monte-Carlo-technique or Taylor-based Monte-Carlo-approach is used to
+calculate p-value of the Anova-type-statistic
 based on a specified number of runs.
+}
+\examples{
+# Load the data
+data("EEGwide", package = "MANOVA.RM")
+
+vars <- colnames(EEGwide)[1:6]
+
+X <- t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars])
+
+# Testing Uncorrelatedness
+C <- diag(x = 1, nrow = 15, ncol = 15)
+Xi <- rep(0,15)
+
+TestCorrelation_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT", repetitions = 1000,
+      seed = 31415, hypothesis = "Uncorrelated")
+
 }

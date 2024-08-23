@@ -5,7 +5,7 @@
 #' @return a matrix
 #'
 #'
-#'
+#' @noRd
 Pd <- function(d){
   return( diag(1,d,d) - matrix(1/d,d,d) )
 }
@@ -16,7 +16,8 @@ Pd <- function(d){
 #' @param nv number of subjects per group
 #' @return list
 #'
-#' @noRd
+#' @export
+#' @keywords internal
 Listcheck <- function(X, nv){
   # no nv
   if(is.null(nv) | (length(nv) == 1)){
@@ -32,7 +33,7 @@ Listcheck <- function(X, nv){
     else{
       if(is.list(X) & (length(X) == 1)){
         data <- X[[1]]
-        if(!is.null(nv) && (nv != ncol(X))){
+        if(!is.null(nv) && (nv != ncol(data))){
           warning(paste0("the number of columns of X (", ncol(X), ") and the group size (", nv, ") do not allign"))
         }
         nv_ <- NULL
@@ -51,11 +52,21 @@ Listcheck <- function(X, nv){
   else{
     # list
     if(is.list(X)){
-      data <- X
-      nv_ <- unlist(lapply(X, ncol))
-      if(!identical(as.numeric(nv), as.numeric(nv_))){
-        warning(paste0("nv does not have the corresponding dimensions to X, will procede with nv = c(", paste0(nv_, collapse = " "),")"))
+      if(length(X) == 1){
+        data <- X[[1]]
+        if((length(nv) != 1) || (nv != ncol(data))){
+          warning(paste0("the number of columns of X (", ncol(data), ") and the group size (", nv, ") do not allign"))
+        }
+        nv_ <- NULL
       }
+      else{
+        data <- X
+        nv_ <- unlist(lapply(X, ncol))
+        if(!identical(as.numeric(nv), as.numeric(nv_))){
+          warning(paste0("nv does not have the corresponding dimensions to X, will procede with nv = c(", paste0(nv_, collapse = " "),")"))
+        }
+      }
+
     }
     # matrix
     else{
@@ -86,6 +97,7 @@ Listcheck <- function(X, nv){
 #'
 #' @param A,B matrices or vectors
 #' @return a metrix or vector
+#'
 #' @noRd
 QF <- function(A, B){
   return( A %*% B %*% t(A) )
@@ -95,7 +107,8 @@ QF <- function(A, B){
 #'
 #' @param X matrix
 #' @return matrix
-#' @export
+#'
+#' @noRd
 MSroot <- function(X){
   if(length(X) == 1){
     MSroot <- matrix(sqrt(X),1,1)
@@ -119,6 +132,8 @@ MSroot <- function(X){
 #' @param inc_diag TRUE or FALSE: should the diagonal be included?
 #'
 #' @return vector
+#'
+#' @keywords internal
 #' @export
 dvech <- function(X, a, d, p, inc_diag){
   if(!matrixcalc::is.square.matrix(X)){
@@ -140,12 +155,20 @@ dvech <- function(X, a, d, p, inc_diag){
   }
 }
 
-vechp<-function(x){
-  if(!matrixcalc::is.square.matrix(x)){
-    stop("argument x is not a square numeric matrix")
+#' Vectorization of the upper triangular part of the matrix
+#'
+#' @param X
+#'
+#' @return vector
+#'
+#' @keywords internal
+#' @export
+vechp <- function(X){
+  if(!matrixcalc::is.square.matrix(X)){
+    stop("argument X is not a square numeric matrix")
   }
 
-  return(as.vector(t(x)[!upper.tri(x,TRUE)]))
+  return(as.vector(t(X)[!upper.tri(X,TRUE)]))
 }
 
 
@@ -158,16 +181,18 @@ vechp<-function(x){
 #' @param w weight matrix
 #'
 #' @return matrix
+#'
+#' @keywords internal
 #' @export
-WDirect.sumL <- function(X,w){
+WDirect.sumL <- function(X, w){
   groups <- length(X)
-  if(groups==1){
+  if(groups == 1){
     Result <- X*w
   }
   else{
     Result <- matrixcalc::direct.sum(w[1]*X[[1]], w[2]*X[[2]])
-    if(groups>2){
-      for (i in 3:groups){
+    if(groups > 2){
+      for(i in 3:groups){
         Result <-  matrixcalc::direct.sum(Result, w[i]*X[[i]])
       }
     }
@@ -181,6 +206,9 @@ WDirect.sumL <- function(X,w){
 #'
 #' @param X matrix
 #' @return vector
+#'
+#' @export
+#' @keywords internal
 vtcrossprod <- function(X){
   return(matrixcalc::vech(tcrossprod(X,X)))
 }
@@ -193,18 +221,12 @@ vtcrossprod <- function(X){
 #' @param p dimension of the vectorised matrix
 #'
 #' @return vector
+#'
+#' @export
+#' @keywords internal
 vdtcrossprod <- function(X,a,d,p){
   return(dvech(tcrossprod(X,X),a,d,p, inc_diag = TRUE))
 }
-
-#' @title Function to center observations
-#'
-#' @param X matrix that will be centered
-centering <- function(X){
-  return(X-rowMeans(X))
-}
-
-
 
 
 
@@ -214,6 +236,9 @@ centering <- function(X){
 #' @param n number of columns
 #'
 #' @return matrix
+#'
+#' @export
+#' @keywords internal
 Qvech <- function(X, n){
   return(matrix(apply(X,2,vtcrossprod), ncol=n))
 }

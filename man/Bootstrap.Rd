@@ -26,3 +26,4 @@ of the ATS is generated. For multiple groups the corresponding sample sizes from
 The weighted sum of covariance matrices is calculated and used to calculate the value
 of the ATS.
 }
+\keyword{internal}

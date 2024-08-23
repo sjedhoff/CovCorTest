@@ -11,7 +11,7 @@ Tayapp1G(
   CorData,
   MvrH,
   Trace,
-  M,
+  M4,
   L,
   P,
   Q,
@@ -35,7 +35,7 @@ to vectorized correlations}
 
 \item{Trace}{a trace used in the ATS for the test statistic}
 
-\item{M}{a auxiliary matrix for the transformation from vectorised covariances
+\item{M4}{a auxiliary matrix for the transformation from vectorised covariances
 to vectorized correlations}
 
 \item{L}{an auxiliary matrix for the transformation from vectorised covariances
@@ -60,8 +60,9 @@ a matrix containing the values of the Taylor ATS for a number of repetitions
 }
 \description{
 An auxiliary function to calculate the values for the
-Taylor-based Monte-Carlo-approximation for one group.  After receiving some
+Taylor-based Monte-Carlo-approximation for one group. After receiving some
 auxiliary matrices and data, the Monte-Carlo observations are generated and
 different parts of the final sum are defined. Based on this a number of the
 Taylor-based ATS are calculated, where the number can be chosen.
 }
+\keyword{internal}

@@ -15,3 +15,4 @@ vector
 \description{
 Function to calculate vech(X t(X))
 }
+\keyword{internal}

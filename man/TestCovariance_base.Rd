@@ -23,27 +23,43 @@ the group sizes. For one group, nv is not necessary}
 
 \item{nv}{vector of sample sizes for the bootstrap samples per group}
 
-\item{C}{hypothesis matrix for calculating the ATS}
+\item{C}{hypothesis matrix for calculating the Anova-Type-Statistic}
 
 \item{Xi}{a vector defining together with C the investigated hypothesis}
 
 \item{method}{a character, to chose whether bootstrap("BT") or
 Monte-Carlo-technique("MC") is used.}
 
-\item{repetitions}{a scalar,  indicate the number of runs for the chosen method.
+\item{repetitions}{a scalar, indicates the number of runs for the chosen method.
 The predefined value is 1,000, and the number should not be below 500.}
 
 \item{seed}{A seed, if it should be set for reproducibility. Predefined values
-is NULL, which means no seed is set. A chosen seed is deleted at the end.}
+is NULL, which means no seed is set.}
 
 \item{hypothesis}{character or NULL, will be displayed in the print call}
 }
 \value{
-an object of the class 'CovTest'
+an object of the class \code{\link{CovTest}}
 }
 \description{
 This function conducts the test for hypotheses regarding the
 covariance matrix. Depending on the chosen method a
-bootstrap  or Monte-Carlo-technique is used to calculate p-value of the ATS
+bootstrap  or Monte-Carlo-technique is used to calculate p-value of the Anova-Type-Statistic
 based on a specified number of runs.
+}
+\examples{
+# Load the data
+data("EEGwide", package = "MANOVA.RM")
+
+vars <- colnames(EEGwide)[1:6]
+
+X <- t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars])
+
+# Testing the trace
+C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,1), nrow = 1, ncol = 21)
+Xi <- 2
+
+TestCovariance_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT", repetitions = 1000,
+      seed = 31415, hypothesis = "Trace")
+
 }

@@ -10,6 +10,8 @@
 #' correlation matrix
 #' @param d dimension of the correlation matrix
 #' @return a transformed vector
+#'
+#' @keywords internal
 #' @export
 ascending_root_fct_cor <- function(x, a, d){
   xt <- x
@@ -31,7 +33,7 @@ ascending_root_fct_cor <- function(x, a, d){
 #' Function for the Taylor-based Monte-Carlo-approximation for one group
 #'
 #' @description An auxiliary function to calculate the values for the
-#' Taylor-based Monte-Carlo-approximation for one group.  After receiving some
+#' Taylor-based Monte-Carlo-approximation for one group. After receiving some
 #' auxiliary matrices and data, the Monte-Carlo observations are generated and
 #' different parts of the final sum are defined. Based on this a number of the
 #' Taylor-based ATS are calculated, where the number can be chosen.
@@ -43,7 +45,7 @@ ascending_root_fct_cor <- function(x, a, d){
 #' @param MvrH an auxiliary matrix for the transformation from vectorised covariances
 #' to vectorized correlations
 #' @param Trace a trace used in the ATS for the test statistic
-#' @param M a auxiliary matrix for the transformation from vectorised covariances
+#' @param M4 a auxiliary matrix for the transformation from vectorised covariances
 #' to vectorized correlations
 #' @param L an auxiliary matrix for the transformation from vectorised covariances
 #' to vectorized correlations
@@ -57,13 +59,16 @@ ascending_root_fct_cor <- function(x, a, d){
 #' diagonal vectorised correlation
 #' to diagonalwise vectorisation. used for the transformation function 'ascending_root_fct_cor', else NULL
 #' @return a matrix containing the values of the Taylor ATS for a number of repetitions
-Tayapp1G <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M, L, P, Q, n1, Atilde = NULL, Jacobi = NULL){
+#'
+#' @keywords internal
+#' @export
+Tayapp1G <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M4, L, P, Q, n1, Atilde = NULL, Jacobi = NULL){
   vechCorData <- matrixcalc::vech(CorData)
-  DvechCorDataM <- as.vector(vechCorData) * M
-  XPB <- gData(MSrootStUpsi, repetitions)
+  DvechCorDataM <- as.vector(vechCorData) * M4
+  XPB <- generateData(MSrootStUpsi, repetitions)
 
   PUX <- P %*% XPB
-  MUX0 <- M %*% Q %*% XPB
+  MUX0 <- M4 %*% Q %*% XPB
 
   HX <- Qvech(PUX, repetitions)
 
@@ -81,7 +86,7 @@ Tayapp1G <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M, L, P
   else{
     XTaydv <- Atilde %*% (Part1 + L %*% (Part2 - Part3 + Part4) / sqrt(n1))
     CXTaydv <- C %*% Jacobi %*% XTaydv
-    Result <- apply(CXTaydv, 2, crossprod) / Trace
+    Result <- n1 * apply(CXTaydv, 2, crossprod) / Trace
   }
   return(Result)
 }
@@ -89,7 +94,7 @@ Tayapp1G <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M, L, P
 #' Function for the Taylor-based Monte-Carlo-approximation for multiple groups
 #'
 #' @description An auxiliary function to calculate the values for the Taylor-based
-#' Monte-Carlo-approximation for one group.  After receiving some auxiliary matrices
+#' Monte-Carlo-approximation for multiple groups. After receiving some auxiliary matrices
 #' and data, the Monte-Carlo observations are generated and different parts of the
 #' final sum are defined. Based on this a number of the Taylor-based ATS are
 #' calculated, where the number can be chosen.
@@ -103,7 +108,7 @@ Tayapp1G <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M, L, P
 #' @param MvrH an auxiliary matrix for the transformation from vectorised covariances
 #' to vectorized correlations
 #' @param Trace a trace used in the ATS for the test statistic
-#' @param M an auxiliary matrix for the transformation from vectorised covariances
+#' @param M4 an auxiliary matrix for the transformation from vectorised covariances
 #' to vectorized correlations
 #' @param L an auxiliary matrix for the transformation from vectorised covariances
 #' to vectorized correlations
@@ -113,15 +118,19 @@ Tayapp1G <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M, L, P
 #' to vectorized correlations
 #' @param nv vector of sample sizes
 #' @return a matrix containing the values of the Taylor ATS for a number of repetitions
-TayappMG <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M, L, P, Q, nv){
+#'
+#' @keywords internal
+#' @export
+#'
+TayappMG <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M4, L, P, Q, nv){
   vechCorData <- lapply(CorData, matrixcalc::vech)
-  DvechCorDataM <- lapply(lapply(vechCorData, as.vector), "*", M)
+  DvechCorDataM <- lapply(lapply(vechCorData, as.vector), "*", M4)
 
-  XPB <- mapply(gData, MSrootStUpsi, repetitions, SIMPLIFY = FALSE)
+  XPB <- mapply(generateData, MSrootStUpsi, repetitions, SIMPLIFY = FALSE)
 
   PUX <- lapply(XPB, function(X) P %*% X )
-  MUX0 <- lapply(XPB, function(X) (M %*% Q) %*% X )
-  HX <- lapply(PUX, Qvech, repetitions, SIMPLIFY = FALSE)
+  MUX0 <- lapply(XPB, function(X) (M4 %*% Q) %*% X )
+  HX <- lapply(PUX, Qvech, repetitions)
 
   Part1 <- mapply(function(A, B) A %*% B, MvrH, XPB, SIMPLIFY = FALSE)
   Part2 <- mapply("*", lapply(vechCorData, as.vector), HX, SIMPLIFY = FALSE)
@@ -132,8 +141,10 @@ TayappMG <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M, L, P
               sqrt(nv)) / sqrt(nv))
   }, Part1, list(L), Part2, Part3, Part4, nv, SIMPLIFY = FALSE)
 
-  CXTaymean <- C %*% unlist(lapply(XTay, rowMeans))
-  Result <- sum(nv) * tcrossprod(CXTaymean) / Trace
+  XTayMatrix <- do.call(rbind, XTay)
+
+  CXTay <- C %*% XTayMatrix
+  Result <- sum(nv) *apply(CXTay, 2, crossprod) / Trace
   return(Result)
 }
 

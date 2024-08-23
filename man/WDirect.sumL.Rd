@@ -19,3 +19,4 @@ Hereby the matrices which are part of a list are multiplied with
 the corresponding components of a matrix w, containing the weights. These,
 now weighted matrices are put together to one larger block-diagonal matrix.
 }
+\keyword{internal}

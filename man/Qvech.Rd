@@ -17,3 +17,4 @@ matrix
 \description{
 Auxiliary function to calculate the covariance of the vectorized correlation matrix
 }
+\keyword{internal}

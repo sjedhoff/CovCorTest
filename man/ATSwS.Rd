@@ -2,7 +2,7 @@
 % Please edit documentation in R/BasicFunctions.R
 \name{ATSwS}
 \alias{ATSwS}
-\title{ATS with weighted sum}
+\title{Anova-Type-Statistic with weighted sum}
 \usage{
 ATSwS(A, repetitions)
 }
@@ -15,5 +15,6 @@ ATSwS(A, repetitions)
 a vector of the length of repetitions
 }
 \description{
-ATS with weighted sum
+Calculation of a Anova-Type-Statistic using
 }
+\keyword{internal}

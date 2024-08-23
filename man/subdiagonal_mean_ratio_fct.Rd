@@ -22,3 +22,4 @@ A function which calculates the mean of the secondary diagonals
 and divide them through the next one. Since the elements can be negative, for
 the denominator absolute values are used.
 }
+\keyword{internal}

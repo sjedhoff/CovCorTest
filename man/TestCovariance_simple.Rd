@@ -23,11 +23,12 @@ the group sizes. For one group, nv is not necessary}
 \item{nv}{vector of sample sizes for the bootstrap samples per group}
 
 \item{hypothesis}{a character to choose one of the predefined hypotheses which are
-"equal", "equal-trace", "equal-diagonals", "given-trace", "given-matrix" and "uncorrelated"}
+"equal", for multiple groups "equal-trace" and "equal-diagonals" and for a single group
+"given-trace", "given-matrix" and "uncorrelated"}
 
 \item{A}{a scalar or square matrix to specify the hypothesis in case of
 "given-trace" or "given-matrix". The value is predefined as NULL, which means
-trace of 1 resp the identity as given matrix.}
+trace of 1 respectively the identity as given matrix.}
 
 \item{method}{a character, to chose whether bootstrap("BT") or
 Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.}
@@ -36,15 +37,15 @@ Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.}
 The predefined value is 1,000, and the number should not be below 500.}
 
 \item{seed}{A seed, if it should be set for reproducibility. Predefined values
-is NULL, which means no seed is set. A chosen seed is deleted at the end.}
+is NULL, which means no seed is set.}
 }
 \value{
-an object of the class 'CovTest'
+an object of the class \code{\link{CovTest}}
 }
 \description{
-This function is for more applied users so no hypothesis matrix or
-corresponding vector is necessary. This is replaced by predefined hypotheses,
-from which is chosen. From this C and Xi are built and the function
+This function conducts tests for hypotheses regarding the covariance
+matrix for a more applied user. A hypothesis can be selected out of a group of
+predefined hypotheses. From this C and Xi are built and the function
 \code{\link{TestCovariance_base}} is used.
 }
 \examples{

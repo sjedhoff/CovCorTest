@@ -10,6 +10,8 @@
 #' covariance matrix
 #' @param d dimension of the covariance matrix
 #' @return a transformed vector
+#'
+#' @keywords internal
 #' @export
 ascending_root_fct <- function(x, a, d){
   for(i in 3:d){
@@ -35,6 +37,8 @@ ascending_root_fct <- function(x, a, d){
 #' covariance matrix
 #' @param d dimension of the covariance matrix
 #' @return a transformed vector
+#'
+#' @keywords internal
 #' @export
 subdiagonal_mean_ratio_fct <- function(v, a, d){
   ratio <- rep(0, d - 1)
@@ -48,14 +52,17 @@ subdiagonal_mean_ratio_fct <- function(v, a, d){
 #' @title Jacobian matrix for transformation functions
 #'
 #' @description A function which calculates the Jacobian matrix for a given
-#' transformation function h or g
+#' transformation function \code{\link{ascending_root_fct}} or \code{\link{subdiagonal_mean_ratio_fct}}
 #' @param X vectorised covariance matrix for which the Jacobian matrix is applied
 #' @param a vector containing the indices which belong to the diagonal of the
 #' covariance matrix
 #' @param d dimension of the covariance matrix
 #' @param p dimension of the vectorised matrix
-#' @param fun transformation function, that should be used. 'subdiagonal_mean_ratio_fct' or 'ascending_root_fct'
+#' @param fun transformation function, that should be used.
+#' \code{\link{subdiagonal_mean_ratio_fct}} or \code{\link{ascending_root_fct}}
 #' @return the Jacobian matrix applied for the given vector
+#'
+#' @keywords internal
 #' @export
 Jacobian <- function(X, a, d, p, fun){
   if(fun == "ascending_root_fct"){
@@ -107,7 +114,7 @@ Jacobian <- function(X, a, d, p, fun){
 
 #' @title ATS for transformed vectors
 #'
-#' @description A function which calculates the Anova type statistic based on
+#' @description A function which calculates the Anova-type-statistic based on
 #' a transformation function
 #' @param N sample size
 #' @param X matrix containing the bootstrap observations as columns
@@ -117,8 +124,11 @@ Jacobian <- function(X, a, d, p, fun){
 #' covariance matrix
 #' @param d dimension of the covariance matrix
 #' @param p dimension of the vectorised matrix
-#' @param fun transformation function, that should be used. 'subdiagonal_mean_ratio_fct', 'ascending_root_fct', 'ascending_root_fct_cor'
+#' @param fun transformation function, that should be used. \code{\link{subdiagonal_mean_ratio_fct}},
+#' \code{\link{ascending_root_fct}} or \code{\link{ascending_root_fct_cor}}
 #' @return a scalar, the value of the ATS
+#'
+#' @keywords internal
 #' @export
 ATS_fun <- function(N, X, C, v, a, d, p, fun){
   Xmean <-  rowMeans(X)
@@ -146,11 +156,14 @@ ATS_fun <- function(N, X, C, v, a, d, p, fun){
 #' @param MSrootHatCov matrix root of the covariance matrix HatCov, to generate
 #' the bootstrap sample
 #' @param vX the expectation vector for the bootstrap sample
-#' @param fun transformation function, that should be used. 'subdiagonal_mean_ratio_fct' or 'ascending_root_fct'
+#' @param fun transformation function, that should be used. \code{\link{subdiagonal_mean_ratio_fct}} or
+#' \code{\link{ascending_root_fct}}
 #' @return a scalar, the value of the ATS
+#'
+#' @keywords internal
 #' @export
 Bootstrap_trans <- function(N.sim, n1, a, d, p, C, MSrootHatCov, vX, fun){
-  XPB <- gData(MSrootHatCov, n1) + vX
+  XPB <- generateData(MSrootHatCov, n1) + vX
   return(ATS_fun(n1, XPB, C, vX, a, d, p, fun))
 }
 
@@ -168,11 +181,13 @@ Bootstrap_trans <- function(N.sim, n1, a, d, p, C, MSrootHatCov, vX, fun){
 #' @param MSrootHatCov matrix (one group) or list of matrices (multiple groups) of roots of the covariance matrices, to generate
 #' the bootstrap sample
 #' @return a scalar, the value of the ATS
+#'
+#' @keywords internal
 #' @export
 Bootstrap <- function(N.sim, nv, C, MSrootHatCov){
   # one group
   if(length(nv) == 1){
-    XPB <- gData(MSrootHatCov, nv)
+    XPB <- generateData(MSrootHatCov, nv)
     PBHatCov <- stats::var(t(XPB))
     return(ATS(nv, rowMeans(XPB), C, PBHatCov))
   }
@@ -181,9 +196,8 @@ Bootstrap <- function(N.sim, nv, C, MSrootHatCov){
     N <- sum(nv)
     kappainvv <- N / nv
 
-    DataPB <- mapply(gData, MSrootHatCov, nv, SIMPLIFY = FALSE)
+    DataPB <- mapply(generateData, MSrootHatCov, nv, SIMPLIFY = FALSE)
     PBHatCov <- WDirect.sumL(lapply(DataPB, function(X) stats::var(t(X))), kappainvv)
     return(ATS(N, unlist(lapply(DataPB, rowMeans)), C, PBHatCov))
-
   }
 }

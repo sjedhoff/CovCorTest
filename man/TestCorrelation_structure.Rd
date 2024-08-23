@@ -13,27 +13,40 @@ TestCorrelation_structure(
 )
 }
 \arguments{
-\item{X}{a matrix containing the observation vectors as columns}
+\item{X}{a matrix containing the observation vectors as columns (one group)}
 
 \item{structure}{a character specifying the structure regarding them the
-covariance matrix should be checked. Options are "Hautoregressive", "diagonal",
-"Hcompoundsymmetry" and "Htoeplitz".}
+covariance matrix should be checked. Options are "Hautoregressive" ("Har"), "diagonal" ("diag"),
+"Hcompoundsymmetry" ("Hcs") and "Htoeplitz" ("Hteop").}
 
-\item{method}{a character, to chose whether bootstrap("BT") or Taylor-based Monte-Carlos-approach("Tay")
+\item{method}{a character, to chose whether bootstrap("BT") or Taylor-based Monte-Carlo-approach("TAY")
 Monte-Carlo-technique("MC") or is used, while bootstrap is the predefined method.}
 
-\item{repetitions}{a scalar,  indicate the number of runs for the chosen method.
+\item{repetitions}{a scalar, indicate the number of runs for the chosen method.
 The predefined value is 1,000, and the number should not be below 500.}
 
 \item{seed}{A seed, if it should be set for reproducibility. Predefined values
-is NULL, which means no seed is set. A chosen seed is deleted at the end.}
+is NULL, which means no seed is set.}
 }
 \value{
-an object of the class 'CovTest'
+an object of the class \code{\link{CovTest}}
 }
 \description{
 With this function the correlation matrix of data can be checked
-for one of the usual structures. Depending on the chosen method a bootstrap or
-Monte-Carlo-technique is used to calculate p-value of the ATS based on a
+for one of the predefined structures. Depending on the chosen method a bootstrap, the
+Taylor-based Monte-Carlo approach or
+Monte-Carlo-technique is used to calculate p-value of the Anova-Type-Statistoc based on a
 specified number of runs.
+}
+\examples{
+# Load the data
+data("EEGwide", package = "MANOVA.RM")
+
+# Select only the males with the diagnosis AD
+X <- as.matrix(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",
+                          c("brainrate_temporal", "brainrate_frontal","brainrate_central",
+                            "complexity_temporal","complexity_frontal", "complexity_central")])
+
+TestCorrelation_structure(X = X, structure = "diagonal", method = "MC")
+
 }
