@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(myfirstpackage)
+library(CovCorTest)
 
-test_check("myfirstpackage")
+test_check("CovCorTest")
