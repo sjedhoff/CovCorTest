@@ -8,7 +8,7 @@
 #' each matrix in this list is another group, where the observation vectors are the
 #' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
 #' the group sizes. For one group, nv is not necessary
-#' @param nv vector of sample sizes for the bootstrap samples per group
+#' @param nv vector of group sizes
 #' @param C hypothesis matrix for calculating the Anova-Type-Statistic
 #' @param Xi a vector defining together with C the investigated hypothesis
 #' @param method a character, to chose whether bootstrap("BT") or
@@ -126,7 +126,7 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
 #' each matrix in this list is another group, where the observation vectors are the
 #' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
 #' the group sizes. For one group, nv is not necessary
-#' @param nv vector of sample sizes for the bootstrap samples per group
+#' @param nv vector of group sizes
 #' @param hypothesis a character to choose one of the predefined hypotheses which are
 #' "equal", for multiple groups "equal-trace" and "equal-diagonals" and for a single group
 #' "given-trace", "given-matrix" and "uncorrelated"

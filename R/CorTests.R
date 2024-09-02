@@ -9,7 +9,7 @@
 #' each matrix in this list is another group, where the observation vectors are the
 #' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
 #' the group sizes. For one group, nv is not necessary
-#' @param nv vector of sample sizes for the bootstrap samples per group
+#' @param nv vector of group sizes
 #' @param C hypothesis matrix for calculating the ATS
 #' @param Xi a vector defining together with C the investigated hypothesis
 #' @param method a character, to chose whether bootstrap("BT") or
@@ -150,7 +150,7 @@ TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000
 #' each matrix in this list is another group, where the observation vectors are the
 #' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
 #' the group sizes. For one group, nv is not necessary
-#' @param nv vector of sample sizes for the bootstrap samples per group
+#' @param nv vector of group sizes
 #' @param hypothesis a character to choose one of the predefined hypotheses which are
 #' "equal-correlated" and "uncorrelated" (only possible for one group)
 #' @param method a character, to chose whether bootstrap("BT"), Taylor-based Monte-Carlo-approach("TAY") or
