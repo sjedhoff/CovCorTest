@@ -12,7 +12,9 @@ Description: A compilation of tests for hypotheses regarding covariance and corr
  and the functions provide p-values and mostly also estimators of calculated covariance matrices of test statistics.
 Imports: 
     MANOVA.RM,
-    matrixcalc
+    matrixcalc,
+    Rdpack
+RdMacros: Rdpack
 License: GPL (>=3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

@@ -64,3 +64,6 @@ TestCorrelation_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT", repetition
       seed = 31415, hypothesis = "Uncorrelated")
 
 }
+\references{
+\insertRef{sattler_cor_2024}{CovCorTest}
+}

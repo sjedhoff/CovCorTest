@@ -21,6 +21,9 @@
 #' @param hypothesis character or NULL, will be displayed in the print call
 #' @return an object of the class \code{\link{CovTest}}
 #'
+#'
+#' @references \insertRef{sattler_cor_2024}{CovCorTest}
+#'
 #' @import MANOVA.RM
 #' @examples
 #' # Load the data
@@ -158,6 +161,9 @@ TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000
 #' is NULL, which means no seed is set.
 #' @return an object of the class \code{\link{CovTest}}
 #'
+#'
+#' @references \insertRef{sattler_cor_2024}{CovCorTest}
+#'
 #' @import MANOVA.RM
 #' @examples
 #' # Load the data
@@ -257,6 +263,9 @@ TestCorrelation_simple <- function(X, nv = NULL, hypothesis, method = "BT", repe
 #' @param seed A seed, if it should be set for reproducibility. Predefined values
 #' is NULL, which means no seed is set.
 #' @return an object of the class \code{\link{CovTest}}
+#'
+#'
+#' @references \insertRef{sattler_structures_2024}{CovCorTest}
 #'
 #' @import MANOVA.RM
 #' @examples

@@ -67,3 +67,6 @@ TestCorrelation_simple(X_list[[1]], hypothesis = "uncorrelated")
 
 
 }
+\references{
+\insertRef{sattler_cor_2024}{CovCorTest}
+}

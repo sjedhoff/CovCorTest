@@ -20,9 +20,11 @@
 #' @param hypothesis character or NULL, will be displayed in the print call
 #' @return an object of the class \code{\link{CovTest}}
 #'
+#' @references \insertRef{sattler_cov_2020}{CovCorTest}
 #' @export
 #'
 #' @import MANOVA.RM
+#' @importFrom Rdpack reprompt
 #' @examples
 #' # Load the data
 #' data("EEGwide", package = "MANOVA.RM")
@@ -138,6 +140,8 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
 #' @param seed A seed, if it should be set for reproducibility. Predefined values
 #' is NULL, which means no seed is set.
 #' @return an object of the class \code{\link{CovTest}}
+#'
+#' @references \insertRef{sattler_cov_2020}{CovCorTest}
 #'
 #' @import MANOVA.RM
 #' @examples
@@ -298,6 +302,9 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
 #' @param seed A seed, if it should be set for reproducibility. Predefined values
 #' is NULL, which means no seed is set.
 #' @return an object of the class \code{\link{CovTest}}
+#'
+#'
+#' @references \insertRef{sattler_structures_2024}{CovCorTest}
 #'
 #' @examples
 #' # Load the data

@@ -63,3 +63,6 @@ TestCovariance_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT", repetitions
       seed = 31415, hypothesis = "Trace")
 
 }
+\references{
+\insertRef{sattler_cov_2020}{CovCorTest}
+}

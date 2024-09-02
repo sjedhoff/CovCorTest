@@ -43,3 +43,6 @@ X <- as.matrix(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",
 TestCovariance_structure(X = X, structure = "diagonal", method = "MC")
 
 }
+\references{
+\insertRef{sattler_structures_2024}{CovCorTest}
+}

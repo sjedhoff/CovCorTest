@@ -70,3 +70,6 @@ TestCovariance_simple(X = X_list, nv = nv, hypothesis = "equal-trace", method = 
 TestCovariance_simple(X_list[[1]], hypothesis = "given-trace", A = 3)
 
 }
+\references{
+\insertRef{sattler_cov_2020}{CovCorTest}
+}
