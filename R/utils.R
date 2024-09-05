@@ -34,7 +34,7 @@ Listcheck <- function(X, nv){
       if(is.list(X) & (length(X) == 1)){
         data <- X[[1]]
         if(!is.null(nv) && (nv != ncol(data))){
-          warning(paste0("the number of columns of X (", ncol(X), ") and the group size (", nv, ") do not allign"))
+          warning(paste0("the number of columns of X (", ncol(data), ") and the group size (", nv, ") do not allign"))
         }
         nv_ <- NULL
       }
@@ -55,7 +55,7 @@ Listcheck <- function(X, nv){
       if(length(X) == 1){
         data <- X[[1]]
         if((length(nv) != 1) || (nv != ncol(data))){
-          warning(paste0("the number of columns of X (", ncol(data), ") and the group size (", nv, ") do not allign"))
+          warning(paste0("the number of columns of X (", ncol(data), ") and the group size (",paste(nv, collapse = ","), ") do not allign"))
         }
         nv_ <- NULL
       }

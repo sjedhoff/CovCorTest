@@ -21,7 +21,7 @@ each matrix in this list is another group, where the observation vectors are the
 columns. For a matrix, all groups are together in one matrix and nv is used to indicate
 the group sizes. For one group, nv is not necessary}
 
-\item{nv}{vector of sample sizes for the bootstrap samples per group}
+\item{nv}{vector of group sizes}
 
 \item{C}{hypothesis matrix for calculating the Anova-Type-Statistic}
 

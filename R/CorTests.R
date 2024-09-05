@@ -48,14 +48,36 @@ TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000
     on.exit({ .Random.seed <<- old_seed })
     set.seed(seed)
   }
+
+
+  method <- toupper(method)
+  if(!(method == "MC" | method == "BT" | method == "TAY")){
+    stop("method must be bootstrap ('BT') or Monte-Carlo-technique('MC') or Taylor-based Monte-Carlo-approach('Tay')")
+  }
+
+  listcheck <- Listcheck(X,nv)
+  X <- listcheck[[1]]
+  nv <- listcheck[[2]]
+
   # one group
   if(is.null(nv)){
     nv <- dim(X)[2]
     d <- dim(X)[1]
+    groups <- 1
   }
   # multiple groups
   else{
     d <- unlist(lapply(X, nrow))[1]
+    groups <- length(nv)
+  }
+
+  # Check dimensions of C and Xi
+  pu <- d*(d-1)/2
+  if(!is.matrix(C)){
+    stop("C must be a matrix")
+  }
+  if( (nrow(C) != length(Xi)) | (ncol(C) != groups*pu) ){
+    stop("dimensions of C and Xi do not align")
   }
 
   p <- d*(d+1)/2
@@ -194,7 +216,7 @@ TestCorrelation_simple <- function(X, nv = NULL, hypothesis, method = "BT", repe
   hypothesis <- tolower(hypothesis)
   method <- toupper(method)
   if(!(method == "MC" | method == "BT" | method == "TAY")){
-    stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or  Taylor-based Monte-Carlo-approach('Tay')")
+    stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or Taylor-based Monte-Carlo-approach('Tay')")
   }
 
   listcheck <- Listcheck(X, nv)
@@ -254,10 +276,10 @@ TestCorrelation_simple <- function(X, nv = NULL, hypothesis, method = "BT", repe
 #' specified number of runs.
 #' @param X  a matrix containing the observation vectors as columns (one group)
 #' @param structure a character specifying the structure regarding them the
-#' covariance matrix should be checked. Options are "Hautoregressive" ("Har"), "diagonal" ("diag"),
+#' correlation matrix should be checked. Options are "Hautoregressive" ("Har"), "diagonal" ("diag"),
 #' "Hcompoundsymmetry" ("Hcs") and "Htoeplitz" ("Hteop").
-#' @param method a character, to chose whether bootstrap("BT") or Taylor-based Monte-Carlo-approach("TAY")
-#' Monte-Carlo-technique("MC") or is used, while bootstrap is the predefined method.
+#' @param method a character, to chose whether bootstrap("BT") or Taylor-based Monte-Carlo-approach("TAY") or
+#' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.
 #' @param repetitions a scalar, indicate the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed A seed, if it should be set for reproducibility. Predefined values
@@ -286,11 +308,21 @@ TestCorrelation_structure <- function(X, structure, method = "BT", repetitions =
     on.exit({ .Random.seed <<- old_seed })
     set.seed(seed)
   }
-
   structure <- tolower(structure)
   method <- toupper(method)
   if(!(method == "MC" | method == "BT" | method == "TAY")){
-    stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or  Taylor-based Monte-Carlos-approach('Tay')")
+    stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or Taylor-based Monte-Carlos-approach('Tay')")
+  }
+
+  if(is.list(X)){
+    if(length(X) > 1){
+      warning("The input X must be a matrix but is a list. Only the first element of the list is used.")
+      X <- X[[1]]
+    }
+    if(length(X) == 1){
+      X <- X[[1]]
+    }
+
   }
 
   n1 <- dim(X)[2]
@@ -334,7 +366,7 @@ TestCorrelation_structure <- function(X, structure, method = "BT", repetitions =
   Upsidv <- QF(Atilde %*% MvrH1 %*% MvrH2, HatCov)
   Xi <- rep(0, pu)
 
-  if(structure == "Hautoregressive"){
+  if(structure == "hautoregressive" | structure == "har"){
     Jacobi <- Jacobian(vCorData, a, d, p, fun = "ascending_root_fct_cor")
     Upsidvhtilde <- QF(Jacobi, Upsidv)
     C <- Pd(pu)
@@ -352,13 +384,13 @@ TestCorrelation_structure <- function(X, structure, method = "BT", repetitions =
     }
   }
   else{
-    if(structure == "diagonal"){
+    if(structure == "diagonal" | structure == "diag"){
       C <- diag(1, pu, pu)
     }
-    if(structure == "Hcompoundsymmetry"){
+    if(structure == "hcompoundsymmetry" | structure == "hcs"){
       C <- Pd(pu)
     }
-    if(structure == "Htoeplitz"){
+    if(structure == "htoeplitz" | structure == "htoep"){
       C <- Pd(d - 1)
       for(l in 3:d){
         C <- matrixcalc::direct.sum(C, Pd(d - l + 1))

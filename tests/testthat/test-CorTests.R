@@ -104,3 +104,98 @@ test_that("TestCorrelation_simple wrong method",{
                                      repetitions = 1000, seed = 31415)$Teststatistic,
                68.9068261789833)
 })
+
+test_that("TestCorrelation_simple d=1", {
+  expect_error(TestCorrelation_simple(X = X_list[[1]][1,1:12, drop = FALSE], nv = NULL, hypothesis = "uncorrelated"))
+})
+
+## Structure
+test_that("TestCorrelation_structure teststatic", {
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Har", method = "BT")$Teststatistic, 3.59698102595417)
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Har", method = "TAY")$Teststatistic, 3.59698102595417)
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Har", method = "MC")$Teststatistic, 3.59698102595417)
+
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "diag", method = "BT")$Teststatistic, 68.9068261789833)
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "diag", method = "TAY")$Teststatistic, 68.9068261789833)
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "diag", method = "MC")$Teststatistic, 68.9068261789833)
+
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Hcs", method = "BT")$Teststatistic, 5.26105347405293)
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Hcs", method = "TAY")$Teststatistic, 5.26105347405293)
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Hcs", method = "MC")$Teststatistic, 5.26105347405293)
+
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Htoep", method = "BT")$Teststatistic, 4.88304727273834)
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Htoep", method = "TAY")$Teststatistic, 4.88304727273834)
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Htoep", method = "MC")$Teststatistic, 4.88304727273834)
+
+})
+
+test_that("TestCorrelation_structure pvalue", {
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Har", method = "BT", seed = 31415)$pvalue, 0.021)
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Har", method = "TAY", seed = 31415)$pvalue, 0.125)
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Har", method = "MC", seed = 31415)$pvalue, 0.022)
+
+  expect_equal(TestCorrelation_structure(X = X_list[[2]], structure = "diag", method = "BT", seed = 31415)$pvalue, 0)
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "diag", method = "TAY", seed = 31415)$pvalue, 0) #wrong
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "diag", method = "MC", seed = 31415)$pvalue, 0)
+
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Hcs", method = "BT", seed = 31415)$pvalue, 0.007)
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Hcs", method = "TAY", seed = 31415)$pvalue, 0.065) #wrong
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Hcs", method = "MC", seed = 31415)$pvalue, 0.006)
+
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Htoep", method = "BT", seed = 31415)$pvalue, 0.009)
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Htoep", method = "TAY", seed = 31415)$pvalue, 0.124) #wrong
+  expect_equal(TestCorrelation_structure(X = X_list[[1]], structure = "Htoep", method = "MC", seed = 31415)$pvalue, 0.006)
+
+})
+
+
+test_that("TestCorrelation_structure wrong method/hypothesis",{
+  expect_error(TestCorrelation_structure(X = X, structure = "hcs", method = "abc",
+                                        repetitions = 1000, seed = 31415))
+  expect_equal(TestCorrelation_structure(X = X, structure = "hcs", method = "mc",
+                                        repetitions = 1000, seed = 31415)$Teststatistic,
+               5.26105347405293)
+  expect_error(TestCorrelation_structure(X = X, structure = "a"))
+})
+
+test_that("TestCorrelation_structure input list",{
+  expect_warning(expect_equal(TestCorrelation_structure(X = X_list, structure = "hcs", method = "mc",
+                                                       repetitions = 1000, seed = 31415)$pvalue, 0.006))
+  expect_equal(TestCorrelation_structure(X = list(X), structure = "hcs", method = "mc",
+                                        repetitions = 1000, seed = 31415)$pvalue, 0.006)
+})
+
+test_that("TestCorrelation_structure d=1", {
+  expect_error(TestCorrelation_structure(X = X_list[[1]][1,1:12, drop = FALSE], structure = "Har"))
+})
+
+## Base
+test_that("TestCorrelation_base pvalue,statistic",{
+  C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0), nrow = 1, ncol = 15)
+  Xi <- 2
+  expect_equal(TestCorrelation_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT", repetitions = 1000,
+                                   seed = 31415, hypothesis = "Trace")$pvalue, 0)
+  expect_equal(TestCorrelation_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT", repetitions = 1000,
+                                   seed = 31415, hypothesis = "Trace")$Teststatistic, 51.212638310026)
+  expect_equal(TestCorrelation_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT", repetitions = 1000,
+                                   seed = 31415, hypothesis = NULL)$pvalue, 0)
+})
+
+test_that("TestCovariance_base dimensions",{
+  C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,1), nrow = 1, ncol = 21)
+  Xi <- 2
+  expect_error(TestCorrelation_base(X = X, nv = NULL, C = C[1,1:20], Xi = Xi, method = "BT", repetitions = 1000,
+                                   seed = 31415, hypothesis = "Trace"))
+  expect_error(TestCorrelation_base(X = X, nv = NULL, C = C[1,1:20, drop = FALSE], Xi = Xi, method = "BT", repetitions = 1000,
+                                   seed = 31415, hypothesis = "Trace"))
+})
+
+test_that("TestCorrelation_base wrong method",{
+  C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0), nrow = 1, ncol = 15)
+  Xi <- 2
+  expect_error(TestCorrelation_base(X = X, nv = NULL, C = C, Xi = Xi, method = "abc", repetitions = 1000,
+                                   seed = 31415, hypothesis = "Trace"))
+})
+
+
+

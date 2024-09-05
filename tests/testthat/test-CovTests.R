@@ -104,6 +104,12 @@ test_that("TestCovariance_simple single group teststatistics",{
                                                     repetitions = 1000, seed = NULL)$Teststatistic, 3.1849761))
   expect_warning(expect_equal(TestCovariance_simple(X = X_list[[1]], nv = NULL, hypothesis = "given-matrix", method = "MC",
                                                     repetitions = 1000, seed = NULL)$Teststatistic, 3.1849761))
+
+  # Uncorrelated
+  expect_equal(TestCovariance_simple(X = X_list[[1]], nv = NULL, hypothesis = "uncorrelated", method = "MC",
+                                     repetitions = 1000, seed = NULL)$Teststatistic, 4.8878026)
+  expect_equal(TestCovariance_simple(X = X_list[[1]], nv = NULL, hypothesis = "uncorrelated", method = "BT",
+                                     repetitions = 1000, seed = NULL)$Teststatistic, 4.8878026)
 })
 
 test_that("TestCovariance_simple single group pvalue",{
@@ -124,6 +130,12 @@ test_that("TestCovariance_simple single group pvalue",{
                                                     repetitions = 1000, seed = 31415)$pvalue, 0.083))
   expect_warning(expect_equal(TestCovariance_simple(X = X_list[[1]], nv = NULL, hypothesis = "given-matrix", method = "MC",
                                                     repetitions = 1000, seed = 31415)$pvalue, 0.032))
+
+  # Uncorrelated
+  expect_equal(TestCovariance_simple(X = X_list[[1]], nv = NULL, hypothesis = "uncorrelated", method = "MC",
+                                     repetitions = 1000, seed = 31415)$pvalue, 0.017)
+  expect_equal(TestCovariance_simple(X = X_list[[1]], nv = NULL, hypothesis = "uncorrelated", method = "BT",
+                                     repetitions = 1000, seed = 31415)$pvalue, 0.047)
 })
 
 test_that("TestCovariance_simple single group given trace/matrix",{
@@ -150,6 +162,8 @@ test_that("TestCovariance_simple single group wrong hypothesis", {
                                      repetitions = 1000, seed = NULL))
   expect_error(TestCovariance_simple(X = X_list[[1]], nv = NULL, hypothesis = "equal-diagonals", method = "MC",
                                      repetitions = 1000, seed = NULL))
+  expect_warning(TestCovariance_simple(X = X_list[[1]], nv = NULL, hypothesis = "equal", A = 1))
+  expect_error(TestCovariance_simple(X = X_list, nv = nv, hypothesis = "uncorrelated"))
 })
 
 
@@ -158,6 +172,8 @@ test_that("TestCovariance_simple single group different input formats",{
                                      repetitions = 1000, seed = NULL))
   expect_warning(TestCovariance_simple(X = X_list[[1]], nv = 17, hypothesis = "equal", method = "MC",
                                        repetitions = 1000, seed = NULL))
+  expect_warning(TestCovariance_simple(X = list(X_list[[1]]), nv = 15, hypothesis = "equal"))
+  expect_warning(TestCovariance_simple(X = list(X_list[[1]]), nv = nv, hypothesis = "equal"))
 })
 
 test_that("TestCovariance_simple wrong method",{
@@ -196,7 +212,7 @@ test_that("TestCovariance_structure teststatistics",{
                         1.63921322978212)
 })
 
-test_that("TestCovariance_structure teststatistics",{
+test_that("TestCovariance_structure pvalue",{
   expect_equal(TestCovariance_structure(X, structure = "autoregressive", method = "MC", seed = 31415)$pvalue,
                0.103)
   expect_equal(TestCovariance_structure(X, structure = "ar", method = "BT", seed = 31415)$pvalue,
@@ -236,5 +252,46 @@ test_that("TestCovariance_structure input list",{
                                         repetitions = 1000, seed = 31415)$pvalue, 0.177))
   expect_equal(TestCovariance_structure(X = list(X), structure = "cs", method = "mc",
                                         repetitions = 1000, seed = 31415)$pvalue, 0.177)
+})
+
+
+test_that("TestCovariance_structure wrong dimension / hypothesis", {
+  expect_error(TestCovariance_structure(X = X_list[[1]][1,1:12, drop = FALSE], structure = "cs", method = "BT"))
+  expect_error(TestCovariance_structure(X = X_list[[1]], structure = "a", method = "BT"))
+})
+
+
+## Base
+C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,1), nrow = 1, ncol = 21)
+Xi <- 2
+test_that("TestCovariance_base pvalue,statistic",{
+  expect_equal(TestCovariance_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT", repetitions = 1000,
+                      seed = 31415, hypothesis = "Trace")$pvalue, 0.038)
+  expect_equal(TestCovariance_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT", repetitions = 1000,
+                                   seed = 31415, hypothesis = "Trace")$Teststatistic, 6.32190311190589)
+  expect_equal(TestCovariance_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT", repetitions = 1000,
+                                   seed = 31415, hypothesis = NULL)$pvalue, 0.038)
+})
+
+test_that("TestCovariance_base dimensions",{
+  C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,1), nrow = 1, ncol = 21)
+  Xi <- 2
+  expect_error(TestCovariance_base(X = X, nv = NULL, C = C[1,1:20], Xi = Xi, method = "BT", repetitions = 1000,
+                                   seed = 31415, hypothesis = "Trace"))
+  expect_error(TestCovariance_base(X = X, nv = NULL, C = C[1,1:20, drop = FALSE], Xi = Xi, method = "BT", repetitions = 1000,
+                                   seed = 31415, hypothesis = "Trace"))
+})
+
+test_that("TestCovariance_base wrong method",{
+  C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,1), nrow = 1, ncol = 21)
+  Xi <- 2
+  expect_error(TestCovariance_base(X = X, nv = NULL, C = C[1,1:20], Xi = Xi, method = "abc", repetitions = 1000,
+                                   seed = 31415, hypothesis = "Trace"))
+})
+
+## Printing
+test_that("print covtest", {
+  X <- CovTest()
+  expect_null(print(X))
 })
 

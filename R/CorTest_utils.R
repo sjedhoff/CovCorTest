@@ -84,7 +84,7 @@ Tayapp1G <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M4, L, 
   }
   # with the transformation
   else{
-    XTaydv <- Atilde %*% (Part1 + L %*% (Part2 - Part3 + Part4) / sqrt(n1))
+    XTaydv <- Atilde %*% (Part1 + L %*% (Part2 - Part3 + Part4) / sqrt(n1))/ sqrt(n1)
     CXTaydv <- C %*% Jacobi %*% XTaydv
     Result <- n1 * apply(CXTaydv, 2, crossprod) / Trace
   }

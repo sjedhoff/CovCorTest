@@ -59,14 +59,24 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
 
   # just one group is nv = NULL
   if(is.null(nv)){
+    dimensions <- dim(X)[1]
+    groups <- 1
+
+
     nv <- dim(X)[2]
     vX <- matrixcalc::vech(stats::var(t(X)))
     Xq <- matrix(apply(X-rowMeans(X),2,vtcrossprod),ncol=nv)
     HatCov <- stats::var(t(Xq))
     MSrootHatCov <- MSroot(HatCov)
+
+
   }
   # multiple groups
   else{
+    dimensions <- unlist(lapply(X, nrow))
+    groups <- length(nv)
+
+
     N  <- sum(nv)
     kappainvv <- N / nv
 
@@ -80,14 +90,22 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
     HatCov <- WDirect.sumL(HatCov_list, kappainvv)
   }
 
+  # Check dimensions of C and Xi
+  d <- dimensions[1]
+  p <- d * (d+1) / 2
+  ifelse(d > 1, a <- cumsum(c(1, d:2)), a <- 1)
+  if(!is.matrix(C)){
+    stop("C must be a matrix")
+  }
+  if( (nrow(C) != length(Xi)) | (ncol(C) != groups*p) ){
+    stop("dimensions of C and Xi do not align")
+  }
+
   if(method == "MC"){
     ResamplingResult <- ATSwS(QF(C, HatCov), repetitions)
   }
   else if(method == "BT"){
     ResamplingResult <- sapply(1:repetitions, Bootstrap, nv, C, MSrootHatCov)
-  }
-  else{
-    stop("method must be 'MC' or 'BT'")
   }
 
   Teststatistic <- ATS(sum(nv), vX, C, HatCov, Xi)
@@ -318,7 +336,7 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
 #' TestCovariance_structure(X = X, structure = "diagonal", method = "MC")
 #'
 #' @export
-TestCovariance_structure <- function(X, structure, method, repetitions = 1000, seed = NULL){
+TestCovariance_structure <- function(X, structure, method = "BT", repetitions = 1000, seed = NULL){
 
   structure <- tolower(structure)
   method <- toupper(method)
