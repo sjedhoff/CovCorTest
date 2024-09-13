@@ -295,3 +295,46 @@ test_that("print covtest", {
   expect_null(print(X))
 })
 
+
+## Missing values
+test_that("missing values one group", {
+  matrix <- matrix(c(1, NA, 3, NA, NA, NA, 2, 4, NA, NA, 6, 7,1,2,3,4,5,6), nrow=3, byrow=TRUE)
+  expect_error(expect_warning(TestCorrelation_simple(X = matrix, nv = NULL, hypothesis = "uncorrelated")))
+  matrix <- matrix(c(NA, NA, NA, NA, 1, NA, 2, 4, 4, NA, 6, 7), nrow=3, byrow=TRUE)
+  expect_warning(expect_warning(TestCorrelation_simple(X = matrix, nv = NULL, hypothesis = "uncorrelated")))
+})
+
+test_that("missing values mutliple groups", {
+  X <- list(
+    matrix1 = matrix(c(1, NA, 3, NA, 2, NA, 2, 4, 1, NA, 6, 7,1 ,2 ,3, 4, 5, 6, 7, 8, 9), nrow=3, byrow=TRUE),
+    matrix2 = matrix(c(5, NA, 1, NA, 9, NA, 4, NA, 3, 5, 8, NA), nrow=3, byrow=TRUE),
+    matrix3 = matrix(c(2, NA, 2, NA, 4, NA, 2, 4, 1, NA, 6, 7), nrow=3, byrow=TRUE),
+    matrix4 = matrix(c(7, NA, 6, NA, 7, NA, 4, NA, 3, 5, 8, NA), nrow=3, byrow=TRUE)
+  )
+  expect_warning(expect_warning(TestCovariance_simple(X = X, nv = c(7,4,4,4), hypothesis = "equal")))
+  X <- list(
+    matrix1 = matrix(c(1, NA, 3, NA, 2, NA, 2, 4, 1, NA, 6, 7,1 ,2 ,3, 4, 5, 6, 7, 8, 9), nrow=3, byrow=TRUE),
+    matrix2 = matrix(c(NA, NA, NA, NA, 9, NA, 4, NA, 3, 5, 8, NA), nrow=3, byrow=TRUE),
+    matrix3 = matrix(c(2, NA, 2, NA, 4, NA, 2, 4, 1, NA, 6, 7), nrow=3, byrow=TRUE),
+    matrix4 = matrix(c(7, NA, 6, NA, 7, NA, 4, NA, 3, 5, 8, NA), nrow=3, byrow=TRUE)
+  )
+  expect_warning(expect_warning(expect_warning(TestCovariance_simple(X = X, nv = c(7,4,4,4), hypothesis = "equal"))))
+})
+
+## wrong dimensions: only one subject, only one variable
+test_that("dim = 1 one group", {
+  X <- matrix(c(1,2,3,4,5,6), nrow = 1)
+  expect_error(TestCovariance_simple(X, hypothesis = "equal"))
+  X <- matrix(c(1,2,3,4,5,6), ncol = 1)
+  expect_error(TestCovariance_simple(X, hypothesis = "equal"))
+})
+
+test_that("dim = 1 multiple groups",{
+  X <- list(matrix(c(1,2,3,4,5,6), nrow = 3),
+            matrix(c(1,2,3), nrow = 3))
+  expect_error(TestCovariance_simple(X, nv = c(2,1), hypothesis = "equal"))
+  X <- list(matrix(c(1,2,3,4,5,6), nrow = 1),
+            matrix(c(1,2,3), nrow = 1))
+  expect_error(TestCovariance_simple(X, nv = c(6,3), hypothesis = "equal"))
+
+})

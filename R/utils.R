@@ -82,16 +82,71 @@ Listcheck <- function(X, nv){
     }
   }
 
-  ## For multiple groups: check dimensions
+
+
+
+  ## Check for missing values
+  # one group
+  if(is.null(nv_) & any(is.na(data))){
+    data_na <- data
+      # remove rows with NA all the way
+      data <- data[!apply(data, 1, function(x) all(is.na(x))), , drop = FALSE]
+      if(nrow(data) < nrow(data_na)){
+        warning(paste0(nrow(data_na) - nrow(data), " row(s) with only NA values were removed"))
+      }
+      # remove columns with at least one NA
+      data <- data[, !apply(data, 2, function(x) any(is.na(x))), drop = FALSE]
+      if(ncol(data) < ncol(data_na)){
+        warning(paste0(ncol(data_na) - ncol(data), " subject(s) is/are removed due to missing values"))
+      }
+    }
+    # more groups
+    if(!is.null(nv_) & any(unlist(lapply(X, function(x) any(is.na(x)))))){
+      data_na <- data
+      # rows, where at least in one group only missing values are present
+      na_rows <- apply(sapply(data, function(mat) apply(mat, 1, function(row) all(is.na(row)))), 1, any)
+      # remove these rows
+      data <- lapply(data, function(mat) mat[!na_rows, , drop=FALSE])
+      if(any(na_rows)){
+        warning(paste0(sum(na_rows), " row(s) with only NA values were removed"))
+      }
+      # remove columns with at least one NA
+      data <- lapply(data, function(mat) mat[, !apply(mat, 2, function(col) any(is.na(col))), drop=FALSE])
+      if(sum(unlist(lapply(data_na, ncol)) - unlist(lapply(data, ncol))) > 0){
+        warning(paste0(sum(unlist(lapply(data_na, ncol)) - unlist(lapply(data, ncol))), " subject(s) is/are removed due to missing values"))
+      }
+      nv_save <- nv_
+      nv_ <- unlist(lapply(X, ncol))
+    }
+
+
+  ## Check dimensions: multiple groups
   if(!is.null(nv_)){
     dimensions <- unlist(lapply(data, nrow))
     if(max(dimensions) != mean(dimensions)){
       stop("dimensions do not accord")
     }
+    if(any(unlist(lapply(data, ncol)) == 1)){
+      stop("testing covariance/correlation not possible: at least one group has only one subject")
+    }
+    if(nrow(data[[1]]) == 1){
+      stop("testing covariance/correlation not possible: only one variable to test")
+    }
   }
+  else{
+    if(nrow(data) == 1){
+      stop("testing covariance/correlation not possible with only one subject")
+    }
+    if(ncol(data) == 1){
+      stop("testing covariance/correlation not possible with only one variable")
+    }
+  }
+
+
 
   return(list(data,nv_))
 }
+
 
 #' @title Quadratic form for vectors and matrices
 #'
