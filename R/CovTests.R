@@ -2,22 +2,22 @@
 #'
 #' @description This function conducts the test for hypotheses regarding the
 #' covariance matrix. Depending on the chosen method a
-#' bootstrap  or Monte-Carlo-technique is used to calculate p-value of the Anova-Type-Statistic
+#' bootstrap  or Monte-Carlo-technique is used to calculate the p-value of the Anova-type-statistic(ATS)
 #' based on a specified number of runs.
 #' @param X a list or matrix containing the observation vectors. In case of a list,
 #' each matrix in this list is another group, where the observation vectors are the
 #' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
-#' the group sizes. For one group, nv is not necessary
+#' the group sizes. For one group, nv is not necessary.
 #' @param nv vector of group sizes
-#' @param C hypothesis matrix for calculating the Anova-Type-Statistic
+#' @param C hypothesis matrix for calculating the ATS
 #' @param Xi a vector defining together with C the investigated hypothesis
 #' @param method a character, to chose whether bootstrap("BT") or
 #' Monte-Carlo-technique("MC") is used.
 #' @param repetitions a scalar, indicates the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
-#' @param seed A seed, if it should be set for reproducibility. Predefined values
+#' @param seed a seed, if it should be set for reproducibility. Predefined value
 #' is NULL, which means no seed is set.
-#' @param hypothesis character or NULL, will be displayed in the print call
+#' @param hypothesis character or NULL, will be displayed in the print call.
 #' @return an object of the class \code{\link{CovTest}}
 #'
 #' @references \insertRef{sattler_cov_2020}{CovCorTest}
@@ -143,7 +143,7 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
 #' @param X a list or matrix containing the observation vectors. In case of a list,
 #' each matrix in this list is another group, where the observation vectors are the
 #' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
-#' the group sizes. For one group, nv is not necessary
+#' the group sizes. For one group, nv is not necessary.
 #' @param nv vector of group sizes
 #' @param hypothesis a character to choose one of the predefined hypotheses which are
 #' "equal", for multiple groups "equal-trace" and "equal-diagonals" and for a single group
@@ -155,7 +155,7 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
 #' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.
 #' @param repetitions a scalar,  indicate the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
-#' @param seed A seed, if it should be set for reproducibility. Predefined values
+#' @param seed a seed, if it should be set for reproducibility. Predefined value
 #' is NULL, which means no seed is set.
 #' @return an object of the class \code{\link{CovTest}}
 #'
@@ -307,7 +307,7 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
 #'
 #' @description This function conducts the test for the covariance matrix of data regarding
 #' structures. Depending on the chosen method a bootstrap or
-#' Monte-Carlo-technique is used to calculate p-value of the Anova-Type-Statistics based on a
+#' Monte-Carlo-technique is used to calculate p-value of the Anova-type-statistic(ATS) based on a
 #' specified number of runs.
 #' @param X a matrix containing the observation vectors as columns (one group only)
 #' @param structure a character specifying the structure regarding the
@@ -317,7 +317,7 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
 #' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.
 #' @param repetitions a scalar, indicate the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
-#' @param seed A seed, if it should be set for reproducibility. Predefined values
+#' @param seed a seed, if it should be set for reproducibility. Predefined value
 #' is NULL, which means no seed is set.
 #' @return an object of the class \code{\link{CovTest}}
 #'

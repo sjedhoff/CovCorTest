@@ -3,12 +3,12 @@
 #' @description This function conducts the test for hypotheses regarding the
 #' correlation matrix. Depending on the chosen method a
 #' bootstrap, Monte-Carlo-technique or Taylor-based Monte-Carlo-approach is used to
-#' calculate p-value of the Anova-type-statistic
+#' calculate the p-value of the Anova-type-statistic(ATS)
 #' based on a specified number of runs.
 #' @param X a list or matrix containing the observation vectors. In case of a list,
 #' each matrix in this list is another group, where the observation vectors are the
 #' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
-#' the group sizes. For one group, nv is not necessary
+#' the group sizes. For one group, nv is not necessary.
 #' @param nv vector of group sizes
 #' @param C hypothesis matrix for calculating the ATS
 #' @param Xi a vector defining together with C the investigated hypothesis
@@ -16,9 +16,9 @@
 #' Monte-Carlo-technique("MC") or Taylor-based Monte-Carlo-approach("TAY") is used.
 #' @param repetitions a scalar, indicate the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
-#' @param seed A seed, if it should be set for reproducibility. Predefined values
+#' @param seed a seed, if it should be set for reproducibility. Predefined value
 #' is NULL, which means no seed is set.
-#' @param hypothesis character or NULL, will be displayed in the print call
+#' @param hypothesis character or NULL, will be displayed in the print call.
 #' @return an object of the class \code{\link{CovTest}}
 #'
 #'
@@ -171,7 +171,7 @@ TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000
 #' @param X a list or matrix containing the observation vectors. In case of a list,
 #' each matrix in this list is another group, where the observation vectors are the
 #' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
-#' the group sizes. For one group, nv is not necessary
+#' the group sizes. For one group, nv is not necessary.
 #' @param nv vector of group sizes
 #' @param hypothesis a character to choose one of the predefined hypotheses which are
 #' "equal-correlated" and "uncorrelated" (only possible for one group)
@@ -179,7 +179,7 @@ TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000
 #' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.
 #' @param repetitions a scalar, indicate the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
-#' @param seed A seed, if it should be set for reproducibility. Predefined values
+#' @param seed a seed, if it should be set for reproducibility. Predefined value
 #' is NULL, which means no seed is set.
 #' @return an object of the class \code{\link{CovTest}}
 #'
@@ -272,7 +272,7 @@ TestCorrelation_simple <- function(X, nv = NULL, hypothesis, method = "BT", repe
 #' @description With this function the correlation matrix of data can be checked
 #' for one of the predefined structures. Depending on the chosen method a bootstrap, the
 #' Taylor-based Monte-Carlo approach or
-#' Monte-Carlo-technique is used to calculate p-value of the Anova-Type-Statistoc based on a
+#' Monte-Carlo-technique is used to calculate the p-value of the Anova-type-statistic(ATS) based on a
 #' specified number of runs.
 #' @param X  a matrix containing the observation vectors as columns (one group)
 #' @param structure a character specifying the structure regarding them the
@@ -282,7 +282,7 @@ TestCorrelation_simple <- function(X, nv = NULL, hypothesis, method = "BT", repe
 #' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.
 #' @param repetitions a scalar, indicate the number of runs for the chosen method.
 #' The predefined value is 1,000, and the number should not be below 500.
-#' @param seed A seed, if it should be set for reproducibility. Predefined values
+#' @param seed a seed, if it should be set for reproducibility. Predefined value
 #' is NULL, which means no seed is set.
 #' @return an object of the class \code{\link{CovTest}}
 #'
