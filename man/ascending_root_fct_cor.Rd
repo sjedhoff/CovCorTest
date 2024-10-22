@@ -18,9 +18,10 @@ correlation matrix}
 a transformed vector
 }
 \description{
-A function calculating the roots of a vectorised covariance matrix.
-The roots increasing, so square root for the first secondary diagonals, third
-root for the second secondary diagonal and so on. For roots with even order the
-absolute value of the argument is used, since the arguments can be negative.
+A function calculating the roots of a vectorised covariance
+matrix. The roots increasing, so square root for the first secondary
+diagonals, third root for the second secondary diagonal and so on. For roots
+with even order the absolute value of the argument is used, since the
+arguments can be negative.
 }
 \keyword{internal}

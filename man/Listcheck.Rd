@@ -12,7 +12,12 @@ Listcheck(X, nv)
 \item{nv}{number of subjects per group}
 }
 \value{
-list
+A list with two components
+\item{X}{ Dataset in the right format: for a single group, a single matrix.
+For multiple groups, a list with an element for each group contaning a
+matrix.}
+\item{nv}{ Number of subjects per group: NV for a single group and a vector
+for multiple groups.}
 }
 \description{
 Function to transform the data into a list, if there are not already

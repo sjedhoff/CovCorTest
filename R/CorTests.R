@@ -2,19 +2,22 @@
 #'
 #' @description This function conducts the test for hypotheses regarding the
 #' correlation matrix. Depending on the chosen method a
-#' bootstrap, Monte-Carlo-technique or Taylor-based Monte-Carlo-approach is used to
-#' calculate the p-value of the Anova-type-statistic(ATS)
+#' bootstrap, Monte-Carlo-technique or Taylor-based Monte-Carlo-approach is used
+#' to calculate the p-value of the Anova-type-statistic(ATS)
 #' based on a specified number of runs.
-#' @param X a list or matrix containing the observation vectors. In case of a list,
-#' each matrix in this list is another group, where the observation vectors are the
-#' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
-#' the group sizes. For one group, nv is not necessary.
+#' @param X a list or matrix containing the observation vectors.
+#' In case of a list,each matrix in this list is another group, where the
+#' observation vectors are the columns. For a matrix, all groups are together in
+#' one matrix and nv is used to indicate the group sizes. For one group, nv is
+#' not necessary.
 #' @param nv vector of group sizes
 #' @param C hypothesis matrix for calculating the ATS
 #' @param Xi a vector defining together with C the investigated hypothesis
 #' @param method a character, to chose whether bootstrap("BT") or
-#' Monte-Carlo-technique("MC") or Taylor-based Monte-Carlo-approach("TAY") is used.
-#' @param repetitions a scalar, indicate the number of runs for the chosen method.
+#' Monte-Carlo-technique("MC") or Taylor-based Monte-Carlo-approach("TAY") is
+#' used.
+#' @param repetitions a scalar, indicate the number of runs for the chosen
+#' method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed a seed, if it should be set for reproducibility. Predefined value
 #' is NULL, which means no seed is set.
@@ -37,11 +40,12 @@
 #' C <- diag(x = 1, nrow = 15, ncol = 15)
 #' Xi <- rep(0,15)
 #'
-#' TestCorrelation_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT", repetitions = 1000,
-#'       seed = 31415, hypothesis = "Uncorrelated")
+#' TestCorrelation_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT",
+#'     repetitions = 1000, seed = 31415, hypothesis = "Uncorrelated")
 #'
 #' @export
-TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
+TestCorrelation_base <- function(X, nv = NULL, C, Xi, method,
+                                 repetitions = 1000,
                                  seed = NULL, hypothesis = NULL){
   if(!is.null(seed)){
     old_seed <- .Random.seed
@@ -52,7 +56,8 @@ TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000
 
   method <- toupper(method)
   if(!(method == "MC" | method == "BT" | method == "TAY")){
-    stop("method must be bootstrap ('BT') or Monte-Carlo-technique('MC') or Taylor-based Monte-Carlo-approach('Tay')")
+    stop("method must be bootstrap ('BT') or Monte-Carlo-technique('MC') or
+         Taylor-based Monte-Carlo-approach('Tay')")
   }
 
   listcheck <- Listcheck(X,nv)
@@ -100,7 +105,8 @@ TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000
     Xq <- matrix(apply(X-rowMeans(X),2,vtcrossprod), nrow=p, ncol=nv)
     HatCov <- stats::var(t(Xq))
     MvrH1 <- (L-1/2*vCorData*M1)
-    MvrH2 <- sqrt(diag(as.vector(1/vtcrossprod(matrix(matrixcalc::vech(VarData)[a]))),p,p))
+    MvrH2 <- sqrt(diag(as.vector(1/vtcrossprod(matrix(
+                                           matrixcalc::vech(VarData)[a]))),p,p))
     Upsi <- QF(MvrH1%*%MvrH2,HatCov)
     MSrootUpsi <- MSroot(Upsi)
     StUpsi <- QF(MvrH2,HatCov)
@@ -116,9 +122,10 @@ TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000
     HatCov <- lapply(DataQ, function(X) stats::var(t(X)))
     MvrH <- StUpsi <- list()
 
-    for (i in 1:length(nv)){
+    for (i in seq_along(nv)){
       MvrH[[i]] <- (L - 1 / 2 * vCorData[[i]] * M1)
-      StUpsi[[i]] <- QF(sqrt(diag(as.vector(1 / vtcrossprod(matrix(matrixcalc::vech(VarData[[i]])[a]))), p, p)), HatCov[[i]])
+      StUpsi[[i]] <- QF(sqrt(diag(as.vector(1 / vtcrossprod(matrix(
+        matrixcalc::vech(VarData[[i]])[a]))), p, p)), HatCov[[i]])
     }
     Upsi_list <- mapply(QF, MvrH, StUpsi, SIMPLIFY = FALSE)
     MSrootStUpsi <- lapply(StUpsi, MSroot)
@@ -128,16 +135,22 @@ TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000
   }
 
   if(method == "MC"){ ResamplingResult <- ATSwS(QF(C, Upsi), repetitions) }
-  if(method == "BT"){ ResamplingResult <- sapply(1:repetitions, Bootstrap, nv, C, MSrootUpsi) }
+  if(method == "BT"){ ResamplingResult <- vapply(X = 1:repetitions,
+                                                 FUN = Bootstrap,
+                                                 FUN.VALUE = numeric(1),
+                                                 nv, C, MSrootUpsi)
+  }
   if(method == "TAY"){
     P <- diag(1,p,p)[a,]
     Q <- diag(as.vector(matrixcalc::vech(diag(1,d,d))),p,p)
     Trace <- sum(diag(QF(C,Upsi)))
     if(length(nv) == 1){ # one group
-      ResamplingResult <- Tayapp1G(repetitions, C, MSrootStUpsi, CorData, MvrH1, Trace, M4, L, P, Q, nv, NULL, NULL)
+      ResamplingResult <- Tayapp1G(repetitions, C, MSrootStUpsi, CorData,
+                                   MvrH1, Trace, M4, L, P, Q, nv, NULL, NULL)
     }
     else{ #multiple groups
-      ResamplingResult <- TayappMG(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M4, L, P, Q, nv)
+      ResamplingResult <- TayappMG(repetitions, C, MSrootStUpsi, CorData,
+                                   MvrH, Trace, M4, L, P, Q, nv)
     }
   }
 
@@ -164,20 +177,23 @@ TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000
 
 #' @title Simplified call for test regarding correlation matrices
 #'
-#' @description This function conducts tests for hypotheses regarding the correlation
-#' matrix for a more applied user. A hypothesis can be selected out of a group of
-#' predefined hypotheses. From this C and Xi are built and the function
-#'  \code{\link{TestCorrelation_base}} is used.
-#' @param X a list or matrix containing the observation vectors. In case of a list,
-#' each matrix in this list is another group, where the observation vectors are the
-#' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
-#' the group sizes. For one group, nv is not necessary.
+#' @description This function conducts tests for hypotheses regarding the
+#' correlation matrix for a more applied user. A hypothesis can be selected out
+#' of a group of predefined hypotheses. From this C and Xi are built and the
+#' function \code{\link{TestCorrelation_base}} is used.
+#' @param X a list or matrix containing the observation vectors. In case of a
+#' list, each matrix in this list is another group, where the observation
+#' vectors are the columns. For a matrix, all groups are together in one matrix
+#' and nv is used to indicate the group sizes. For one group, nv is not
+#' necessary.
 #' @param nv vector of group sizes
-#' @param hypothesis a character to choose one of the predefined hypotheses which are
-#' "equal-correlated" and "uncorrelated" (only possible for one group)
-#' @param method a character, to chose whether bootstrap("BT"), Taylor-based Monte-Carlo-approach("TAY") or
-#' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.
-#' @param repetitions a scalar, indicate the number of runs for the chosen method.
+#' @param hypothesis a character to choose one of the predefined hypotheses
+#' which are "equal-correlated" and "uncorrelated" (only possible for one group)
+#' @param method a character, to chose whether bootstrap("BT"), Taylor-based
+#' Monte-Carlo-approach("TAY") or Monte-Carlo-technique("MC") is used, while
+#' bootstrap is the predefined method.
+#' @param repetitions a scalar, indicate the number of runs for the chosen
+#' method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed a seed, if it should be set for reproducibility. Predefined value
 #' is NULL, which means no seed is set.
@@ -194,29 +210,31 @@ TestCorrelation_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000
 #' vars <- colnames(EEGwide)[1:6]
 #'
 #' # Part the data into six groups of sex and diagnosis
-#' X_list <- list(t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars]),
-#'                t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "MCI",vars]),
-#'                t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "SCC",vars]),
-#'                t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",vars]),
-#'                t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "MCI",vars]),
-#'                t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "SCC",vars]))
+#' X_list <- list(t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="AD",vars]),
+#'                t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="MCI",vars]),
+#'                t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="SCC",vars]),
+#'                t(EEGwide[EEGwide$sex=="W" & EEGwide$diagnosis=="AD",vars]),
+#'                t(EEGwide[EEGwide$sex=="W" & EEGwide$diagnosis=="MCI",vars]),
+#'                t(EEGwide[EEGwide$sex=="W" & EEGwide$diagnosis=="SCC",vars]))
 #'
 #' nv <- unlist(lapply(X_list, ncol))
 #'
 #' # Test for multiple groups
-#' TestCorrelation_simple(X = X_list, nv = nv, hypothesis = "equal-correlated", method = "MC",
-#'                      repetitions = 1000, seed = NULL)
+#' TestCorrelation_simple(X = X_list, nv = nv, hypothesis = "equal-correlated",
+#'                       method = "MC", repetitions = 1000, seed = NULL)
 #'
 #' # Test for only one group
 #' TestCorrelation_simple(X_list[[1]], hypothesis = "uncorrelated")
 #'
 #'
 #' @export
-TestCorrelation_simple <- function(X, nv = NULL, hypothesis, method = "BT", repetitions = 1000, seed = NULL){
+TestCorrelation_simple <- function(X, nv = NULL, hypothesis, method = "BT",
+                                   repetitions = 1000, seed = NULL){
   hypothesis <- tolower(hypothesis)
   method <- toupper(method)
   if(!(method == "MC" | method == "BT" | method == "TAY")){
-    stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or Taylor-based Monte-Carlo-approach('Tay')")
+    stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or
+         Taylor-based Monte-Carlo-approach('Tay')")
   }
 
   listcheck <- Listcheck(X, nv)
@@ -234,9 +252,6 @@ TestCorrelation_simple <- function(X, nv = NULL, hypothesis, method = "BT", repe
     d <- dim(X)[1]
   }
 
-  if(d == 1){
-    stop("Correlation is only defined for dimensions higher than one")
-  }
   p <- d * (d+1) / 2
   if(!(hypothesis %in% c("equal-correlated", "uncorrelated"))){
     stop("no predefined hypothesis")
@@ -256,11 +271,13 @@ TestCorrelation_simple <- function(X, nv = NULL, hypothesis, method = "BT", repe
   }
   if(hypothesis == "uncorrelated"){
     if(!is.null(nv)){
-      stop("the hypothesis 'uncorrelated' can only be tested for a single group")
+      stop("the hypothesis 'uncorrelated' can only be tested for a
+           single group")
     }
     C <- diag(1, p - d, p - d)
     Xi <- rep(0, p - d)
-    return(TestCorrelation_base(X, nv, C, Xi, method, repetitions, seed, hypothesis))
+    return(TestCorrelation_base(X, nv, C, Xi, method, repetitions, seed,
+                                hypothesis))
   }
 
 }
@@ -270,17 +287,19 @@ TestCorrelation_simple <- function(X, nv = NULL, hypothesis, method = "BT", repe
 #' @title Test for structure of data's correlation matrix
 #'
 #' @description With this function the correlation matrix of data can be checked
-#' for one of the predefined structures. Depending on the chosen method a bootstrap, the
-#' Taylor-based Monte-Carlo approach or
-#' Monte-Carlo-technique is used to calculate the p-value of the Anova-type-statistic(ATS) based on a
+#' for one of the predefined structures. Depending on the chosen method a
+#' bootstrap, the Taylor-based Monte-Carlo approach or  Monte-Carlo-technique
+#' is used to calculate the p-value of the Anova-type-statistic(ATS) based on a
 #' specified number of runs.
 #' @param X  a matrix containing the observation vectors as columns (one group)
 #' @param structure a character specifying the structure regarding them the
-#' correlation matrix should be checked. Options are "Hautoregressive" ("Har"), "diagonal" ("diag"),
-#' "Hcompoundsymmetry" ("Hcs") and "Htoeplitz" ("Hteop").
-#' @param method a character, to chose whether bootstrap("BT") or Taylor-based Monte-Carlo-approach("TAY") or
-#' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.
-#' @param repetitions a scalar, indicate the number of runs for the chosen method.
+#' correlation matrix should be checked. Options are "Hautoregressive" ("Har"),
+#' "diagonal" ("diag"), "Hcompoundsymmetry" ("Hcs") and "Htoeplitz" ("Hteop").
+#' @param method a character, to chose whether bootstrap("BT") or Taylor-based
+#' Monte-Carlo-approach("TAY") or Monte-Carlo-technique("MC") is used, while
+#' bootstrap is the predefined method.
+#' @param repetitions a scalar, indicate the number of runs for the chosen
+#' method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed a seed, if it should be set for reproducibility. Predefined value
 #' is NULL, which means no seed is set.
@@ -296,13 +315,15 @@ TestCorrelation_simple <- function(X, nv = NULL, hypothesis, method = "BT", repe
 #'
 #' # Select only the males with the diagnosis AD
 #' X <- as.matrix(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",
-#'                           c("brainrate_temporal", "brainrate_frontal","brainrate_central",
-#'                             "complexity_temporal","complexity_frontal", "complexity_central")])
+#'              c("brainrate_temporal", "brainrate_frontal","brainrate_central",
+#'              "complexity_temporal","complexity_frontal",
+#'              "complexity_central")])
 #'
 #' TestCorrelation_structure(X = X, structure = "diagonal", method = "MC")
 #'
 #' @export
-TestCorrelation_structure <- function(X, structure, method = "BT", repetitions = 1000, seed = NULL){
+TestCorrelation_structure <- function(X, structure, method = "BT",
+                                      repetitions = 1000, seed = NULL){
   if(!is.null(seed)){
     old_seed <- .Random.seed
     on.exit({ .Random.seed <<- old_seed })
@@ -311,12 +332,14 @@ TestCorrelation_structure <- function(X, structure, method = "BT", repetitions =
   structure <- tolower(structure)
   method <- toupper(method)
   if(!(method == "MC" | method == "BT" | method == "TAY")){
-    stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or Taylor-based Monte-Carlos-approach('Tay')")
+    stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or
+         Taylor-based Monte-Carlos-approach('Tay')")
   }
 
   if(is.list(X)){
     if(length(X) > 1){
-      warning("The input X must be a matrix but is a list. Only the first element of the list is used.")
+      warning("The input X must be a matrix but is a list. Only the first
+              element of the list is used.")
       X <- X[[1]]
     }
     if(length(X) == 1){
@@ -355,7 +378,8 @@ TestCorrelation_structure <- function(X, structure, method = "BT", repetitions =
   HatCov <- stats::var(t(Xq))
   MvrH1 <- (L - 1 / 2 * vechp(CorData) * M1)
 
-  MvrH2 <- sqrt(diag(as.vector(1 / vtcrossprod(matrix(matrixcalc::vech(VarData)[a]))), p, p))
+  MvrH2 <- sqrt(diag(as.vector(1 / vtcrossprod(matrix(
+                                        matrixcalc::vech(VarData)[a]))), p, p))
   Atilde <- matrix(0, pu, pu)
   for(l in 1:(d - 1)){
     for(k in 1:(d - l)){
@@ -370,17 +394,24 @@ TestCorrelation_structure <- function(X, structure, method = "BT", repetitions =
     Jacobi <- Jacobian(vCorData, a, d, p, fun = "ascending_root_fct_cor")
     Upsidvhtilde <- QF(Jacobi, Upsidv)
     C <- Pd(pu)
-    Teststatistic <- ATS(n1, ascending_root_fct_cor(vCorData, a, d), C, Upsidvhtilde, Xi)
-    if(method == "MC"){ ResamplingResult <- ATSwS(QF(C, Upsidvhtilde), repetitions) }
-    if(method == "BT"){ ResamplingResult <- sapply(1:repetitions, Bootstrap_trans, n1, a, d,
-                                                   p, C, MSroot(Upsidv), vCorData, fun = "ascending_root_fct_cor") }
+    Teststatistic <- ATS(n1, ascending_root_fct_cor(vCorData, a, d), C,
+                         Upsidvhtilde, Xi)
+    if(method == "MC"){ ResamplingResult <- ATSwS(QF(C, Upsidvhtilde),
+                                                  repetitions) }
+    if(method == "BT"){ ResamplingResult <- vapply(X = 1:repetitions,
+                                              FUN = Bootstrap_trans,
+                                              FUN.VALUE = numeric(1),
+                                              n1, a, d,
+                                              p, C, MSroot(Upsidv),
+                                              vCorData,
+                                              fun = "ascending_root_fct_cor") }
     if(method == "TAY"){
       P <- diag(1, p, p)[a, ]
       StUpsi <- QF(MvrH2, HatCov)
       Trace <- sum(diag(QF(C, Upsidvhtilde)))
 
       ResamplingResult <- Tayapp1G(repetitions, C, MSroot(StUpsi), CorData,
-                                       MvrH1, Trace, M, L, P, Q, n1, Atilde, Jacobi)
+                                  MvrH1, Trace, M, L, P, Q, n1, Atilde, Jacobi)
     }
   }
   else{
@@ -399,12 +430,17 @@ TestCorrelation_structure <- function(X, structure, method = "BT", repetitions =
     Teststatistic <- ATS(n1, vCorData, C, Upsidv, Xi)
 
     if(method == "MC"){ ResamplingResult <- ATSwS(QF(C, Upsidv), repetitions) }
-    if(method == "BT"){ ResamplingResult <- sapply(1:repetitions, Bootstrap, n1, C, MSroot(Upsidv)) }
+    if(method == "BT"){ ResamplingResult <- vapply(X = 1:repetitions,
+                                                   FUN = Bootstrap,
+                                                   FUN.VALUE = numeric(1),
+                                                   n1,
+                                                   C, MSroot(Upsidv)) }
     if(method == "TAY"){
       P <- diag(1, p, p)[a, ]
       StUpsi <- QF(MvrH2, HatCov)
       Trace <- sum(diag(QF(C, Upsidv)))
-      ResamplingResult <- Tayapp1G(repetitions, C, MSroot(StUpsi), CorData, MvrH1, Trace, M, L, P, Q,n1)
+      ResamplingResult <- Tayapp1G(repetitions, C, MSroot(StUpsi), CorData,
+                                   MvrH1, Trace, M, L, P, Q,n1)
     }
   }
 

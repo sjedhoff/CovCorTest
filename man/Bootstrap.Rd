@@ -9,21 +9,24 @@ Bootstrap(N.sim, nv, C, MSrootHatCov)
 \arguments{
 \item{N.sim}{control variable for using sapply}
 
-\item{nv}{scalar (one group) or vector (multiple groups) of sample sizes for the bootstrap samples}
+\item{nv}{scalar (one group) or vector (multiple groups) of sample sizes for
+the bootstrap samples}
 
 \item{C}{hypothesis matrix for calculating the ATS}
 
-\item{MSrootHatCov}{matrix (one group) or list of matrices (multiple groups) of roots of the covariance matrices, to generate
+\item{MSrootHatCov}{matrix (one group) or list of matrices (multiple groups)
+of roots of the covariance matrices, to generate
 the bootstrap sample}
 }
 \value{
 a scalar, the value of the ATS
 }
 \description{
-This function generates normal distributed random vectors. For one group,
-nv random vectors with covariance matrix HatCov are generated and the corresponding value
-of the ATS is generated. For multiple groups the corresponding sample sizes from nv are used.
-The weighted sum of covariance matrices is calculated and used to calculate the value
-of the ATS.
+This function generates normal distributed random vectors.
+For one group, nv random vectors with covariance matrix HatCov are generated
+and the corresponding value of the ATS is generated. For multiple groups the
+corresponding sample sizes from nv are used.
+The weighted sum of covariance matrices is calculated and used to calculate
+the value of the ATS.
 }
 \keyword{internal}

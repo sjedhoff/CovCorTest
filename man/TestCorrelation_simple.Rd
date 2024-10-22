@@ -14,33 +14,36 @@ TestCorrelation_simple(
 )
 }
 \arguments{
-\item{X}{a list or matrix containing the observation vectors. In case of a list,
-each matrix in this list is another group, where the observation vectors are the
-columns. For a matrix, all groups are together in one matrix and nv is used to indicate
-the group sizes. For one group, nv is not necessary}
+\item{X}{a list or matrix containing the observation vectors. In case of a
+list, each matrix in this list is another group, where the observation
+vectors are the columns. For a matrix, all groups are together in one matrix
+and nv is used to indicate the group sizes. For one group, nv is not
+necessary.}
 
 \item{nv}{vector of group sizes}
 
-\item{hypothesis}{a character to choose one of the predefined hypotheses which are
-"equal-correlated" and "uncorrelated" (only possible for one group)}
+\item{hypothesis}{a character to choose one of the predefined hypotheses
+which are "equal-correlated" and "uncorrelated" (only possible for one group)}
 
-\item{method}{a character, to chose whether bootstrap("BT"), Taylor-based Monte-Carlo-approach("TAY") or
-Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.}
+\item{method}{a character, to chose whether bootstrap("BT"), Taylor-based
+Monte-Carlo-approach("TAY") or Monte-Carlo-technique("MC") is used, while
+bootstrap is the predefined method.}
 
-\item{repetitions}{a scalar, indicate the number of runs for the chosen method.
+\item{repetitions}{a scalar, indicate the number of runs for the chosen
+method.
 The predefined value is 1,000, and the number should not be below 500.}
 
-\item{seed}{A seed, if it should be set for reproducibility. Predefined values
+\item{seed}{a seed, if it should be set for reproducibility. Predefined value
 is NULL, which means no seed is set.}
 }
 \value{
 an object of the class \code{\link{CovTest}}
 }
 \description{
-This function conducts tests for hypotheses regarding the correlation
-matrix for a more applied user. A hypothesis can be selected out of a group of
-predefined hypotheses. From this C and Xi are built and the function
-\code{\link{TestCorrelation_base}} is used.
+This function conducts tests for hypotheses regarding the
+correlation matrix for a more applied user. A hypothesis can be selected out
+of a group of predefined hypotheses. From this C and Xi are built and the
+function \code{\link{TestCorrelation_base}} is used.
 }
 \examples{
 # Load the data
@@ -49,18 +52,18 @@ data("EEGwide", package = "MANOVA.RM")
 vars <- colnames(EEGwide)[1:6]
 
 # Part the data into six groups of sex and diagnosis
-X_list <- list(t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars]),
-               t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "MCI",vars]),
-               t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "SCC",vars]),
-               t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",vars]),
-               t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "MCI",vars]),
-               t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "SCC",vars]))
+X_list <- list(t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="AD",vars]),
+               t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="MCI",vars]),
+               t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="SCC",vars]),
+               t(EEGwide[EEGwide$sex=="W" & EEGwide$diagnosis=="AD",vars]),
+               t(EEGwide[EEGwide$sex=="W" & EEGwide$diagnosis=="MCI",vars]),
+               t(EEGwide[EEGwide$sex=="W" & EEGwide$diagnosis=="SCC",vars]))
 
 nv <- unlist(lapply(X_list, ncol))
 
 # Test for multiple groups
-TestCorrelation_simple(X = X_list, nv = nv, hypothesis = "equal-correlated", method = "MC",
-                     repetitions = 1000, seed = NULL)
+TestCorrelation_simple(X = X_list, nv = nv, hypothesis = "equal-correlated",
+                      method = "MC", repetitions = 1000, seed = NULL)
 
 # Test for only one group
 TestCorrelation_simple(X_list[[1]], hypothesis = "uncorrelated")

@@ -14,7 +14,13 @@ Pd <- function(d){
 #'
 #' @param X object that should be checked
 #' @param nv number of subjects per group
-#' @return list
+#'
+#' @return A list with two components
+#' \item{X}{ Dataset in the right format: for a single group, a single matrix.
+#' For multiple groups, a list with an element for each group contaning a
+#' matrix.}
+#' \item{nv}{ Number of subjects per group: NV for a single group and a vector
+#' for multiple groups.}
 #'
 #' @export
 #' @keywords internal
@@ -24,7 +30,8 @@ Listcheck <- function(X, nv){
     # one group
     if(is.matrix(X)){
       if(!is.null(nv) && (nv != ncol(X))){
-        warning(paste0("the number of columns of X (", ncol(X), ") and the group size (", nv, ") do not allign"))
+        warning(paste0("the number of columns of X (", ncol(X), ") and the group
+                       size (", nv, ") do not allign"))
       }
       data <- X
       nv_ <- NULL
@@ -34,7 +41,8 @@ Listcheck <- function(X, nv){
       if(is.list(X) & (length(X) == 1)){
         data <- X[[1]]
         if(!is.null(nv) && (nv != ncol(data))){
-          warning(paste0("the number of columns of X (", ncol(data), ") and the group size (", nv, ") do not allign"))
+          warning(paste0("the number of columns of X (", ncol(data), ") and the
+                         group size (", nv, ") do not allign"))
         }
         nv_ <- NULL
       }
@@ -42,7 +50,8 @@ Listcheck <- function(X, nv){
       else{if(is.list(X) & (length(X) > 1)){
         data <- X
         nv_ <- unlist(lapply(X, ncol))
-        warning(paste0("no nv or unfitting nv is given, will procede with nv = c(",paste0(nv_, collapse = " "),")"))
+        warning(paste0("no nv or unfitting nv is given, will procede with nv =
+                       c(",paste0(nv_, collapse = " "),")"))
       }}
     }
 
@@ -55,7 +64,9 @@ Listcheck <- function(X, nv){
       if(length(X) == 1){
         data <- X[[1]]
         if((length(nv) != 1) || (nv != ncol(data))){
-          warning(paste0("the number of columns of X (", ncol(data), ") and the group size (",paste(nv, collapse = ","), ") do not allign"))
+          warning(paste0("the number of columns of X (", ncol(data), ") and
+                         the group size (",paste(nv, collapse = ","), ") do not
+                         allign"))
         }
         nv_ <- NULL
       }
@@ -63,7 +74,9 @@ Listcheck <- function(X, nv){
         data <- X
         nv_ <- unlist(lapply(X, ncol))
         if(!identical(as.numeric(nv), as.numeric(nv_))){
-          warning(paste0("nv does not have the corresponding dimensions to X, will procede with nv = c(", paste0(nv_, collapse = " "),")"))
+          warning(paste0("nv does not have the corresponding dimensions to X,
+                         will procede with nv = c(", paste0(nv_, collapse = " ")
+                         ,")"))
         }
       }
 
@@ -71,11 +84,12 @@ Listcheck <- function(X, nv){
     # matrix
     else{
       if(ncol(X) != sum(nv)){
-        stop(paste0("the number of columns (", ncol(X),") and the sum of group sizes (", sum(nv),") do not allign"))
+        stop(paste0("the number of columns (", ncol(X),") and the sum of group
+                    sizes (", sum(nv),") do not allign"))
       }
       v <- cumsum(c(1,nv))
       data <- list()
-      for(i in 1:length(nv)){
+      for(i in seq_along(nv)){
         data[[i]] <- matrix(X[,v[i]:(v[i+1]-1)], ncol=nv[i])
       }
       nv_ <- nv
@@ -92,28 +106,34 @@ Listcheck <- function(X, nv){
       # remove rows with NA all the way
       data <- data[!apply(data, 1, function(x) all(is.na(x))), , drop = FALSE]
       if(nrow(data) < nrow(data_na)){
-        warning(paste0(nrow(data_na) - nrow(data), " row(s) with only NA values were removed"))
+        warning(paste0(nrow(data_na) - nrow(data), " row(s) with only NA values
+                       were removed"))
       }
       # remove columns with at least one NA
       data <- data[, !apply(data, 2, function(x) any(is.na(x))), drop = FALSE]
       if(ncol(data) < ncol(data_na)){
-        warning(paste0(ncol(data_na) - ncol(data), " subject(s) is/are removed due to missing values"))
+        warning(paste0(ncol(data_na) - ncol(data), " subject(s) is/are removed
+                       due to missing values"))
       }
     }
     # more groups
     if(!is.null(nv_) & any(unlist(lapply(X, function(x) any(is.na(x)))))){
       data_na <- data
-      # rows, where at least in one group only missing values are present
-      na_rows <- apply(sapply(data, function(mat) apply(mat, 1, function(row) all(is.na(row)))), 1, any)
+      # rows, where at least in one group only missing values are pres
+      na_rows <- apply(vapply(data, function(mat) apply(mat, 1, function(row)
+        all(is.na(row))), FUN.VALUE = logical(nrow(X[[1]]))), 1, any)
       # remove these rows
       data <- lapply(data, function(mat) mat[!na_rows, , drop=FALSE])
       if(any(na_rows)){
-        warning(paste0(sum(na_rows), " row(s) with only NA values were removed"))
+        warning(paste0(sum(na_rows)," row(s) with only NA values were removed"))
       }
       # remove columns with at least one NA
-      data <- lapply(data, function(mat) mat[, !apply(mat, 2, function(col) any(is.na(col))), drop=FALSE])
+      data <- lapply(data, function(mat) mat[, !apply(mat, 2,
+                                    function(col) any(is.na(col))), drop=FALSE])
       if(sum(unlist(lapply(data_na, ncol)) - unlist(lapply(data, ncol))) > 0){
-        warning(paste0(sum(unlist(lapply(data_na, ncol)) - unlist(lapply(data, ncol))), " subject(s) is/are removed due to missing values"))
+        warning(paste0(sum(unlist(lapply(data_na, ncol)) -
+                             unlist(lapply(data, ncol))),
+                       " subject(s) is/are removed due to missing values"))
       }
       nv_save <- nv_
       nv_ <- unlist(lapply(X, ncol))
@@ -127,10 +147,12 @@ Listcheck <- function(X, nv){
       stop("dimensions do not accord")
     }
     if(any(unlist(lapply(data, ncol)) == 1)){
-      stop("testing covariance/correlation not possible: at least one group has only one subject")
+      stop("testing covariance/correlation not possible: at least one group has
+           only one subject")
     }
     if(nrow(data[[1]]) == 1){
-      stop("testing covariance/correlation not possible: only one variable to test")
+      stop("testing covariance/correlation not possible: only one variable to
+           test")
     }
   }
   else{
@@ -144,7 +166,7 @@ Listcheck <- function(X, nv){
 
 
 
-  return(list(data,nv_))
+  return(list(X = data, nv = nv_))
 }
 
 
@@ -285,7 +307,8 @@ vdtcrossprod <- function(X,a,d,p){
 
 
 
-#' @title Auxiliary function to calculate the covariance of the vectorized correlation matrix
+#' @title Auxiliary function to calculate the covariance of the vectorized
+#' correlation matrix
 #'
 #' @param X matrix
 #' @param n number of columns

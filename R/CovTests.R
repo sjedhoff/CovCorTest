@@ -2,18 +2,21 @@
 #'
 #' @description This function conducts the test for hypotheses regarding the
 #' covariance matrix. Depending on the chosen method a
-#' bootstrap  or Monte-Carlo-technique is used to calculate the p-value of the Anova-type-statistic(ATS)
+#' bootstrap  or Monte-Carlo-technique is used to calculate the p-value of the
+#' Anova-type-statistic(ATS)
 #' based on a specified number of runs.
-#' @param X a list or matrix containing the observation vectors. In case of a list,
-#' each matrix in this list is another group, where the observation vectors are the
-#' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
-#' the group sizes. For one group, nv is not necessary.
+#' @param X a list or matrix containing the observation vectors. In case of a
+#' list, each matrix in this list is another group, where the observation
+#' vectors are the columns. For a matrix, all groups are together in one matrix
+#' and nv is used to indicate the group sizes. For one group, nv is not
+#' necessary.
 #' @param nv vector of group sizes
 #' @param C hypothesis matrix for calculating the ATS
 #' @param Xi a vector defining together with C the investigated hypothesis
 #' @param method a character, to chose whether bootstrap("BT") or
 #' Monte-Carlo-technique("MC") is used.
-#' @param repetitions a scalar, indicates the number of runs for the chosen method.
+#' @param repetitions a scalar, indicates the number of runs for the chosen
+#' method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed a seed, if it should be set for reproducibility. Predefined value
 #' is NULL, which means no seed is set.
@@ -34,11 +37,12 @@
 #' X <- t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars])
 #'
 #' # Testing the trace
-#' C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,1), nrow = 1, ncol = 21)
+#' C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,1),
+#'             nrow = 1, ncol = 21)
 #' Xi <- 2
 #'
-#' TestCovariance_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT", repetitions = 1000,
-#'       seed = 31415, hypothesis = "Trace")
+#' TestCovariance_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT",
+#'             repetitions = 1000, seed = 31415, hypothesis = "Trace")
 #'
 TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
                                 seed = NULL, hypothesis = NULL){
@@ -105,7 +109,8 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
     ResamplingResult <- ATSwS(QF(C, HatCov), repetitions)
   }
   else if(method == "BT"){
-    ResamplingResult <- sapply(1:repetitions, Bootstrap, nv, C, MSrootHatCov)
+    ResamplingResult <- vapply(1:repetitions, Bootstrap, numeric(1), nv, C,
+                               MSrootHatCov)
   }
 
   Teststatistic <- ATS(sum(nv), vX, C, HatCov, Xi)
@@ -136,24 +141,27 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
 
 #' @title Simplified call for test regarding covariance matrices
 #'
-#' @description This function conducts tests for hypotheses regarding the covariance
-#' matrix for a more applied user. A hypothesis can be selected out of a group of
-#' predefined hypotheses. From this C and Xi are built and the function
-#'  \code{\link{TestCovariance_base}} is used.
-#' @param X a list or matrix containing the observation vectors. In case of a list,
-#' each matrix in this list is another group, where the observation vectors are the
-#' columns. For a matrix, all groups are together in one matrix and nv is used to indicate
-#' the group sizes. For one group, nv is not necessary.
+#' @description This function conducts tests for hypotheses regarding the
+#' covariance matrix for a more applied user. A hypothesis can be selected out
+#' of a group of predefined hypotheses. From this C and Xi are built and the
+#' function \code{\link{TestCovariance_base}} is used.
+#' @param X a list or matrix containing the observation vectors. In case of a
+#' list, each matrix in this list is another group, where the observation
+#' vectors are the columns. For a matrix, all groups are together in one matrix
+#' and nv is used to indicate he group sizes. For one group, nv is not
+#' necessary.
 #' @param nv vector of group sizes
-#' @param hypothesis a character to choose one of the predefined hypotheses which are
-#' "equal", for multiple groups "equal-trace" and "equal-diagonals" and for a single group
-#' "given-trace", "given-matrix" and "uncorrelated"
+#' @param hypothesis a character to choose one of the predefined hypotheses
+#' which are "equal", for multiple groups "equal-trace" and "equal-diagonals"
+#' and for a single group "given-trace", "given-matrix" and "uncorrelated"
 #' @param A a scalar or square matrix to specify the hypothesis in case of
 #' "given-trace" or "given-matrix". The value is predefined as NULL, which means
 #' trace of 1 respectively the identity as given matrix.
 #' @param method a character, to chose whether bootstrap("BT") or
-#' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.
-#' @param repetitions a scalar,  indicate the number of runs for the chosen method.
+#' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined
+#' method.
+#' @param repetitions a scalar,  indicate the number of runs for the chosen
+#' method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed a seed, if it should be set for reproducibility. Predefined value
 #' is NULL, which means no seed is set.
@@ -169,22 +177,23 @@ TestCovariance_base <- function(X, nv = NULL, C, Xi, method, repetitions = 1000,
 #' vars <- colnames(EEGwide)[1:6]
 #'
 #' # Part the data into six groups of sex and diagnosis
-#' X_list <- list(t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars]),
-#'                t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "MCI",vars]),
-#'                t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "SCC",vars]),
-#'                t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",vars]),
-#'                t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "MCI",vars]),
-#'                t(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "SCC",vars]))
+#' X_list <- list(t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="AD",vars]),
+#'                t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="MCI",vars]),
+#'                t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="SCC",vars]),
+#'                t(EEGwide[EEGwide$sex=="W" & EEGwide$diagnosis=="AD",vars]),
+#'                t(EEGwide[EEGwide$sex=="W" & EEGwide$diagnosis=="MCI",vars]),
+#'                t(EEGwide[EEGwide$sex=="W" & EEGwide$diagnosis=="SCC",vars]))
 #'
 #' nv <- unlist(lapply(X_list, ncol))
 #'
-#' TestCovariance_simple(X = X_list, nv = nv, hypothesis = "equal-trace", method = "MC",
-#'                      repetitions = 1000, seed = NULL)
+#' TestCovariance_simple(X = X_list, nv = nv, hypothesis = "equal-trace",
+#'                       method = "MC", repetitions = 1000, seed = NULL)
 #'
 #' TestCovariance_simple(X_list[[1]], hypothesis = "given-trace", A = 3)
 #'
 #' @export
-TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "MC",
+TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL,
+                                  method = "MC",
                                   repetitions = 1000, seed = NULL){
   hypothesis <- tolower(hypothesis)
   method <- toupper(method)
@@ -212,11 +221,13 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
   ifelse(d > 1, a <- cumsum(c(1, d:2)), a <- 1)
 
   if(!(hypothesis %in%
-       c("equal", "equal-trace", "equal-diagonals", "given-trace", "given-matrix", "uncorrelated"))){
+       c("equal", "equal-trace", "equal-diagonals", "given-trace",
+         "given-matrix", "uncorrelated"))){
     stop("no predefined hypothesis")
   }
   if(!is.null(A) & !(hypothesis %in% c("given-trace", "given-matrix"))){
-    warning(paste0("the input argument A is not used, since the selected hypothesis is '", hypothesis, "'"))
+    warning(paste0("the input argument A is not used, since the selected
+                   hypothesis is '", hypothesis, "'"))
   }
 
   if(hypothesis == "equal"){
@@ -229,7 +240,8 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
       Xi <- rep(0, p*groups)
     }
     return(TestCovariance_base(X, nv = nv, C = C, Xi = Xi, method = method,
-                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+                               repetitions = repetitions, seed = seed,
+                               hypothesis = hypothesis))
   }
   if(hypothesis == "given-trace"){
     if(groups > 1){
@@ -240,13 +252,15 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
     C <- tracevec
     if(is.null(A)){
       A <- 1
-      warning("since no input A for a trace to be tested is given, a trace of 1 is tested")
+      warning("since no input A for a trace to be tested is given, a trace of
+              1 is tested")
     }
     if(!is.numeric(A) | length(A) != 1){
       stop("for testing the trace the input A must be a scalar")
     }
     return(TestCovariance_base(X, nv = nv, C = C, Xi = A, method = method,
-                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+                               repetitions = repetitions, seed = seed,
+                               hypothesis = hypothesis))
   }
   if(hypothesis == "given-matrix"){
     if(groups > 1){
@@ -255,7 +269,8 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
     C <- diag(1, p, p)
     if(is.null(A)){
       Xi <- matrixcalc::vech(diag(1, d, d))
-      warning("since no input A for a matrix to be tested is given, the identity matrix is tested")
+      warning("since no input A for a matrix to be tested is given, the
+              identity matrix is tested")
     }
     else{
       if(!is.matrix(A)){
@@ -269,7 +284,8 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
       }
     }
     return(TestCovariance_base(X, nv = nv, C = C, Xi = Xi, method = method,
-                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+                               repetitions = repetitions, seed = seed,
+                               hypothesis = hypothesis))
   }
   if(hypothesis == "uncorrelated"){
     if(groups > 1){
@@ -278,44 +294,53 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
     C <- diag(1, p, p)[-a,]
     Xi <- rep(0, p - d)
     return(TestCovariance_base(X = X, nv = nv, C = C, Xi = Xi, method = method,
-                            repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+                            repetitions = repetitions, seed = seed,
+                            hypothesis = hypothesis))
   }
   if(hypothesis == "equal-trace"){
     if(groups == 1){
-      stop("the hypothesis 'equal-trace' can only be tested for multiple groups")
+      stop("the hypothesis 'equal-trace' can only be tested for
+           multiple groups")
     }
     tracevec <- matrix(0, 1, p)
     tracevec[1, a] <- 1
     C <- Pd(groups) %x% tracevec
     Xi <- rep(0, groups)
     return(TestCovariance_base(X = X, nv = nv, C = C, Xi = Xi, method = method,
-                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+                               repetitions = repetitions, seed = seed,
+                               hypothesis = hypothesis))
   }
   if(hypothesis == "equal-diagonals"){
     if(groups == 1){
-      stop("the hypothesis 'equal-diagonals' can only be tested for multiple groups")
+      stop("the hypothesis 'equal-diagonals' can only be tested for
+           multiple groups")
     }
     C <- Pd(groups) %x% diag(1, p, p)[a,]
     Xi <- rep(0, times = groups * d)
     return(TestCovariance_base(X = X, nv = nv, C = C, Xi = Xi, method = method,
-                               repetitions = repetitions, seed = seed, hypothesis = hypothesis))
+                               repetitions = repetitions, seed = seed,
+                               hypothesis = hypothesis))
   }
 
 }
 
 #' @title Test for structure of data's covariance matrix
 #'
-#' @description This function conducts the test for the covariance matrix of data regarding
-#' structures. Depending on the chosen method a bootstrap or
-#' Monte-Carlo-technique is used to calculate p-value of the Anova-type-statistic(ATS) based on a
-#' specified number of runs.
-#' @param X a matrix containing the observation vectors as columns (one group only)
+#' @description This function conducts the test for the covariance matrix of
+#' data regarding structures. Depending on the chosen method a bootstrap or
+#' Monte-Carlo-technique is used to calculate p-value of the
+#' Anova-type-statistic(ATS) based on a specified number of runs.
+#' @param X a matrix containing the observation vectors as columns
+#' (one group only)
 #' @param structure a character specifying the structure regarding the
-#' covariance matrix should be checked. Options are "autoregressive" ("ar"), "FO-autoregressive" ("FO-ar"),
-#' "diagonal" ("diag"), "sphericity" ("spher"), "compoundsymmetry" ("cs") and "toeplitz" ("toep").
+#' covariance matrix should be checked. Options are "autoregressive" ("ar"),
+#' "FO-autoregressive" ("FO-ar"), "diagonal" ("diag"), "sphericity" ("spher"),
+#' "compoundsymmetry" ("cs") and "toeplitz" ("toep").
 #' @param method a character, to chose whether bootstrap("BT") or
-#' Monte-Carlo-technique("MC") is used, while bootstrap is the predefined method.
-#' @param repetitions a scalar, indicate the number of runs for the chosen method.
+#' Monte-Carlo-technique("MC") is used, while bootstrap is the
+#' predefined method.
+#' @param repetitions a scalar, indicate the number of runs for the chosen
+#' method.
 #' The predefined value is 1,000, and the number should not be below 500.
 #' @param seed a seed, if it should be set for reproducibility. Predefined value
 #' is NULL, which means no seed is set.
@@ -330,13 +355,15 @@ TestCovariance_simple <- function(X, nv = NULL, hypothesis, A = NULL, method = "
 #'
 #' # Select only the males with the diagnosis AD
 #' X <- as.matrix(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",
-#'                           c("brainrate_temporal", "brainrate_frontal","brainrate_central",
-#'                             "complexity_temporal","complexity_frontal", "complexity_central")])
+#'                           c("brainrate_temporal", "brainrate_frontal",
+#'                           "brainrate_central","complexity_temporal",
+#'                           "complexity_frontal", "complexity_central")])
 #'
 #' TestCovariance_structure(X = X, structure = "diagonal", method = "MC")
 #'
 #' @export
-TestCovariance_structure <- function(X, structure, method = "BT", repetitions = 1000, seed = NULL){
+TestCovariance_structure <- function(X, structure, method = "BT",
+                                     repetitions = 1000, seed = NULL){
 
   structure <- tolower(structure)
   method <- toupper(method)
@@ -351,7 +378,8 @@ TestCovariance_structure <- function(X, structure, method = "BT", repetitions = 
   }
   if(is.list(X)){
     if(length(X) > 1){
-      warning("The input X must be a matrix but is a list. Only the first element of the list is used.")
+      warning("The input X must be a matrix but is a list. Only the first
+              element of the list is used.")
       X <- X[[1]]
     }
     if(length(X) == 1){
@@ -362,9 +390,11 @@ TestCovariance_structure <- function(X, structure, method = "BT", repetitions = 
 
   n1 <- dim(X)[2]
   d <- dim(X)[1]
-  if(d==1){ stop("Structures can be only investigated for more than one dimension") }
-  if(!(structure %in% c("autoregressive", "ar", "fo-autoregressive", "fo-ar", "diagonal",
-                        "diag", "sphericity", "spher", "compoundsymmetry", "cs", "toeplitz", "toep") )){
+  if(d==1){ stop("Structures can be only investigated for more than one
+                 dimension") }
+  if(!(structure %in% c("autoregressive", "ar", "fo-autoregressive", "fo-ar",
+                        "diagonal", "diag", "sphericity", "spher",
+                        "compoundsymmetry", "cs", "toeplitz", "toep") )){
     stop("no predefined hypothesis")
   }
 
@@ -386,7 +416,8 @@ TestCovariance_structure <- function(X, structure, method = "BT", repetitions = 
         ResamplingResult <- ATSwS(QF(C, HatCovh), repetitions)
       }
       if(method == "BT") {
-        ResamplingResult <- sapply(1:repetitions, Bootstrap_trans, n1, a ,d, p,
+        ResamplingResult <- vapply(1:repetitions, Bootstrap_trans,
+                                   FUN.VALUE = numeric(1), n1, a ,d, p,
                                    C, MSroot(HatCov), vX, 'ascending_root_fct')
       }
       Teststatistic <- ATS(n1, ascending_root_fct(vX, a, d), C, HatCovh, Xi)
@@ -407,14 +438,19 @@ TestCovariance_structure <- function(X, structure, method = "BT", repetitions = 
         ResamplingResult <- ATSwS(QF(C, HatCovg), repetitions)
       }
       if(method == "BT"){
-        ResamplingResult <- sapply(1:repetitions, Bootstrap_trans, n1, a, d, p,
-                                   C, MSroot(HatCov), vX, 'subdiagonal_mean_ratio_fct')
+        ResamplingResult <- vapply(1:repetitions, Bootstrap_trans,
+                                   FUN.VALUE = numeric(1),
+                                   n1, a, d, p,
+                                   C, MSroot(HatCov), vX,
+                                   'subdiagonal_mean_ratio_fct')
       }
-      Teststatistic <- ATS(n1, subdiagonal_mean_ratio_fct(vX, a, d), C, HatCovg, Xi)
+      Teststatistic <- ATS(n1, subdiagonal_mean_ratio_fct(vX, a, d), C,
+                           HatCovg, Xi)
       pvalue <- mean(ResamplingResult > Teststatistic)
     }
 
-    if(structure %in% c("diagonal", "diag", "sphericity", "spher", "compoundsymmetry", "cs", "toeplitz", "toep")){
+    if(structure %in% c("diagonal", "diag", "sphericity", "spher",
+                        "compoundsymmetry", "cs", "toeplitz", "toep")){
 
       Xi <- rep(0, p)
 
@@ -438,7 +474,10 @@ TestCovariance_structure <- function(X, structure, method = "BT", repetitions = 
         ResamplingResult <- ATSwS(QF(C, HatCov), repetitions)
       }
       if(method == "BT"){
-        ResamplingResult <- sapply(1:repetitions, Bootstrap, n1, C, MSroot(HatCov))
+        ResamplingResult <- vapply(1:repetitions, Bootstrap,
+                                   FUN.VALUE = numeric(1),
+                                   n1,
+                                   C, MSroot(HatCov))
       }
 
       Teststatistic <- ATS(n1, vX, C, HatCov, Xi)

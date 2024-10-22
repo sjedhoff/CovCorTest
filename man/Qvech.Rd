@@ -2,7 +2,8 @@
 % Please edit documentation in R/utils.R
 \name{Qvech}
 \alias{Qvech}
-\title{Auxiliary function to calculate the covariance of the vectorized correlation matrix}
+\title{Auxiliary function to calculate the covariance of the vectorized
+correlation matrix}
 \usage{
 Qvech(X, n)
 }
@@ -15,6 +16,7 @@ Qvech(X, n)
 matrix
 }
 \description{
-Auxiliary function to calculate the covariance of the vectorized correlation matrix
+Auxiliary function to calculate the covariance of the vectorized
+correlation matrix
 }
 \keyword{internal}

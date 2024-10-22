@@ -16,10 +16,11 @@ TestCorrelation_base(
 )
 }
 \arguments{
-\item{X}{a list or matrix containing the observation vectors. In case of a list,
-each matrix in this list is another group, where the observation vectors are the
-columns. For a matrix, all groups are together in one matrix and nv is used to indicate
-the group sizes. For one group, nv is not necessary}
+\item{X}{a list or matrix containing the observation vectors.
+In case of a list,each matrix in this list is another group, where the
+observation vectors are the columns. For a matrix, all groups are together in
+one matrix and nv is used to indicate the group sizes. For one group, nv is
+not necessary.}
 
 \item{nv}{vector of group sizes}
 
@@ -28,15 +29,17 @@ the group sizes. For one group, nv is not necessary}
 \item{Xi}{a vector defining together with C the investigated hypothesis}
 
 \item{method}{a character, to chose whether bootstrap("BT") or
-Monte-Carlo-technique("MC") or Taylor-based Monte-Carlo-approach("TAY") is used.}
+Monte-Carlo-technique("MC") or Taylor-based Monte-Carlo-approach("TAY") is
+used.}
 
-\item{repetitions}{a scalar, indicate the number of runs for the chosen method.
+\item{repetitions}{a scalar, indicate the number of runs for the chosen
+method.
 The predefined value is 1,000, and the number should not be below 500.}
 
-\item{seed}{A seed, if it should be set for reproducibility. Predefined values
+\item{seed}{a seed, if it should be set for reproducibility. Predefined value
 is NULL, which means no seed is set.}
 
-\item{hypothesis}{character or NULL, will be displayed in the print call}
+\item{hypothesis}{character or NULL, will be displayed in the print call.}
 }
 \value{
 an object of the class \code{\link{CovTest}}
@@ -44,8 +47,8 @@ an object of the class \code{\link{CovTest}}
 \description{
 This function conducts the test for hypotheses regarding the
 correlation matrix. Depending on the chosen method a
-bootstrap, Monte-Carlo-technique or Taylor-based Monte-Carlo-approach is used to
-calculate p-value of the Anova-type-statistic
+bootstrap, Monte-Carlo-technique or Taylor-based Monte-Carlo-approach is used
+to calculate the p-value of the Anova-type-statistic(ATS)
 based on a specified number of runs.
 }
 \examples{
@@ -60,8 +63,8 @@ X <- t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars])
 C <- diag(x = 1, nrow = 15, ncol = 15)
 Xi <- rep(0,15)
 
-TestCorrelation_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT", repetitions = 1000,
-      seed = 31415, hypothesis = "Uncorrelated")
+TestCorrelation_base(X = X, nv = NULL, C = C, Xi = Xi, method = "BT",
+    repetitions = 1000, seed = 31415, hypothesis = "Uncorrelated")
 
 }
 \references{

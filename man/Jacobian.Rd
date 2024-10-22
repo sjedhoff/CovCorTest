@@ -7,7 +7,8 @@
 Jacobian(X, a, d, p, fun)
 }
 \arguments{
-\item{X}{vectorised covariance matrix for which the Jacobian matrix is applied}
+\item{X}{vectorised covariance matrix for which the Jacobian matrix is
+applied}
 
 \item{a}{vector containing the indices which belong to the diagonal of the
 covariance matrix}
@@ -24,6 +25,7 @@ the Jacobian matrix applied for the given vector
 }
 \description{
 A function which calculates the Jacobian matrix for a given
-transformation function \code{\link{ascending_root_fct}} or \code{\link{subdiagonal_mean_ratio_fct}}
+transformation function \code{\link{ascending_root_fct}} or
+\code{\link{subdiagonal_mean_ratio_fct}}
 }
 \keyword{internal}

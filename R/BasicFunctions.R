@@ -12,8 +12,9 @@
 #' @export
 #' @keywords internal
 ATSwS <- function(A, repetitions){
-  Chi <- matrix(stats::rchisq(dim(A)[1] * repetitions, df = 1), ncol = repetitions)
-  return(colSums(crossprod(eigen(A, only.values = 1)$value, Chi)) / sum(diag(A)))
+  Chi <- matrix(stats::rchisq(dim(A)[1] * repetitions, df = 1),
+                ncol = repetitions)
+  return(colSums(crossprod(eigen(A, only.values = 1)$value, Chi))/sum(diag(A)))
 }
 
 

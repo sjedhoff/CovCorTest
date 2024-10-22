@@ -19,11 +19,15 @@ A \code{CovTest} object is a list with the following components:
 \item{\code{method}}{Character. Either 'Covariance' or 'Correlation'.}
 \item{\code{pvalue}}{Numeric. The p-value of the test.}
 \item{\code{Teststatistic}}{Numeric. The test statistic.}
-\item{\code{CovarianceMatrix}}{Matrix. The estimated covariance or correlation matrix.}
-\item{\code{C}}{Numeric. A constant or vector of constants used in the test.}
+\item{\code{CovarianceMatrix}}{Matrix. The estimated covariance or
+correlation matrix.}
+\item{\code{C}}{Numeric. A constant or vector of constants used in the
+test.}
 \item{\code{Xi}}{Numeric. A parameter related to the test.}
-\item{\code{resampling_method}}{Character. The resampling method used in the test.}
-\item{\code{repetitions}}{Integer. The number of repetitions used in resampling.}
+\item{\code{resampling_method}}{Character. The resampling method used in
+the test.}
+\item{\code{repetitions}}{Integer. The number of repetitions used in
+resampling.}
 \item{\code{hypothesis}}{Character. The hypothesis being tested.}
 \item{\code{nv}}{Numeric. The sample size or the number of variables.}
 }

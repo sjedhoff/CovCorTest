@@ -21,7 +21,8 @@ Tayapp1G(
 )
 }
 \arguments{
-\item{repetitions}{a number specifying the number of runs for the approximation}
+\item{repetitions}{a number specifying the number of runs for the
+approximation}
 
 \item{C}{the used hypothesis matrix}
 
@@ -30,33 +31,35 @@ observations}
 
 \item{CorData}{the calculated correlation matrix}
 
-\item{MvrH}{an auxiliary matrix for the transformation from vectorised covariances
-to vectorized correlations}
+\item{MvrH}{an auxiliary matrix for the transformation from vectorised
+covariances to vectorized correlations}
 
 \item{Trace}{a trace used in the ATS for the test statistic}
 
-\item{M4}{a auxiliary matrix for the transformation from vectorised covariances
-to vectorized correlations}
+\item{M4}{a auxiliary matrix for the transformation from vectorised
+covariances to vectorized correlations}
 
-\item{L}{an auxiliary matrix for the transformation from vectorised covariances
-to vectorized correlations}
+\item{L}{an auxiliary matrix for the transformation from vectorised
+covariances to vectorized correlations}
 
-\item{P}{an auxiliary matrix for the transformation from vectorised covariances
-to vectorized correlations}
+\item{P}{an auxiliary matrix for the transformation from vectorised
+covariances to vectorized correlations}
 
-\item{Q}{an auxiliary matrix for the transformation from vectorised covariances
-to vectorized correlations}
+\item{Q}{an auxiliary matrix for the transformation from vectorised
+covariances to vectorized correlations}
 
 \item{n1}{the total sample size, a scalar}
 
-\item{Atilde}{an auxiliary matrix for the transformation from row-wise vectorisation}
+\item{Atilde}{an auxiliary matrix for the transformation from row-wise
+vectorisation}
 
-\item{Jacobi}{the Jacobian matrix of the transformation function applied for the
-diagonal vectorised correlation
-to diagonalwise vectorisation. used for the transformation function 'ascending_root_fct_cor', else NULL}
+\item{Jacobi}{the Jacobian matrix of the transformation function applied
+for the diagonal vectorised correlation  to diagonalwise vectorisation. used
+for the transformation function 'ascending_root_fct_cor', else NULL}
 }
 \value{
-a matrix containing the values of the Taylor ATS for a number of repetitions
+a matrix containing the values of the Taylor ATS for a number of
+repetitions
 }
 \description{
 An auxiliary function to calculate the values for the

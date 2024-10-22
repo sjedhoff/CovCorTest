@@ -25,7 +25,8 @@ the bootstrap sample}
 
 \item{vX}{the expectation vector for the bootstrap sample}
 
-\item{fun}{transformation function, that should be used. \code{\link{subdiagonal_mean_ratio_fct}} or
+\item{fun}{transformation function, that should be used.
+\code{\link{subdiagonal_mean_ratio_fct}} or
 \code{\link{ascending_root_fct}}}
 }
 \value{

@@ -2,7 +2,8 @@
 % Please edit documentation in R/CovTest_utils.R
 \name{subdiagonal_mean_ratio_fct}
 \alias{subdiagonal_mean_ratio_fct}
-\title{Transformation of the vectorised covariance matrix by quotients of means}
+\title{Transformation of the vectorised covariance matrix by
+quotients of means}
 \usage{
 subdiagonal_mean_ratio_fct(v, a, d)
 }

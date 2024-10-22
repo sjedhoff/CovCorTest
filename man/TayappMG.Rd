@@ -7,7 +7,8 @@
 TayappMG(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M4, L, P, Q, nv)
 }
 \arguments{
-\item{repetitions}{a number specifying the number of runs for the approximation}
+\item{repetitions}{a number specifying the number of runs for the
+approximation}
 
 \item{C}{the used hypothesis matrix}
 
@@ -16,33 +17,34 @@ observations}
 
 \item{CorData}{the calculated correlation matrix}
 
-\item{MvrH}{an auxiliary matrix for the transformation from vectorised covariances
-to vectorized correlations}
+\item{MvrH}{an auxiliary matrix for the transformation from vectorised
+covariances to vectorized correlations}
 
 \item{Trace}{a trace used in the ATS for the test statistic}
 
-\item{M4}{an auxiliary matrix for the transformation from vectorised covariances
-to vectorized correlations}
+\item{M4}{an auxiliary matrix for the transformation from vectorised
+covariances to vectorized correlations}
 
-\item{L}{an auxiliary matrix for the transformation from vectorised covariances
-to vectorized correlations}
+\item{L}{an auxiliary matrix for the transformation from vectorised
+covariances to vectorized correlations}
 
-\item{P}{an auxiliary matrix for the transformation from vectorised covariances
-to vectorized correlations}
+\item{P}{an auxiliary matrix for the transformation from vectorised
+covariances to vectorized correlations}
 
-\item{Q}{an auxiliary matrix for the transformation from vectorised covariances
-to vectorized correlations}
+\item{Q}{an auxiliary matrix for the transformation from vectorised
+covariances to vectorized correlations}
 
 \item{nv}{vector of sample sizes}
 }
 \value{
-a matrix containing the values of the Taylor ATS for a number of repetitions
+a matrix containing the values of the Taylor ATS for a number
+of repetitions
 }
 \description{
-An auxiliary function to calculate the values for the Taylor-based
-Monte-Carlo-approximation for multiple groups. After receiving some auxiliary matrices
-and data, the Monte-Carlo observations are generated and different parts of the
-final sum are defined. Based on this a number of the Taylor-based ATS are
-calculated, where the number can be chosen.
+An auxiliary function to calculate the values for the
+Taylor-based Monte-Carlo-approximation for multiple groups. After receiving
+some auxiliary matrices and data, the Monte-Carlo observations are generated
+and different parts of the final sum are defined. Based on this a number of
+the Taylor-based ATS are calculated, where the number can be chosen.
 }
 \keyword{internal}
