@@ -24,13 +24,13 @@ A compilation of tests for hypotheses regarding covariance and correlation matri
 ## Installation
 
 The offical version of CovCorTest can be installed using the R Console:
-```{r}
+```{r, eval = FALSE}
 install.packages("CovCorTest")
 ```
 
 You can install the development version of CovCorTest from [GitHub](https://github.com/) with:
 
-```{r}
+```{r, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("sjedhoff/CovCorTest")
 ```
@@ -52,4 +52,9 @@ library(CovCorTest)
 
 
 ## Literature
+
+- Sattler, P. & Dobler, D. (2024). Testing for patterns and structures in covariance and correlation matrices. <em>arXiv preprint</em> https://arxiv.org/abs/2310.11799
+- Sattler, P., Bathke, A.C. & Pauly, M. (2020). Testing Hypothese about Covariance Matrixes in general MANOVA Designs. <em>Journal of Statistical Planning and Inference</em> 219, 134-146 https://doi.org/10.1016/j.jspi.2021.12.001
+- Sattler, P. & Pauly, M. (2024). Testing hypotheses about correlation matrices in general MANOVA designs. <em>TEST</em> 33, 496–516 https://doi.org/10.1007/s11749-023-00906-6
+
 

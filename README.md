@@ -23,13 +23,6 @@ The offical version of CovCorTest can be installed using the R Console:
 
 ``` r
 install.packages("CovCorTest")
-#> Installiere Paket nach 'C:/Users/sjedh/AppData/Local/Temp/RtmpCYyLbV/temp_libpath282074287f3f'
-#> (da 'lib' nicht spezifiziert)
-#> Warning: package 'CovCorTest' is not available for this version of R
-#> 
-#> A version of this package for your version of R might be available elsewhere,
-#> see the ideas at
-#> https://cran.r-project.org/doc/manuals/r-patched/R-admin.html#Installing-packages
 ```
 
 You can install the development version of CovCorTest from
@@ -38,44 +31,6 @@ You can install the development version of CovCorTest from
 ``` r
 # install.packages("devtools")
 devtools::install_github("sjedhoff/CovCorTest")
-#> Using GitHub PAT from the git credential store.
-#> Downloading GitHub repo sjedhoff/CovCorTest@HEAD
-#> sandwich   (3.1-0  -> 3.1-1 ) [CRAN]
-#> mvtnorm    (1.2-4  -> 1.3-1 ) [CRAN]
-#> Rcpp       (1.0.10 -> 1.0.13) [CRAN]
-#> rbibutils  (2.2.16 -> 2.3   ) [CRAN]
-#> data.table (1.14.8 -> 1.16.2) [CRAN]
-#> multcomp   (1.4-25 -> 1.4-26) [CRAN]
-#> plotrix    (3.8-2  -> 3.8-4 ) [CRAN]
-#> plyr       (1.8.8  -> 1.8.9 ) [CRAN]
-#> Installing 8 packages: sandwich, mvtnorm, Rcpp, rbibutils, data.table, multcomp, plotrix, plyr
-#> Installiere Pakete nach 'C:/Users/sjedh/AppData/Local/Temp/RtmpCYyLbV/temp_libpath282074287f3f'
-#> (da 'lib' nicht spezifiziert)
-#> Paket 'sandwich' erfolgreich ausgepackt und MD5 Summen abgeglichen
-#> Paket 'mvtnorm' erfolgreich ausgepackt und MD5 Summen abgeglichen
-#> Paket 'Rcpp' erfolgreich ausgepackt und MD5 Summen abgeglichen
-#> Paket 'rbibutils' erfolgreich ausgepackt und MD5 Summen abgeglichen
-#> Paket 'data.table' erfolgreich ausgepackt und MD5 Summen abgeglichen
-#> Paket 'multcomp' erfolgreich ausgepackt und MD5 Summen abgeglichen
-#> Paket 'plotrix' erfolgreich ausgepackt und MD5 Summen abgeglichen
-#> Paket 'plyr' erfolgreich ausgepackt und MD5 Summen abgeglichen
-#> 
-#> Die heruntergeladenen Binärpakete sind in 
-#>  C:\Users\sjedh\AppData\Local\Temp\RtmpiYrDPt\downloaded_packages
-#> ── R CMD build ─────────────────────────────────────────────────────────────────
-#>          checking for file 'C:\Users\sjedh\AppData\Local\Temp\RtmpiYrDPt\remotes2eb047671f86\sjedhoff-CovCorTest-9f3daa6235923210e940154cb30d510cfc20b70a/DESCRIPTION' ...     checking for file 'C:\Users\sjedh\AppData\Local\Temp\RtmpiYrDPt\remotes2eb047671f86\sjedhoff-CovCorTest-9f3daa6235923210e940154cb30d510cfc20b70a/DESCRIPTION' ...   ✔  checking for file 'C:\Users\sjedh\AppData\Local\Temp\RtmpiYrDPt\remotes2eb047671f86\sjedhoff-CovCorTest-9f3daa6235923210e940154cb30d510cfc20b70a/DESCRIPTION' (415ms)
-#>       ─  preparing 'CovCorTest': (728ms)
-#>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
-#>       ─  installing the package to process help pages
-#>      Lade nötigen Namensraum: CovCorTest
-#>       ─  saving partial Rd database (1.5s)
-#>       ─  checking for LF line-endings in source and make files and shell scripts
-#>       ─  checking for empty or unneeded directories
-#>       ─  building 'CovCorTest_0.0.1.tar.gz'
-#>      
-#> 
-#> Installiere Paket nach 'C:/Users/sjedh/AppData/Local/Temp/RtmpCYyLbV/temp_libpath282074287f3f'
-#> (da 'lib' nicht spezifiziert)
 ```
 
 ## Structure of the package
@@ -107,3 +62,14 @@ library(CovCorTest)
 ```
 
 ## Literature
+
+- Sattler, P. & Dobler, D. (2024). Testing for patterns and structures
+  in covariance and correlation matrices. <em>arXiv preprint</em>
+  <https://arxiv.org/abs/2310.11799>
+- Sattler, P., Bathke, A.C. & Pauly, M. (2020). Testing Hypothese about
+  Covariance Matrixes in general MANOVA Designs. <em>Journal of
+  Statistical Planning and Inference</em> 219, 134-146
+  <https://doi.org/10.1016/j.jspi.2021.12.001>
+- Sattler, P. & Pauly, M. (2024). Testing hypotheses about correlation
+  matrices in general MANOVA designs. <em>TEST</em> 33, 496–516
+  <https://doi.org/10.1007/s11749-023-00906-6>
