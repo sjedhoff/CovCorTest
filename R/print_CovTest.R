@@ -52,6 +52,10 @@ print.CovTest <- function(x, ...){
   method_print <- ifelse(x$resampling_method == "MC", "Monte-Carlo-technique",
                          ifelse(x$resampling_method == "BT", "Bootstrap",
                                 "Taylor-based Monte-Carlo-approach"))
+
+
+  pval <- ifelse(x$pvalue < 10^(-4), paste0("p < 1e-", log10(x$repetitions)), paste0("p = ", round(x$pvalue, digits = 4)))
+
   group_text <- ifelse(length(x$nv) == 1, "one group", paste0("",length(x$nv),
                                                               "  groups"))
 
@@ -61,7 +65,7 @@ print.CovTest <- function(x, ...){
   "\n Teststatistic value: \t",
   round(x$Teststatistic, digits = 4),
   "\n p-value: \t \t",
-  round(x$pvalue, digits = 4),
+  pval,
   "\n \n p-value computed using ", method_print, " and n=", x$repetitions, "\n",
   sep = "")
 }
