@@ -17,7 +17,7 @@ Pd <- function(d){
 #'
 #' @return A list with two components
 #' \item{X}{ Dataset in the right format: for a single group, a single matrix.
-#' For multiple groups, a list with an element for each group contaning a
+#' For multiple groups, a list with an element for each group containing a
 #' matrix.}
 #' \item{nv}{ Number of subjects per group: NV for a single group and a vector
 #' for multiple groups.}
@@ -218,16 +218,14 @@ dvech <- function(X, a, d, p, inc_diag){
   }
   else{
     E <- rep(X[1,d],p)
-    if(inc_diag){ # with the diagonal
-      for(i in 1:(d-1)){
-        E[a[i]:(a[i+1]-1)] <- diag(X[1:(d-i+1),i:d])
-      }
+    for(i in 1:(d-1)){
+      E[a[i]:(a[i+1]-1)] <- diag(X[1:(d-i+1),i:d])
     }
-    else{ # without the diagonal
-      for(i in 2:(d-1)){
-        E[(a[i]-d):(a[i+1]-1-d)] <- diag(X[1:(d-i+1),i:d])
-      }
+    # without the diagonal
+    if(!inc_diag){
+      E <- E[-(1:d)]
     }
+
     return(E)
   }
 }

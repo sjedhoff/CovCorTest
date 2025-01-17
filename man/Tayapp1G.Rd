@@ -55,7 +55,7 @@ vectorisation}
 
 \item{Jacobi}{the Jacobian matrix of the transformation function applied
 for the diagonal vectorised correlation  to diagonalwise vectorisation. used
-for the transformation function 'ascending_root_fct_cor', else NULL}
+for the transformation function 'subdiagonal_mean_ratio_cor', else NULL}
 }
 \value{
 a matrix containing the values of the Taylor ATS for a number of

@@ -1,34 +1,3 @@
-#' @title Root transformation of the vectorised covariance matrix
-#'
-#' @description A function calculating the roots of a vectorised covariance
-#' matrix. The roots increasing, so square root for the first secondary
-#' diagonals, third root for the second secondary diagonal and so on. For roots
-#' with even order the absolute value of the argument is used, since the
-#' arguments can be negative.
-#'
-#' @param x vectorised covariance matrix which should be transformed
-#' @param a vector containing the indices which belong to the diagonal of the
-#' covariance matrix
-#' @param d dimension of the covariance matrix
-#' @return a transformed vector
-#'
-#' @keywords internal
-#' @export
-ascending_root_fct <- function(x, a, d){
-  for(i in 3:d){
-    if(i %% 2 == 1){
-      x[(0:(d - i)) + a[i]] <- abs( x[(0:(d - i)) + a[i]] )^(1/(i - 1))
-    }
-    if((i %% 2 == 0)){
-      x[(0:(d - i)) + a[i]] <- (x[(0:(d - i)) + a[i]] <= 0) *
-        (-abs(x[(0:(d - i)) + a[i]])^(1/(i - 1))) +
-        (x[(0:(d - i)) + a[i]] > 0) * (abs(x[(0:(d - i)) + a[i]])^(1/(i - 1)))
-    }
-  }
-  return(x)
-}
-
-
 #' @title  Transformation of the vectorised covariance matrix by
 #' quotients of means
 #'
@@ -48,15 +17,16 @@ subdiagonal_mean_ratio_fct <- function(v, a, d){
   ae <-  c(a, a[d] + 1)
   for(l in 2:(d)){
     ratio[l - 1] <-  mean(v[ae[l]:(ae[l + 1] - 1)]) /
-      mean(abs(v[ae[l - 1]:(ae[l] - 1)]))
+      mean(v[ae[l - 1]:(ae[l] - 1)])
   }
   return(c(v, ratio))
 }
 
+
 #' @title Jacobian matrix for transformation functions
 #'
 #' @description A function which calculates the Jacobian matrix for a given
-#' transformation function \code{\link{ascending_root_fct}} or
+#' transformation function \code{\link{subdiagonal_mean_ratio_cor}} or
 #' \code{\link{subdiagonal_mean_ratio_fct}}
 #' @param X vectorised covariance matrix for which the Jacobian matrix is
 #' applied
@@ -65,65 +35,44 @@ subdiagonal_mean_ratio_fct <- function(v, a, d){
 #' @param d dimension of the covariance matrix
 #' @param p dimension of the vectorised matrix
 #' @param fun transformation function, that should be used.
-#' \code{\link{subdiagonal_mean_ratio_fct}}, \code{\link{ascending_root_fct}} or
-#' \code{\link{ascending_root_fct_cor}}
+#' \code{\link{subdiagonal_mean_ratio_fct}} or \code{\link{subdiagonal_mean_ratio_cor}}
 #' @return the Jacobian matrix applied for the given vector
 #'
 #' @keywords internal
 #' @export
 Jacobian <- function(X, a, d, p, fun){
-  if(fun == "ascending_root_fct"){
-    E <- rep(1, p)
-    for(i in 3:d){
-      if(i %% 2 == 1){
-        E[(0:(d - i)) + a[i]] <-  X[(0:(d - i)) + a[i]] /
-          ((i - 1) * abs(X[(0:(d - i)) + a[i]])^(2 - 1/(i - 1)))
-      }
-      if(i %% 2 == 0){
-        E[(0:(d - i)) + a[i]] <-  1/((i - 1) * abs(X[(0:(d - i)) +
-                                                       a[i]])^(1 - (1/(i - 1))))
-      }
-    }
-    return(diag(E, p, p))
-  }
-  else{
     if(fun == "subdiagonal_mean_ratio_fct"){
       J <-  matrix(0, d - 1, p)
-      for (l in 1:(d - 1)){
-        S1 <- sum(abs(X[a[l]:(a[l] + d - l)]))
+      for(l in 1:(d - 1)){
+        S1 <- sum((X[a[l]:(a[l] + d - l)]))
         S2 <- sum(X[a[l + 1]:(a[l + 1] + d - l - 1)])
 
         J[l, a[l + 1] + 0:(d - l - 1)] <- (d - l + 1) / (d - l) / S1
-        J[l, a[l] + 0:(d - l)] <- (d - l + 1) / (d - l) *
-          sign(X[a[l] + 0:(d - l)]) * (-S2 / (S1) ^ 2)
+        J[l, a[l] + 0:(d - l)] <- (d - l + 1) / (d - l)  * (-S2 / (S1^2))
       }
       return(rbind(diag(1, p, p), J))
     }
     else{
-      if(fun == "ascending_root_fct_cor"){
-        E <- rep(1, p - d)
-        for(i in 3:d){
-          if((i %% 2 == 1)){
-            E[(0:(d - i)) + a[i - 1] - (i - 2)] <-  X[(0:(d - i)) +
-              a[i - 1] - (i - 2)] / ((i - 1) * abs(X[(0:(d - i)) +
-               a[i - 1] - (i - 2)]) ^ (2 - 1 / (i - 1)))
-          }
-          if((i %% 2 == 0)){
-            E[(0:(d - i)) + a[i - 1] - (i - 2)] <-
-              1 / ((i - 1) * abs(X[(0:(d - i)) +
-                                     a[i - 1] - (i - 2)]) ^ (1 - (1 / (i - 1))))
-          }
+      if(fun == "subdiagonal_mean_ratio_cor"){
+        J <-  matrix(0, d - 2, p-d)
+        for (l in 2:(d - 1)){
+          S1 <- sum((X[(a[l]-d):(a[l] - l)]))
+          S2 <- sum(X[(a[l + 1]-d):(a[l + 1]- l - 1)])
+
+          J[l-1, (a[l + 1] + 0:(d - l - 1))-d] <- (d - l + 1) / (d - l) / S1
+          J[l-1, (a[l] + 0:(d - l))-d] <- (d - l + 1) / (d - l)  * (-S2 / (S1^2))
         }
-        return(diag(E, p - d, p - d))
+        return(rbind(diag(1, p-d, p-d), J))
+
       }
+
       else{
-        stop("fun must be 'subdiagonal_mean_ratio_fct', 'ascending_root_fct' or
-             'ascending_root_fct_cor'")
+        stop("fun must be 'subdiagonal_mean_ratio_fct', 'subdiagonal_mean_ratio_cor'")
       }
     }
 
-  }
 }
+
 
 #' @title ATS for transformed vectors
 #'
@@ -138,8 +87,7 @@ Jacobian <- function(X, a, d, p, fun){
 #' @param d dimension of the covariance matrix
 #' @param p dimension of the vectorised matrix
 #' @param fun transformation function, that should be used.
-#' \code{\link{subdiagonal_mean_ratio_fct}},
-#' \code{\link{ascending_root_fct}} or \code{\link{ascending_root_fct_cor}}
+#' \code{\link{subdiagonal_mean_ratio_fct}} or \code{\link{subdiagonal_mean_ratio_cor}}
 #' @return a scalar, the value of the ATS
 #'
 #' @keywords internal
@@ -172,7 +120,7 @@ ATS_fun <- function(N, X, C, v, a, d, p, fun){
 #' @param vX the expectation vector for the bootstrap sample
 #' @param fun transformation function, that should be used.
 #' \code{\link{subdiagonal_mean_ratio_fct}} or
-#' \code{\link{ascending_root_fct}}
+#' \code{\link{subdiagonal_mean_ratio_cor}}
 #' @return a scalar, the value of the ATS
 #'
 #' @keywords internal

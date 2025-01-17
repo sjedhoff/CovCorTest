@@ -6,7 +6,7 @@
 #' with even order the absolute value of the argument is used, since the
 #' arguments can be negative.
 #'
-#' @param x vectorised correlation matrix which should be transformed
+#' @param v vectorised correlation matrix which should be transformed
 #' @param a vector containing the indices which belong to the diagonal of the
 #' correlation matrix
 #' @param d dimension of the correlation matrix
@@ -14,23 +14,18 @@
 #'
 #' @keywords internal
 #' @export
-ascending_root_fct_cor <- function(x, a, d){
-  xt <- x
-  for(i in 3:d){
-    if ((i %% 2 == 1)){
-      xt[(0:(d - i)) + a[i - 1] - (i - 2)] <-
-        abs(x[(0:(d - i)) + a[i - 1] - (i -2)]) ^ (1 / (i - 1))
-    }
-    if ((i %% 2 == 0)){
-      xt[(0:(d - i)) + a[i - 1] - (i - 2)] <-
-        (x[(0:(d - i)) + a[i - 1] - (i -2)] <= 0) *
-        (-abs(x[(0:(d - i)) + a[i - 1] - (i - 2)]) ^ (1 / (i - 1))) +
-        (x[(0:(d -i)) + a[i - 1] - (i - 2)] > 0) * (abs(x[(0:(d - i)) +
-        a[i - 1] - (i - 2)]) ^(1 / (i - 1)))
-    }
+subdiagonal_mean_ratio_cor <- function(v, a, d){
+  ratio <- rep(0, d - 2)
+  ae <-  c(a, a[d] + 1)
+  for(l in 3:(d)){
+    ratio[l - 2] <-  mean(v[(ae[l]-d):(ae[l + 1] - 1-d)]) / mean(v[(ae[l - 1]-d):(ae[l] - 1-d)])
   }
-  return(xt)
+  return(c(v,ratio))
 }
+
+
+
+
 
 
 
@@ -63,7 +58,7 @@ ascending_root_fct_cor <- function(x, a, d){
 #' vectorisation
 #' @param Jacobi the Jacobian matrix of the transformation function applied
 #' for the diagonal vectorised correlation  to diagonalwise vectorisation. used
-#' for the transformation function 'ascending_root_fct_cor', else NULL
+#' for the transformation function 'subdiagonal_mean_ratio_cor', else NULL
 #' @return a matrix containing the values of the Taylor ATS for a number of
 #' repetitions
 #'

@@ -5,7 +5,7 @@ test_that("Jacobian wrong function", {
   pu <- d * (d - 1) / 2
   a <- cumsum(c(1, (d):2))
   expect_no_error(Jacobian(X = X, a = a, d = d, p = p,
-                        fun = "ascending_root_fct_cor"))
+                        fun = "subdiagonal_mean_ratio_fct"))
   expect_error(Jacobian(X = X, a = a, d = d, p = p,
                            fun = "wrong_name"))
 })

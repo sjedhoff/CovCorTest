@@ -407,22 +407,27 @@ TestCovariance_structure <- function(X, structure, method = "BT",
     HatCov <- stats::var(t(Xq))
 
     if(structure == "autoregressive" | structure == "ar"){
-      C <- matrixcalc::direct.sum(diag(1, d, d), Pd(p - d))
-      Xi <- c(rep(1, times = d), rep(0, times = p - d))
-      Jacobi <- Jacobian(vX, a, d, p, 'ascending_root_fct')
-      HatCovh <- QF(Jacobi, HatCov)
+      C <- diag(1,d,d)
+      for(l in 2:d){
+        C <- matrixcalc::direct.sum(C, Pd(d - l + 1))
+      }
+      C <- matrixcalc::direct.sum(C, Pd(d - 1))
+      Xi <- c(rep(1,d),rep(0, times = p - 1))
+      Jacobi <- Jacobian(vX, a, d, p, 'subdiagonal_mean_ratio_fct')
+      HatCovg <- QF(Jacobi, HatCov)
 
-      if(method == "MC") {
-        ResamplingResult <- ATSwS(QF(C, HatCovh), repetitions)
+      if(method == "MC"){
+        ResamplingResult <- ATSwS(QF(C, HatCovg), repetitions)
       }
-      if(method == "BT") {
-        ResamplingResult <- vapply(1:repetitions, Bootstrap_trans,
-                                   FUN.VALUE = numeric(1), n1, a ,d, p,
-                                   C, MSroot(HatCov), vX, 'ascending_root_fct')
+      if(method == "BT"){
+        ResamplingResult <- sapply(1:repetitions, Bootstrap_trans, n1, a, d, p,
+                                   C, MSroot(HatCov), vX, 'subdiagonal_mean_ratio_fct')
       }
-      Teststatistic <- ATS(n1, ascending_root_fct(vX, a, d), C, HatCovh, Xi)
+
+      Teststatistic <- ATS(n1, subdiagonal_mean_ratio_fct(vX, a, d), C, HatCovg, Xi)
       pvalue <- mean(ResamplingResult > Teststatistic)
     }
+
 
     if(structure == "fo-autoregressive" | structure == "fo-ar"){
       C <- Pd(d)

@@ -373,7 +373,7 @@ TestCorrelation_structure <- function(X, structure, method = "BT",
   M1 <- L %*% M
   VarData <- stats::var(t(X))
   CorData <- stats::cov2cor(VarData)
-  vCorData <- dvech(CorData, a, d, pu, inc_diag = FALSE)
+  vCorData <- dvech(CorData, a, d, p, inc_diag = FALSE)
   Xq <- matrix(apply(X - rowMeans(X), 2, vtcrossprod), nrow = p, ncol = n1)
   HatCov <- stats::var(t(Xq))
   MvrH1 <- (L - 1 / 2 * vechp(CorData) * M1)
@@ -391,10 +391,16 @@ TestCorrelation_structure <- function(X, structure, method = "BT",
   Xi <- rep(0, pu)
 
   if(structure == "hautoregressive" | structure == "har"){
-    Jacobi <- Jacobian(vCorData, a, d, p, fun = "ascending_root_fct_cor")
+    Jacobi <- Jacobian(vCorData, a, d, p, fun = "subdiagonal_mean_ratio_cor")
     Upsidvhtilde <- QF(Jacobi, Upsidv)
-    C <- Pd(pu)
-    Teststatistic <- ATS(n1, ascending_root_fct_cor(vCorData, a, d), C,
+    C <- Pd(d - 1)
+    for(l in 3:d){
+      C <- matrixcalc::direct.sum(C, Pd(d - l + 1))
+    }
+    C <- matrixcalc::direct.sum(C, Pd(d-2))
+    Xi=rep(0,p-2)
+
+    Teststatistic <- ATS(n1, subdiagonal_mean_ratio_cor(vCorData, a, d), C,
                          Upsidvhtilde, Xi)
     if(method == "MC"){ ResamplingResult <- ATSwS(QF(C, Upsidvhtilde),
                                                   repetitions) }
@@ -404,7 +410,7 @@ TestCorrelation_structure <- function(X, structure, method = "BT",
                                               n1, a, d,
                                               p, C, MSroot(Upsidv),
                                               vCorData,
-                                              fun = "ascending_root_fct_cor") }
+                                              fun = "subdiagonal_mean_ratio_cor") }
     if(method == "TAY"){
       P <- diag(1, p, p)[a, ]
       StUpsi <- QF(MvrH2, HatCov)

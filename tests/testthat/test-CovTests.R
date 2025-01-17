@@ -659,11 +659,11 @@ test_that("TestCovariance_structure teststatistics", {
   expect_equal(
     TestCovariance_structure(X, structure = "autoregressive",
                              method = "MC")$Teststatistic,
-    2.13297722090024
+    2.14534594320388
   )
   expect_equal(
     TestCovariance_structure(X, structure = "ar", method = "BT")$Teststatistic,
-    2.13297722090024
+    2.14534594320388
   )
   expect_equal(
     TestCovariance_structure(X, structure = "FO-autoregressive",
@@ -724,7 +724,7 @@ test_that("TestCovariance_structure pvalue", {
       method = "MC",
       seed = 31415
     )$pvalue,
-    0.103
+    0.129
   )
   expect_equal(
     TestCovariance_structure(
@@ -733,7 +733,7 @@ test_that("TestCovariance_structure pvalue", {
       method = "BT",
       seed = 31415
     )$pvalue,
-    0.158
+    0.142
   )
   expect_equal(
     TestCovariance_structure(
@@ -751,7 +751,7 @@ test_that("TestCovariance_structure pvalue", {
       method = "BT",
       seed = 31415
     )$pvalue,
-    0.224
+    0.214
   )
   expect_equal(
     TestCovariance_structure(

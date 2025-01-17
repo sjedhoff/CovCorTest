@@ -376,7 +376,7 @@ test_that("TestCorrelation_structure teststatic", {
       structure = "Har",
       method = "BT"
     )$Teststatistic,
-    3.59698102595417
+    3.95677381790978
   )
   expect_equal(
     TestCorrelation_structure(
@@ -384,7 +384,7 @@ test_that("TestCorrelation_structure teststatic", {
       structure = "Har",
       method = "TAY"
     )$Teststatistic,
-    3.59698102595417
+    3.95677381790978
   )
   expect_equal(
     TestCorrelation_structure(
@@ -392,7 +392,7 @@ test_that("TestCorrelation_structure teststatic", {
       structure = "Har",
       method = "MC"
     )$Teststatistic,
-    3.59698102595417
+    3.95677381790978
   )
 
   expect_equal(
@@ -489,7 +489,7 @@ test_that("TestCorrelation_structure pvalue", {
       method = "TAY",
       seed = 31415
     )$pvalue,
-    0.125
+    0.104
   )
   expect_equal(
     TestCorrelation_structure(
@@ -498,7 +498,7 @@ test_that("TestCorrelation_structure pvalue", {
       method = "MC",
       seed = 31415
     )$pvalue,
-    0.022
+    0.02
   )
 
   expect_equal(

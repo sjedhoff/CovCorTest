@@ -26,7 +26,7 @@
 #' @keywords internal
 CovTest <- function() {
   structure(list("method" = character(1),
-                 "pvalue" = numeric(1),
+                 "pvalue" = 0.1,
                  "Teststatistic" = numeric(1),
                  "CovarianceMatrix" = matrix(),
                  "C" = numeric(1),

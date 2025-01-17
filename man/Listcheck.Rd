@@ -14,7 +14,7 @@ Listcheck(X, nv)
 \value{
 A list with two components
 \item{X}{ Dataset in the right format: for a single group, a single matrix.
-For multiple groups, a list with an element for each group contaning a
+For multiple groups, a list with an element for each group containing a
 matrix.}
 \item{nv}{ Number of subjects per group: NV for a single group and a vector
 for multiple groups.}

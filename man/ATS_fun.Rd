@@ -23,8 +23,7 @@ covariance matrix}
 \item{p}{dimension of the vectorised matrix}
 
 \item{fun}{transformation function, that should be used.
-\code{\link{subdiagonal_mean_ratio_fct}},
-\code{\link{ascending_root_fct}} or \code{\link{ascending_root_fct_cor}}}
+\code{\link{subdiagonal_mean_ratio_fct}} or \code{\link{subdiagonal_mean_ratio_cor}}}
 }
 \value{
 a scalar, the value of the ATS
