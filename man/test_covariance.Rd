@@ -42,7 +42,7 @@ or \code{"given-matrix"} (matrix). Ignored for other hypotheses.}
 
 \item{method}{A character indicating the resampling method: \code{"BT"} (Bootstrap) or \code{"MC"} (Monte Carlo).}
 
-\item{repetitions}{Number of repetitions to use for the resampling method (default: 1000, should be ≥ 500).}
+\item{repetitions}{Number of repetitions to use for the resampling method (default: 1000, should be >= 500).}
 
 \item{seed}{Optional random seed for reproducibility.}
 }

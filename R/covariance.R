@@ -23,7 +23,7 @@
 #' @param C (Optional) A user-defined contrast matrix for testing custom hypotheses. Must match dimensions with `Xi`.
 #' @param Xi (Optional) A numeric vector used in combination with `C` to specify a custom hypothesis.
 #' @param method A character indicating the resampling method: `"BT"` (Bootstrap) or `"MC"` (Monte Carlo).
-#' @param repetitions Number of repetitions to use for the resampling method (default: 1000, should be ≥ 500).
+#' @param repetitions Number of repetitions to use for the resampling method (default: 1000, should be >= 500).
 #' @param seed Optional random seed for reproducibility.
 #'
 #' @return An object of class \code{\link{CovTest}}.
