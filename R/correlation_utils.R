@@ -1,12 +1,12 @@
-#' @title Root transformation of the vectorised correlation matrix
+#' @title Root transformation of the vectorized correlation matrix
 #'
-#' @description A function calculating the roots of a vectorised covariance
+#' @description A function calculating the roots of a vectorized covariance
 #' matrix. The roots increasing, so square root for the first secondary
 #' diagonals, third root for the second secondary diagonal and so on. For roots
 #' with even order the absolute value of the argument is used, since the
 #' arguments can be negative.
 #'
-#' @param v vectorised correlation matrix which should be transformed
+#' @param v vectorized correlation matrix which should be transformed
 #' @param a vector containing the indices which belong to the diagonal of the
 #' correlation matrix
 #' @param d dimension of the correlation matrix
@@ -42,22 +42,22 @@ subdiagonal_mean_ratio_cor <- function(v, a, d){
 #' @param MSrootStUpsi the matrix root of the covariance matrix for the Taylor
 #' observations
 #' @param CorData the calculated correlation matrix
-#' @param MvrH an auxiliary matrix for the transformation from vectorised
+#' @param MvrH an auxiliary matrix for the transformation from vectorized
 #' covariances to vectorized correlations
 #' @param Trace a trace used in the ATS for the test statistic
-#' @param M4 a auxiliary matrix for the transformation from vectorised
+#' @param M4 a auxiliary matrix for the transformation from vectorized
 #' covariances to vectorized correlations
-#' @param L an auxiliary matrix for the transformation from vectorised
+#' @param L an auxiliary matrix for the transformation from vectorized
 #' covariances to vectorized correlations
-#' @param P an auxiliary matrix for the transformation from vectorised
+#' @param P an auxiliary matrix for the transformation from vectorized
 #' covariances to vectorized correlations
-#' @param Q an auxiliary matrix for the transformation from vectorised
+#' @param Q an auxiliary matrix for the transformation from vectorized
 #' covariances to vectorized correlations
 #' @param n1 the total sample size, a scalar
 #' @param Atilde an auxiliary matrix for the transformation from row-wise
-#' vectorisation
+#' vectorization
 #' @param Jacobi the Jacobian matrix of the transformation function applied
-#' for the diagonal vectorised correlation  to diagonalwise vectorisation. used
+#' for the diagonal vectorized correlation  to diagonalwise vectorization. used
 #' for the transformation function 'subdiagonal_mean_ratio_cor', else NULL
 #' @return a matrix containing the values of the Taylor ATS for a number of
 #' repetitions
@@ -107,18 +107,18 @@ Tayapp1G <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M4, L,
 #' @param MSrootStUpsi the matrix root of the covariance matrix for the Taylor
 #' observations
 #' @param CorData the calculated correlation matrix
-#' @param MvrH an auxiliary matrix for the transformation from vectorised
+#' @param MvrH an auxiliary matrix for the transformation from vectorized
 #'  covariances to vectorized correlations
-#' @param MvrH an auxiliary matrix for the transformation from vectorised
+#' @param MvrH an auxiliary matrix for the transformation from vectorized
 #'  covariances to vectorized correlations
 #' @param Trace a trace used in the ATS for the test statistic
-#' @param M4 an auxiliary matrix for the transformation from vectorised
+#' @param M4 an auxiliary matrix for the transformation from vectorized
 #'  covariances to vectorized correlations
-#' @param L an auxiliary matrix for the transformation from vectorised
+#' @param L an auxiliary matrix for the transformation from vectorized
 #'  covariances to vectorized correlations
-#' @param P an auxiliary matrix for the transformation from vectorised
+#' @param P an auxiliary matrix for the transformation from vectorized
 #'  covariances to vectorized correlations
-#' @param Q an auxiliary matrix for the transformation from vectorised
+#' @param Q an auxiliary matrix for the transformation from vectorized
 #'  covariances to vectorized correlations
 #' @param nv vector of sample sizes
 #' @return a matrix containing the values of the Taylor ATS for a number

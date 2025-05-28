@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{dvech}
 \alias{dvech}
-\title{Diagonal vectorisation}
+\title{Diagonal vectorization}
 \usage{
 dvech(X, a, d, p, inc_diag)
 }
@@ -12,9 +12,9 @@ dvech(X, a, d, p, inc_diag)
 \item{a}{vector containing the indices which belong to the diagonal of the
 matrix}
 
-\item{d}{dimension of the matrix which should be vectorised}
+\item{d}{dimension of the matrix which should be vectorized}
 
-\item{p}{dimension of the vectorised matrix}
+\item{p}{dimension of the vectorized  matrix}
 
 \item{inc_diag}{TRUE or FALSE: should the diagonal be included?}
 }
@@ -22,6 +22,6 @@ matrix}
 vector
 }
 \description{
-Diagonal vectorisation of the upper triangular matrix
+Diagonal vectorization of the upper triangular matrix
 }
 \keyword{internal}

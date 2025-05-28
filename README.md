@@ -19,7 +19,7 @@ test statistics.
 
 ## Installation
 
-The offical version of CovCorTest can be installed using the R Console:
+The official version of CovCorTest can be installed using the R Console:
 
 ``` r
 install.packages("CovCorTest")
@@ -36,29 +36,66 @@ devtools::install_github("sjedhoff/CovCorTest")
 ## Structure of the package
 
 The package is structures in tests regarding the covariance matrix and
-the correlation matrix and their structures. For this, each of the
-matrices, covariance and correlation, has eac three different test
-functions. The best approach is to start with the simple functions:
-`TestCovariance_simple` and `TestCorrelation_simple`. These function
+the correlation matrix and their structures. A combined test for both is implemented as well.
+For each of the matrices, covariance and correlation, two test functions are defined. 
+The best approach is to start with the simple functions:
+`test_covariance` and `test_correlation` respectively allow to test for a selection
+of different predefined hypotheses for the corresponding matrices. These function
 take the dataset, the group sizes (when testing for multiple groups) and
 the hypothesis, which should be tested. Since the hypothesis can be
 chosen using a character string like “equal”, no further knowledge about
-the matrices used to test the hypotheses is needed. The advanced methods
-are `TestCovariance_base` and `TestCorrelation_base`, where the
-hypothesis is selected using a hypothesis matrix and a corresponding
-vector. This can be used to test all forms of hypotheses, but in-depth
+the matrices used to test the hypotheses is needed. 
+For more advanced users, alternatively to using the `hypothesis` argument,
+a specific hypothesis matrix `C` and a corresponding vector `Xi` can be passed
+along to the function. This can be used to test all forms of hypotheses, but in-depth
 knowledge is necessary.
 
 The structures of the covariance and correlation matrices can be tested
-using `TestCovariance_structure`and `TestCorrelation_structure`
+using `test_covariance_structure`and `test_correlation_structure`
 respectively. Instead of a hypothesis, a structure can be selected using
 a string, which will then be tested.
 
+The `combined_test` functions delivers a possibility to test for equality of the covariance
+and correlation matrix of two groups.
+
 ## Example
 
+We are using the `EEGwide` dataset from the `MANOVA.RM` package as an example.
+For this, we are just focusing on two groups and the numerical variables.
 ``` r
 library(CovCorTest)
-## basic example code
+data("EEGwide", package = "MANOVA.RM")
+vars <- colnames(EEGwide)[1:6]
+
+data <- list(t(EEGwide[EEGwide$sex == "M" &
+                           EEGwide$diagnosis == "AD", vars]),
+               t(EEGwide[EEGwide$sex == "M" &
+                           EEGwide$diagnosis == "MCI", vars]))
+```
+
+For the two groups, we can check for equality of the covariance matrices
+```r
+test_covariance(X = data, nv = c(12,27), hypothesis = "equal")
+
+```
+The nv argument is for passing along group sizes. We can also leave it empty
+and a warning message shows.
+
+
+We could also test, if the two groups are equal-correlated
+```r
+test_correlation(X = data, hypothesis = "equal-correlated")
+```
+
+With the combined test, we can test for the covariance and the correlation matrices
+```r
+test_combined(X = data, nv = c(12, 27))
+```
+
+The test for the structure of the covariance and correlation matrices are just
+for one matrix, i.e. just one group. Different structures can be tested:
+```r
+test_covariance_structure(X = data[[1]], structure = "diag")
 ```
 
 ## Literature

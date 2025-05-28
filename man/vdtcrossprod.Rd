@@ -13,7 +13,7 @@ vdtcrossprod(X, a, d, p)
 
 \item{d}{dimension of the matrix}
 
-\item{p}{dimension of the vectorised matrix}
+\item{p}{dimension of the vectorized  matrix}
 }
 \value{
 vector

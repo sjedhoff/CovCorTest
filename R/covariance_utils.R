@@ -1,10 +1,10 @@
-#' @title  Transformation of the vectorised covariance matrix by
+#' @title  Transformation of the vectorized covariance matrix by
 #' quotients of means
 #'
 #' @description A function which calculates the mean of the secondary diagonals
 #' and divide them through the next one. Since the elements can be negative, for
 #' the denominator absolute values are used.
-#' @param v vectorised covariance matrix which should be transformed
+#' @param v vectorized covariance matrix which should be transformed
 #' @param a vector containing the indices which belong to the diagonal of the
 #' covariance matrix
 #' @param d dimension of the covariance matrix
@@ -28,12 +28,12 @@ subdiagonal_mean_ratio_fct <- function(v, a, d){
 #' @description A function which calculates the Jacobian matrix for a given
 #' transformation function \code{\link{subdiagonal_mean_ratio_cor}} or
 #' \code{\link{subdiagonal_mean_ratio_fct}}
-#' @param X vectorised covariance matrix for which the Jacobian matrix is
+#' @param X vectorized covariance matrix for which the Jacobian matrix is
 #' applied
 #' @param a vector containing the indices which belong to the diagonal of the
 #' covariance matrix
 #' @param d dimension of the covariance matrix
-#' @param p dimension of the vectorised matrix
+#' @param p dimension of the vectorized matrix
 #' @param fun transformation function, that should be used.
 #' \code{\link{subdiagonal_mean_ratio_fct}} or \code{\link{subdiagonal_mean_ratio_cor}}
 #' @return the Jacobian matrix applied for the given vector
@@ -81,11 +81,11 @@ Jacobian <- function(X, a, d, p, fun){
 #' @param N sample size
 #' @param X matrix containing the bootstrap observations as columns
 #' @param C the hypothesis matrix
-#' @param v vectorised empirical covariance matrix of the original data
+#' @param v vectorized empirical covariance matrix of the original data
 #' @param a vector containing the indices which belongs to the diagonal of the
 #' covariance matrix
 #' @param d dimension of the covariance matrix
-#' @param p dimension of the vectorised matrix
+#' @param p dimension of the vectorized matrix
 #' @param fun transformation function, that should be used.
 #' \code{\link{subdiagonal_mean_ratio_fct}} or \code{\link{subdiagonal_mean_ratio_cor}}
 #' @return a scalar, the value of the ATS
@@ -113,7 +113,7 @@ ATS_fun <- function(N, X, C, v, a, d, p, fun){
 #' @param a vector containing the indices which belong to the diagonal of the
 #' covariance matrix
 #' @param d dimension of the covariance matrix
-#' @param p dimension of the vectorised matrix
+#' @param p dimension of the vectorized matrix
 #' @param C a hypothesis matrix for calculating the ATS
 #' @param MSrootHatCov matrix root of the covariance matrix HatCov, to generate
 #' the bootstrap sample

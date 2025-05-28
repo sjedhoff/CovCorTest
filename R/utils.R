@@ -1,3 +1,68 @@
+################################################################################
+##                              Basic Functions                                #
+################################################################################
+
+
+
+#' Anova-Type-Statistic with weighted sum
+#'
+#' @description
+#' Calculation of a Anova-Type-Statistic using
+#'
+#' @param A a matrix
+#' @param repetitions a scalar, number of runs
+#' @return a vector of the length of repetitions
+#'
+#' @export
+#' @keywords internal
+ATSwS <- function(A, repetitions){
+  Chi <- matrix(stats::rchisq(dim(A)[1] * repetitions, df = 1),
+                ncol = repetitions)
+  return(colSums(crossprod(eigen(A, only.values = 1)$value, Chi))/sum(diag(A)))
+}
+
+
+#' Anova-Type-statistic
+#'
+#' @param N number of observations
+#' @param vVarData a matrix of vectorized covariance/correlation data
+#' @param C hypothesis matrix for calculating the ATS
+#' @param HatCov covariance matrix
+#' @param Xi a vector defining together with C the investigated hypothesis
+#'
+#' @return a vector
+#'
+#' @export
+#' @keywords internal
+ATS <- function(N, vVarData, C, HatCov, Xi = 0){
+  CDiff <-  C %*% vVarData - Xi
+  statisticATS <-  N * crossprod(CDiff) / (sum(diag(QF(C, HatCov))))
+  return(as.numeric(statisticATS))
+}
+
+#' Function to generate bootstrap observations
+#'
+#' @param WSigma weight matrix
+#' @param nv number of observations in the groups
+#'
+#' @return a matrix
+#'
+#' @export
+#' @keywords internal
+generateData <- function(WSigma, nv){
+  data <- WSigma %*% matrix(stats::rnorm(dim(WSigma)[1] * nv), ncol = nv)
+  return(data)
+}
+
+################################################################################
+##                            Utility Functions                               ##
+################################################################################
+
+
+
+
+
+
 #' @title Centering matrix
 #'
 #' @description matrix Pd for testing equality of the d components of a vector
@@ -9,7 +74,6 @@
 Pd <- function(d){
   return( diag(1,d,d) - matrix(1/d,d,d) )
 }
-
 #' @title Function to transform the data into a list, if there are not already
 #'
 #' @param X object that should be checked
@@ -25,6 +89,8 @@ Pd <- function(d){
 #' @export
 #' @keywords internal
 Listcheck <- function(X, nv){
+  #List containing elements which are no matrices
+  if(is.list(X) & (min(sapply(X,is.matrix))==0)){stop("all list elements have to be matrices")}
   # no nv
   if(is.null(nv) | (length(nv) == 1)){
     # one group
@@ -47,12 +113,15 @@ Listcheck <- function(X, nv){
         nv_ <- NULL
       }
       # list with more elements
-      else{if(is.list(X) & (length(X) > 1)){
-        data <- X
-        nv_ <- unlist(lapply(X, ncol))
-        warning(paste0("no nv or unfitting nv is given, will procede with nv =
+
+
+      else{
+        if(is.list(X) & (length(X) > 1)){
+          data <- X
+          nv_ <- unlist(lapply(X, ncol))
+          warning(paste0("no nv or unfitting nv is given, will procede with nv =
                        c(",paste0(nv_, collapse = " "),")"))
-      }}
+        }}
     }
 
   }
@@ -103,41 +172,41 @@ Listcheck <- function(X, nv){
   # one group
   if(is.null(nv_) & any(is.na(data))){
     data_na <- data
-      # remove rows with NA all the way
-      data <- data[!apply(data, 1, function(x) all(is.na(x))), , drop = FALSE]
-      if(nrow(data) < nrow(data_na)){
-        warning(paste0(nrow(data_na) - nrow(data), " row(s) with only NA values
+    # remove rows with NA all the way
+    data <- data[!apply(data, 1, function(x) all(is.na(x))), , drop = FALSE]
+    if(nrow(data) < nrow(data_na)){
+      warning(paste0(nrow(data_na) - nrow(data), " row(s) with only NA values
                        were removed"))
-      }
-      # remove columns with at least one NA
-      data <- data[, !apply(data, 2, function(x) any(is.na(x))), drop = FALSE]
-      if(ncol(data) < ncol(data_na)){
-        warning(paste0(ncol(data_na) - ncol(data), " subject(s) is/are removed
+    }
+    # remove columns with at least one NA
+    data <- data[, !apply(data, 2, function(x) any(is.na(x))), drop = FALSE]
+    if(ncol(data) < ncol(data_na)){
+      warning(paste0(ncol(data_na) - ncol(data), " subject(s) is/are removed
                        due to missing values"))
-      }
     }
-    # more groups
-    if(!is.null(nv_) & any(unlist(lapply(X, function(x) any(is.na(x)))))){
-      data_na <- data
-      # rows, where at least in one group only missing values are pres
-      na_rows <- apply(vapply(data, function(mat) apply(mat, 1, function(row)
-        all(is.na(row))), FUN.VALUE = logical(nrow(X[[1]]))), 1, any)
-      # remove these rows
-      data <- lapply(data, function(mat) mat[!na_rows, , drop=FALSE])
-      if(any(na_rows)){
-        warning(paste0(sum(na_rows)," row(s) with only NA values were removed"))
-      }
-      # remove columns with at least one NA
-      data <- lapply(data, function(mat) mat[, !apply(mat, 2,
-                                    function(col) any(is.na(col))), drop=FALSE])
-      if(sum(unlist(lapply(data_na, ncol)) - unlist(lapply(data, ncol))) > 0){
-        warning(paste0(sum(unlist(lapply(data_na, ncol)) -
-                             unlist(lapply(data, ncol))),
-                       " subject(s) is/are removed due to missing values"))
-      }
-      nv_save <- nv_
-      nv_ <- unlist(lapply(X, ncol))
+  }
+  # more groups
+  if(!is.null(nv_) & any(unlist(lapply(X, function(x) any(is.na(x)))))){
+    data_na <- data
+    # rows, where at least in one group only missing values are pres
+    na_rows <- apply(vapply(data, function(mat) apply(mat, 1, function(row)
+      all(is.na(row))), FUN.VALUE = logical(nrow(X[[1]]))), 1, any)
+    # remove these rows
+    data <- lapply(data, function(mat) mat[!na_rows, , drop=FALSE])
+    if(any(na_rows)){
+      warning(paste0(sum(na_rows)," row(s) with only NA values were removed"))
     }
+    # remove columns with at least one NA
+    data <- lapply(data, function(mat) mat[, !apply(mat, 2,
+                                                    function(col) any(is.na(col))), drop=FALSE])
+    if(sum(unlist(lapply(data_na, ncol)) - unlist(lapply(data, ncol))) > 0){
+      warning(paste0(sum(unlist(lapply(data_na, ncol)) -
+                           unlist(lapply(data, ncol))),
+                     " subject(s) is/are removed due to missing values"))
+    }
+    nv_save <- nv_
+    nv_ <- unlist(lapply(data, ncol))
+  }
 
 
   ## Check dimensions: multiple groups
@@ -169,7 +238,6 @@ Listcheck <- function(X, nv){
   return(list(X = data, nv = nv_))
 }
 
-
 #' @title Quadratic form for vectors and matrices
 #'
 #' @param A,B matrices or vectors
@@ -198,14 +266,13 @@ MSroot <- function(X){
 }
 
 
-
-#' @title Diagonal vectorisation
-#' @description  Diagonal vectorisation of the upper triangular matrix
+#' @title Diagonal vectorization
+#' @description  Diagonal vectorization of the upper triangular matrix
 #' @param X quadratic matrix which should be diagonalized
 #' @param a vector containing the indices which belong to the diagonal of the
 #' matrix
-#' @param d dimension of the matrix which should be vectorised
-#' @param p dimension of the vectorised matrix
+#' @param d dimension of the matrix which should be vectorized
+#' @param p dimension of the vectorized  matrix
 #' @param inc_diag TRUE or FALSE: should the diagonal be included?
 #'
 #' @return vector
@@ -293,7 +360,7 @@ vtcrossprod <- function(X){
 #' @param X matrix
 #' @param a indices that belong to the diagonal of the matrix
 #' @param d dimension of the matrix
-#' @param p dimension of the vectorised matrix
+#' @param p dimension of the vectorized  matrix
 #'
 #' @return vector
 #'
