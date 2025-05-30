@@ -6,6 +6,8 @@
 ## Statistical Tests for Covariance and Correlation Matrices and their Structures
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/sjedhoff/CovCorTest/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sjedhoff/CovCorTest/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/sjedhoff/CovCorTest/graph/badge.svg)](https://app.codecov.io/gh/sjedhoff/CovCorTest)
 <!-- badges: end -->
 
 A compilation of tests for hypotheses regarding covariance and
