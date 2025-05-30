@@ -88,4 +88,16 @@ test_that("test_combined d=1", {
     nv = nv[1:2],
     seed = 31415
   ))
+  expect_error(test_combined(
+    X = list( X_list[[1]][1,, drop = FALSE], X_list[[2]][1,, drop = FALSE]),
+    nv = nv[1:2],
+    seed = 31415
+  ))
 })
+
+test_that("CombTest object",{
+  test <- CombTest()
+  expect_null(print(test))
+})
+
+

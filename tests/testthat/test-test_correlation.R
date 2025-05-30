@@ -368,6 +368,12 @@ test_that("test_correlation d=1", {
   ))
 })
 
+test_that("test_correlation no hypothesis, C or Xi missing", {
+  expect_error(test_correlation(
+    X = X_list, nv = nv, C = c(1,2,3)
+  ))
+})
+
 ## Structure
 test_that("test_correlation_structure teststatic", {
   expect_equal(
@@ -635,7 +641,7 @@ test_that("test_correlation_structure input list", {
 })
 
 test_that("test_correlation_structure d=1", {
-  expect_error(test_correlation_structure(X = X_list[[1]][1, 1:12, drop = FALSE],
+expect_error(test_correlation_structure(X = X_list[[1]][1, 1:12, drop = FALSE],
                                          structure = "Har"))
 })
 

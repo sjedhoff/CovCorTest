@@ -18,7 +18,8 @@ subdiagonal_mean_ratio_cor <- function(v, a, d){
   ratio <- rep(0, d - 2)
   ae <-  c(a, a[d] + 1)
   for(l in 3:(d)){
-    ratio[l - 2] <-  mean(v[(ae[l]-d):(ae[l + 1] - 1-d)]) / mean(v[(ae[l - 1]-d):(ae[l] - 1-d)])
+    ratio[l - 2] <-  mean(v[(ae[l]-d):(ae[l + 1] - 1-d)]) /
+      mean(v[(ae[l - 1]-d):(ae[l] - 1-d)])
   }
   return(c(v,ratio))
 }

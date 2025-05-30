@@ -17,32 +17,42 @@ test_covariance(
 )
 }
 \arguments{
-\item{X}{A list or a matrix containing the observation vectors. If a list, each entry is a group,
-with observations as columns. If a matrix, all groups are combined, and \code{nv} must be used to indicate group sizes.}
+\item{X}{A list or a matrix containing the observation vectors. If a list,
+each entry is a group, with observations as columns. If a matrix, all
+groups are combined, and \code{nv} must be used to indicate group sizes.}
 
-\item{nv}{(Optional) A vector indicating group sizes, needed when \code{X} is a combined matrix or for multiple groups.}
+\item{nv}{(Optional) A vector indicating group sizes, needed when \code{X} is a
+combined matrix or for multiple groups.}
 
-\item{C}{(Optional) A user-defined contrast matrix for testing custom hypotheses. Must match dimensions with \code{Xi}.}
+\item{C}{(Optional) A user-defined contrast matrix for testing custom
+hypotheses. Must match dimensions with \code{Xi}.}
 
-\item{Xi}{(Optional) A numeric vector used in combination with \code{C} to specify a custom hypothesis.}
+\item{Xi}{(Optional) A numeric vector used in combination with \code{C} to
+specify a custom hypothesis.}
 
 \item{hypothesis}{A character specifying one of the predefined hypotheses:
 \itemize{
 \item \code{"equal"} — equal covariance matrices
 \item \code{"equal-trace"} — equal traces across groups
 \item \code{"equal-diagonals"} — equal variances across groups
-\item \code{"given-trace"} — test against a given trace (single group only)
-\item \code{"given-matrix"} — test against a given covariance matrix (single group only)
-\item \code{"uncorrelated"} — test if variables are uncorrelated (single group only)
+\item \code{"given-trace"} — test against a given trace
+(single group only)
+\item \code{"given-matrix"} — test against a given covariance matrix
+(single group only)
+\item \code{"uncorrelated"} — test if variables are uncorrelated
+(single group only)
 }
 If \code{C} and \code{Xi} are provided, this can be set to \code{NULL}.}
 
-\item{A}{Optional scalar or matrix to define the hypothesis value when \code{hypothesis} is \code{"given-trace"} (scalar)
+\item{A}{Optional scalar or matrix to define the hypothesis value when
+\code{hypothesis} is \code{"given-trace"} (scalar)
 or \code{"given-matrix"} (matrix). Ignored for other hypotheses.}
 
-\item{method}{A character indicating the resampling method: \code{"BT"} (Bootstrap) or \code{"MC"} (Monte Carlo).}
+\item{method}{A character indicating the resampling method:
+\code{"BT"} (Bootstrap) or \code{"MC"} (Monte Carlo).}
 
-\item{repetitions}{Number of repetitions to use for the resampling method (default: 1000, should be >= 500).}
+\item{repetitions}{Number of repetitions to use for the resampling method
+(default: 1000, should be >= 500).}
 
 \item{seed}{Optional random seed for reproducibility.}
 }
@@ -50,10 +60,12 @@ or \code{"given-matrix"} (matrix). Ignored for other hypotheses.}
 An object of class \code{\link{CovTest}}.
 }
 \description{
-This function conducts statistical tests for hypotheses regarding covariance matrices.
-Users can either select from predefined hypotheses (e.g., equal covariance, equal trace, etc.) or
-provide their own contrast matrix \code{C} and vector \code{Xi} for custom hypotheses. It supports both
-bootstrap and Monte Carlo resampling methods to obtain the p-value of the ANOVA-type statistic (ATS).
+This function conducts statistical tests for hypotheses
+regarding covariance matrices. Users can either select from predefined
+hypotheses (e.g., equal covariance, equal trace, etc.) or
+provide their own contrast matrix \code{C} and vector \code{Xi} for custom hypotheses.
+It supports both bootstrap and Monte Carlo resampling methods to
+obtain the p-value of the ANOVA-type statistic (ATS).
 }
 \examples{
 # Load the data

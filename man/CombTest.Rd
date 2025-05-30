@@ -11,15 +11,19 @@ An object of class \code{CombTest}.
 }
 \description{
 This help page describes the structure of the \code{CombTest} class,
-which is used to represent the results the combined covariance and correlation test.
+which is used to represent the results the combined covariance and
+correlation test.
 }
 \details{
 A \code{CombTest} object is a list with the following components:
 \describe{
 \item{\code{method}}{Character. Either 'Covariance' or 'Correlation'.}
-\item{\code{pvalue-Variances}}{Numeric. The p-value of the test regarding the covariances.}
-\item{\code{pvalue-Correlations}}{Numeric. The p-value of the test regarding the correlations.}
-\item{\code{pvalue-Total}}{Numeric. The p-value of the whole test of the global hypothesis.}
+\item{\code{pvalue-Variances}}{Numeric. The p-value of the test regarding
+the covariances.}
+\item{\code{pvalue-Correlations}}{Numeric. The p-value of the test
+regarding the correlations.}
+\item{\code{pvalue-Total}}{Numeric. The p-value of the whole test of the
+global hypothesis.}
 \item{\code{Teststatistic}}{Numeric. The test statistic.}
 \item{\code{resampling_method}}{Character. The resampling method used in
 the test.}

@@ -16,22 +16,28 @@ test_correlation(
 )
 }
 \arguments{
-\item{X}{A list or a matrix containing the observation vectors. If a list, each entry is a group,
-with observations as columns. If a matrix, all groups are combined, and \code{nv} must be used to indicate group sizes.}
+\item{X}{A list or a matrix containing the observation vectors. If a list,
+each entry is a group, with observations as columns. If a matrix,
+all groups are combined, and \code{nv} must be used to indicate group sizes.}
 
-\item{nv}{(Optional) A vector indicating group sizes, needed when \code{X} is a combined matrix or for multiple groups.}
+\item{nv}{(Optional) A vector indicating group sizes, needed when
+\code{X} is a combined matrix or for multiple groups.}
 
-\item{C}{(Optional) A user-defined contrast matrix for testing custom hypotheses. Must match dimensions with \code{Xi}.}
+\item{C}{(Optional) A user-defined contrast matrix for testing custom
+hypotheses. Must match dimensions with \code{Xi}.}
 
-\item{Xi}{(Optional) A numeric vector used in combination with \code{C} to specify a custom hypothesis.}
+\item{Xi}{(Optional) A numeric vector used in combination with \code{C} to
+specify a custom hypothesis.}
 
 \item{hypothesis}{A character string describing the null hypothesis.
 Must be one of \code{"equal-correlated"} or \code{"uncorrelated"}.
 If supplied, \code{C} and \code{Xi} are ignored.}
 
-\item{method}{A character indicating the resampling method: \code{"BT"} (Bootstrap) or \code{"MC"} (Monte Carlo).}
+\item{method}{A character indicating the resampling method:
+\code{"BT"} (Bootstrap) or \code{"MC"} (Monte Carlo).}
 
-\item{repetitions}{Number of repetitions to use for the resampling method (default: 1000, should be >= 500).}
+\item{repetitions}{Number of repetitions to use for the resampling method
+(default: 1000, should be >= 500).}
 
 \item{seed}{Optional random seed for reproducibility.}
 }
@@ -39,17 +45,19 @@ If supplied, \code{C} and \code{Xi} are ignored.}
 An object of class \code{"CovTest"}.
 }
 \description{
-This function conducts statistical tests for hypotheses regarding correlation matrices.
+This function conducts statistical tests for hypotheses
+regarding correlation matrices.
 Users can either select from predefined hypotheses or
-provide their own contrast matrix \code{C} and vector \code{Xi} for custom hypotheses. It supports both
-bootstrap and Monte Carlo resampling methods to obtain the p-value of the ANOVA-type statistic (ATS).
+provide their own contrast matrix \code{C} and vector \code{Xi} for custom hypotheses.
+It supports both bootstrap and Monte Carlo resampling methods to
+obtain the p-value of the ANOVA-type statistic (ATS).
 }
 \examples{
 # Example with one group:
 set.seed(1)
 X <- matrix(rnorm(5 * 100), nrow = 5)
-result <- test_correlation(X, hypothesis = "uncorrelated", method = "BT", repetitions = 100)
-print(result$pvalue)
+test_correlation(X, hypothesis = "uncorrelated",
+                  method = "BT", repetitions = 100)
 
 }
 \references{

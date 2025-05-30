@@ -1,29 +1,41 @@
 #' @title Test for Covariance Matrices
 #'
-#' @description This function conducts statistical tests for hypotheses regarding covariance matrices.
-#' Users can either select from predefined hypotheses (e.g., equal covariance, equal trace, etc.) or
-#' provide their own contrast matrix `C` and vector `Xi` for custom hypotheses. It supports both
-#' bootstrap and Monte Carlo resampling methods to obtain the p-value of the ANOVA-type statistic (ATS).
+#' @description This function conducts statistical tests for hypotheses
+#' regarding covariance matrices. Users can either select from predefined
+#' hypotheses (e.g., equal covariance, equal trace, etc.) or
+#' provide their own contrast matrix `C` and vector `Xi` for custom hypotheses.
+#' It supports both bootstrap and Monte Carlo resampling methods to
+#' obtain the p-value of the ANOVA-type statistic (ATS).
 #'
-#' @param X A list or a matrix containing the observation vectors. If a list, each entry is a group,
-#'   with observations as columns. If a matrix, all groups are combined, and `nv` must be used to indicate group sizes.
-#' @param nv (Optional) A vector indicating group sizes, needed when `X` is a combined matrix or for multiple groups.
+#' @param X A list or a matrix containing the observation vectors. If a list,
+#'  each entry is a group, with observations as columns. If a matrix, all
+#'  groups are combined, and `nv` must be used to indicate group sizes.
+#' @param nv (Optional) A vector indicating group sizes, needed when `X` is a
+#' combined matrix or for multiple groups.
 #' @param hypothesis A character specifying one of the predefined hypotheses:
 #'   \itemize{
 #'     \item `"equal"` — equal covariance matrices
 #'     \item `"equal-trace"` — equal traces across groups
 #'     \item `"equal-diagonals"` — equal variances across groups
-#'     \item `"given-trace"` — test against a given trace (single group only)
-#'     \item `"given-matrix"` — test against a given covariance matrix (single group only)
-#'     \item `"uncorrelated"` — test if variables are uncorrelated (single group only)
+#'     \item `"given-trace"` — test against a given trace
+#'     (single group only)
+#'     \item `"given-matrix"` — test against a given covariance matrix
+#'     (single group only)
+#'     \item `"uncorrelated"` — test if variables are uncorrelated
+#'     (single group only)
 #'   }
 #'   If `C` and `Xi` are provided, this can be set to `NULL`.
-#' @param A Optional scalar or matrix to define the hypothesis value when `hypothesis` is `"given-trace"` (scalar)
+#' @param A Optional scalar or matrix to define the hypothesis value when
+#' `hypothesis` is `"given-trace"` (scalar)
 #'   or `"given-matrix"` (matrix). Ignored for other hypotheses.
-#' @param C (Optional) A user-defined contrast matrix for testing custom hypotheses. Must match dimensions with `Xi`.
-#' @param Xi (Optional) A numeric vector used in combination with `C` to specify a custom hypothesis.
-#' @param method A character indicating the resampling method: `"BT"` (Bootstrap) or `"MC"` (Monte Carlo).
-#' @param repetitions Number of repetitions to use for the resampling method (default: 1000, should be >= 500).
+#' @param C (Optional) A user-defined contrast matrix for testing custom
+#' hypotheses. Must match dimensions with `Xi`.
+#' @param Xi (Optional) A numeric vector used in combination with `C` to
+#' specify a custom hypothesis.
+#' @param method A character indicating the resampling method:
+#' `"BT"` (Bootstrap) or `"MC"` (Monte Carlo).
+#' @param repetitions Number of repetitions to use for the resampling method
+#' (default: 1000, should be >= 500).
 #' @param seed Optional random seed for reproducibility.
 #'
 #' @return An object of class \code{\link{CovTest}}.
@@ -85,7 +97,7 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
       stop("no predefined hypothesis")
     }
 
-  if(!is.null(A) & !(hypothesis %in% c("given-trace", "given-matrix"))){
+  if(!is.null(A) && !(hypothesis %in% c("given-trace", "given-matrix"))){
     warning(paste0("the input argument A is not used, since the selected
                    hypothesis is '", hypothesis, "'"))
   }
@@ -121,15 +133,16 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
            },
            "given-trace" = {
              if(groups > 1){
-               stop("the hypothesis 'given-trace' can only be tested for one group")
+               stop("the hypothesis 'given-trace' can only be tested for
+                    one group")
              }
              tracevec <- matrix(0, 1, p)
              tracevec[1,a] <- 1
              C <- tracevec
              if(is.null(A)){
                A <- 1
-               warning("since no input A for a trace to be tested is given, a trace of
-              1 is tested")
+               warning("since no input A for a trace to be tested is given,
+               a trace of 1 is tested")
              }
              if(!is.numeric(A) | length(A) != 1){
                stop("for testing the trace the input A must be a scalar")
@@ -138,7 +151,8 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
            },
            "given-matrix" = {
              if(groups > 1){
-               stop("the hypothesis 'given-matrix' can only be tested for one group")
+               stop("the hypothesis 'given-matrix' can only be tested for
+                    one group")
              }
              C <- diag(1, p, p)
              if(is.null(A)){
@@ -148,24 +162,31 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
              }
              else{
                if(!is.matrix(A)){
-                 stop("the given matrix A must be a matrix with dimensions d x d")
+                 stop("the given matrix A must be a matrix with dimensions
+                      d x d")
                }
                if(matrixcalc::is.square.matrix(A) & dim(A)[1] == d){
                  Xi <- matrixcalc::vech(A)
                }
                else{
-                 stop("the given matrix A must be a square matrix with dimensions d x d")
+                 stop("the given matrix A must be a square matrix with
+                      dimensions d x d")
                }
              }
            },
            "uncorrelated" = {
              if(groups > 1){
-               stop("the hypothesis 'uncorrelated' can only be tested for one group")
+               stop("the hypothesis 'uncorrelated' can only be tested for
+                    one group")
              }
              C <- diag(1, p, p)[-a, , drop = FALSE]
              Xi <- rep(0, p - d)
            }
     )
+  }
+  # if no hypothesis, use C and Xi
+  if (is.null(C) || is.null(Xi)) {
+    stop("Either provide 'hypothesis' or both 'C' and 'Xi'")
   }
 
   # seed
@@ -214,7 +235,7 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
   if(!is.matrix(C)){
     stop("C must be a matrix")
   }
-  if( (nrow(C) != length(Xi)) | (ncol(C) != groups*p) ){
+  if( (nrow(C) != length(Xi)) || (ncol(C) != groups*p) ){
     stop("dimensions of C and Xi do not align")
   }
 
@@ -295,7 +316,7 @@ test_covariance_structure <- function(X, structure, method = "BT",
 
   structure <- tolower(structure)
   method <- toupper(method)
-  if(!(method == "MC" | method == "BT")){
+  if(!(method == "MC" || method == "BT")){
     stop("method must be bootstrap ('BT') or Monte-Carlo-technique('MC')")
   }
 
@@ -340,7 +361,7 @@ test_covariance_structure <- function(X, structure, method = "BT",
     Xq <- apply(X - rowMeans(X), 2, vdtcrossprod, a, d, p)
     HatCov <- stats::var(t(Xq))
 
-    if(structure == "autoregressive" | structure == "ar"){
+    if(structure == "autoregressive" || structure == "ar"){
       C <- diag(1,d,d)
       for(l in 2:d){
         C <- matrixcalc::direct.sum(C, Pd(d - l + 1))
@@ -355,15 +376,17 @@ test_covariance_structure <- function(X, structure, method = "BT",
       }
       if(method == "BT"){
         ResamplingResult <- sapply(1:repetitions, Bootstrap_trans, n1, a, d, p,
-                                   C, MSroot(HatCov), vX, 'subdiagonal_mean_ratio_fct')
+                                   C, MSroot(HatCov), vX,
+                                   'subdiagonal_mean_ratio_fct')
       }
 
-      Teststatistic <- ATS(n1, subdiagonal_mean_ratio_fct(vX, a, d), C, HatCovg, Xi)
+      Teststatistic <- ATS(n1, subdiagonal_mean_ratio_fct(vX, a, d), C,
+                           HatCovg, Xi)
       pvalue <- mean(ResamplingResult > Teststatistic)
     }
 
 
-    if(structure == "fo-autoregressive" | structure == "fo-ar"){
+    if(structure == "fo-autoregressive" || structure == "fo-ar"){
       C <- Pd(d)
       for(l in 2:d){
         C <- matrixcalc::direct.sum(C, Pd(d - l + 1))
@@ -393,16 +416,16 @@ test_covariance_structure <- function(X, structure, method = "BT",
 
       Xi <- rep(0, p)
 
-      if(structure == "diagonal" | structure == "diag"){
+      if(structure == "diagonal" || structure == "diag"){
         C <- matrixcalc::direct.sum(matrix(0, d, d), diag(1, p - d, p - d))
       }
-      if(structure == "sphericity" | structure == "spher"){
+      if(structure == "sphericity" || structure == "spher"){
         C <- matrixcalc::direct.sum(Pd(d), diag(1, p - d, p - d))
       }
-      if(structure == "compoundsymmetry" | structure == "cs"){
+      if(structure == "compoundsymmetry" || structure == "cs"){
         C <- matrixcalc::direct.sum(Pd(d), Pd(p - d))
       }
-      if(structure == "toeplitz" | structure == "toep"){
+      if(structure == "toeplitz" || structure == "toep"){
         C <- Pd(d)
         for(l in 2:d){
           C <- matrixcalc::direct.sum(C, Pd(d - l + 1))

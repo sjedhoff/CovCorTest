@@ -2,7 +2,8 @@
 % Please edit documentation in R/combined.R
 \name{test_combined}
 \alias{test_combined}
-\title{Combined test for equality of covariance matrices and correlation matrices}
+\title{Combined test for equality of covariance matrices and correlation
+matrices}
 \usage{
 test_combined(X, nv = NULL, repetitions = 1000, seed = NULL)
 }
@@ -14,19 +15,21 @@ one matrix and nv is used to indicate the group sizes.}
 
 \item{nv}{vector of group sizes}
 
-\item{repetitions}{a scalar,  indicate the number of runs for the chosen method.
-The predefined value is 1.000, and the number should not be below 500.}
+\item{repetitions}{a scalar,  indicate the number of runs for the chosen
+method. The predefined value is 1.000, and the number should not be
+below 500.}
 
-\item{seed}{A seed, if it should be set for reproducibility. Predefined values
-is 0, which means no seed is set. A chosen seed is deleted at the end.}
+\item{seed}{A seed, if it should be set for reproducibility. Predefined
+values is 0, which means no seed is set. A chosen seed is deleted at the end.}
 }
 \value{
 an object of the class \code{\link{CovTest}}.
 }
 \description{
-For two groups a combined test for equality of covariance matrices
-and equality of correlation matrices between these groups is conducted. Both hypotheses
-can be rejected or only the larger one, the equality of the covariance matrices
+For two groups a combined test for equality of covariance
+matrices and equality of correlation matrices between these groups is
+conducted. Both hypotheses can be rejected or only the larger one, the
+equality of the covariance matrices
 }
 \examples{
 # Load the data

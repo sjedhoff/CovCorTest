@@ -90,9 +90,10 @@ Pd <- function(d){
 #' @keywords internal
 Listcheck <- function(X, nv){
   #List containing elements which are no matrices
-  if(is.list(X) & (min(sapply(X,is.matrix))==0)){stop("all list elements have to be matrices")}
+  if(is.list(X) && (min(sapply(X,is.matrix))==0)){stop("all list elements have
+                                                        to be matrices")}
   # no nv
-  if(is.null(nv) | (length(nv) == 1)){
+  if(is.null(nv) || (length(nv) == 1)){
     # one group
     if(is.matrix(X)){
       if(!is.null(nv) && (nv != ncol(X))){
@@ -104,7 +105,7 @@ Listcheck <- function(X, nv){
     }
     # list with one element
     else{
-      if(is.list(X) & (length(X) == 1)){
+      if(is.list(X) && (length(X) == 1)){
         data <- X[[1]]
         if(!is.null(nv) && (nv != ncol(data))){
           warning(paste0("the number of columns of X (", ncol(data), ") and the
@@ -116,7 +117,7 @@ Listcheck <- function(X, nv){
 
 
       else{
-        if(is.list(X) & (length(X) > 1)){
+        if(is.list(X) && (length(X) > 1)){
           data <- X
           nv_ <- unlist(lapply(X, ncol))
           warning(paste0("no nv or unfitting nv is given, will procede with nv =
@@ -170,7 +171,7 @@ Listcheck <- function(X, nv){
 
   ## Check for missing values
   # one group
-  if(is.null(nv_) & any(is.na(data))){
+  if(is.null(nv_) && any(is.na(data))){
     data_na <- data
     # remove rows with NA all the way
     data <- data[!apply(data, 1, function(x) all(is.na(x))), , drop = FALSE]
@@ -186,7 +187,7 @@ Listcheck <- function(X, nv){
     }
   }
   # more groups
-  if(!is.null(nv_) & any(unlist(lapply(X, function(x) any(is.na(x)))))){
+  if(!is.null(nv_) && any(unlist(lapply(X, function(x) any(is.na(x)))))){
     data_na <- data
     # rows, where at least in one group only missing values are pres
     na_rows <- apply(vapply(data, function(mat) apply(mat, 1, function(row)
@@ -198,13 +199,14 @@ Listcheck <- function(X, nv){
     }
     # remove columns with at least one NA
     data <- lapply(data, function(mat) mat[, !apply(mat, 2,
-                                                    function(col) any(is.na(col))), drop=FALSE])
+                                                    function(col)
+                                                      any(is.na(col))),
+                                           drop=FALSE])
     if(sum(unlist(lapply(data_na, ncol)) - unlist(lapply(data, ncol))) > 0){
       warning(paste0(sum(unlist(lapply(data_na, ncol)) -
                            unlist(lapply(data, ncol))),
                      " subject(s) is/are removed due to missing values"))
     }
-    nv_save <- nv_
     nv_ <- unlist(lapply(data, ncol))
   }
 

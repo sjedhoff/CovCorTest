@@ -1,11 +1,12 @@
 Package: CovCorTest
 Title: Statistical Tests for Covariance and Correlation Matrices and their
     Structures
-Version: 0.0.1
+Version: 1.0.0
 Authors@R: c(
     person("Paavo", "Sattler", , "paavo.sattler@tu-dortmund.de", role = "aut",
-           comment = "0000-0001-8731-0893"),
-    person("Svenja", "Jedhoff", , "jedhoff@statistik.tu-dortmund.de", role = c("cre", "aut")),
+           comment = c(ORCID = "0000-0001-8731-0893")),
+    person("Svenja", "Jedhoff", , "jedhoff@statistik.tu-dortmund.de", role = c("cre", "aut"),
+           comment = c(ORCID = "0009-0008-2939-9103")),
     person("Markus", "Pauly", role = "ctb"),
     person("Arne C", "Bathke", role = "ctb"),
     person("Dennis", "Dobler", role = "ctb")

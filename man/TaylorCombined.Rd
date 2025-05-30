@@ -18,40 +18,43 @@ TaylorCombined(
 )
 }
 \arguments{
-\item{repetitions}{a number specifying the number of runs for the approximation}
+\item{repetitions}{a number specifying the number of runs for the
+approximation}
 
 \item{MSrootHatCov}{the matrix root of the covariance matrix for the Taylor
 observations}
 
 \item{CorData}{the calculated correlation matrix}
 
-\item{MvrH1}{an auxiliary matrix for the transformation from vectorized covariances
-to vectorized correlations}
+\item{MvrH1}{an auxiliary matrix for the transformation from vectorized
+covariances to vectorized correlations}
 
-\item{MvrH2}{an auxiliary matrix for the transformation from vectorized covariances
-to vectorized correlations}
+\item{MvrH2}{an auxiliary matrix for the transformation from vectorized
+covariances to vectorized correlations}
 
-\item{M4}{an auxiliary matrix for the transformation from vectorized covariances
-to vectorized correlations}
+\item{M4}{an auxiliary matrix for the transformation from vectorized
+covariances to vectorized correlations}
 
-\item{L}{an auxiliary matrix for the transformation from vectorized covariances
-to vectorized correlations}
+\item{L}{an auxiliary matrix for the transformation from vectorized
+covariances to vectorized correlations}
 
-\item{P}{an auxiliary matrix for the transformation from vectorized covariances
-to vectorized correlations}
+\item{P}{an auxiliary matrix for the transformation from vectorized
+covariances to vectorized correlations}
 
-\item{Q}{an auxiliary matrix for the transformation from vectorized covariances
-to vectorized correlations}
+\item{Q}{an auxiliary matrix for the transformation from vectorized
+covariances to vectorized correlations}
 
 \item{nv}{vector of sample sizes}
 }
 \value{
-a matrix containing the values of the test vector for a number of repetitions
+a matrix containing the values of the test vector for a number of
+repetitions
 }
 \description{
 An auxiliary function to calculate the values for the
-Taylor-based Monte-Carlo-approximation for the combined test. After receiving some
-auxiliary matrices and data, the Monte-Carlo observations are generated, and
-different parts of the final sum are defined. Based on this, a number of the
-Taylor-based vectors are calculated, where the number can be chosen.
+Taylor-based Monte-Carlo-approximation for the combined test. After receiving
+some auxiliary matrices and data, the Monte-Carlo observations are
+generated, and different parts of the final sum are defined. Based on this,
+a number of the Taylor-based vectors are calculated, where the number can be
+chosen.
 }

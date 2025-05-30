@@ -35,7 +35,8 @@ subdiagonal_mean_ratio_fct <- function(v, a, d){
 #' @param d dimension of the covariance matrix
 #' @param p dimension of the vectorized matrix
 #' @param fun transformation function, that should be used.
-#' \code{\link{subdiagonal_mean_ratio_fct}} or \code{\link{subdiagonal_mean_ratio_cor}}
+#' \code{\link{subdiagonal_mean_ratio_fct}} or
+#'  \code{\link{subdiagonal_mean_ratio_cor}}
 #' @return the Jacobian matrix applied for the given vector
 #'
 #' @keywords internal
@@ -60,14 +61,15 @@ Jacobian <- function(X, a, d, p, fun){
           S2 <- sum(X[(a[l + 1]-d):(a[l + 1]- l - 1)])
 
           J[l-1, (a[l + 1] + 0:(d - l - 1))-d] <- (d - l + 1) / (d - l) / S1
-          J[l-1, (a[l] + 0:(d - l))-d] <- (d - l + 1) / (d - l)  * (-S2 / (S1^2))
+          J[l-1, (a[l] + 0:(d - l))-d] <- (d - l + 1) / (d - l)  *(-S2 / (S1^2))
         }
         return(rbind(diag(1, p-d, p-d), J))
 
       }
 
       else{
-        stop("fun must be 'subdiagonal_mean_ratio_fct', 'subdiagonal_mean_ratio_cor'")
+        stop("fun must be 'subdiagonal_mean_ratio_fct',
+             'subdiagonal_mean_ratio_cor'")
       }
     }
 
@@ -87,7 +89,8 @@ Jacobian <- function(X, a, d, p, fun){
 #' @param d dimension of the covariance matrix
 #' @param p dimension of the vectorized matrix
 #' @param fun transformation function, that should be used.
-#' \code{\link{subdiagonal_mean_ratio_fct}} or \code{\link{subdiagonal_mean_ratio_cor}}
+#' \code{\link{subdiagonal_mean_ratio_fct}} or
+#'  \code{\link{subdiagonal_mean_ratio_cor}}
 #' @return a scalar, the value of the ATS
 #'
 #' @keywords internal

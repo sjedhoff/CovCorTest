@@ -1,17 +1,22 @@
 #' Test for Correlation Matrices
 #'
-#' @description This function conducts statistical tests for hypotheses regarding correlation matrices.
+#' @description This function conducts statistical tests for hypotheses
+#' regarding correlation matrices.
 #' Users can either select from predefined hypotheses or
-#' provide their own contrast matrix `C` and vector `Xi` for custom hypotheses. It supports both
-#' bootstrap and Monte Carlo resampling methods to obtain the p-value of the ANOVA-type statistic (ATS).
+#' provide their own contrast matrix `C` and vector `Xi` for custom hypotheses.
+#' It supports both bootstrap and Monte Carlo resampling methods to
+#' obtain the p-value of the ANOVA-type statistic (ATS).
 #'
-#' @param X A list or a matrix containing the observation vectors. If a list, each entry is a group,
-#'   with observations as columns. If a matrix, all groups are combined, and `nv` must be used to indicate group sizes.
-#' @param nv (Optional) A vector indicating group sizes, needed when `X` is a combined matrix or for multiple groups.
+#' @param X A list or a matrix containing the observation vectors. If a list,
+#'  each entry is a group, with observations as columns. If a matrix,
+#'  all groups are combined, and `nv` must be used to indicate group sizes.
+#' @param nv (Optional) A vector indicating group sizes, needed when
+#'  `X` is a combined matrix or for multiple groups.
 #' @param hypothesis A character specifying one of the predefined hypotheses:
 #' \itemize{
 #'     \item `"equal-correlated"` — equal correlation matrices
-#'     \item `"uncorrelated"` — test if variables are uncorrelated (single group only)
+#'     \item `"uncorrelated"` — test if variables are uncorrelated
+#'     (single group only)
 #'   }
 #'  If `C` and `Xi` are provided, this can be set to `NULL`.
 #' @param C A contrast matrix specifying the null hypothesis.
@@ -24,12 +29,17 @@
 #' @param method Character string indicating the resampling method to use.
 #'  One of \code{"BT"} (bootstrap), \code{"MC"} (Monte Carlo), or
 #'  \code{"TAY"} (Taylor approximation).
-#' @param repetitions Integer. Number of resampling repetitions (default is 1000).
+#' @param repetitions Integer. Number of resampling repetitions
+#' (default is 1000).
 #' @param seed Optional integer. If provided, sets the seed for reproducibility.
-#' @param C (Optional) A user-defined contrast matrix for testing custom hypotheses. Must match dimensions with `Xi`.
-#' @param Xi (Optional) A numeric vector used in combination with `C` to specify a custom hypothesis.
-#' @param method A character indicating the resampling method: `"BT"` (Bootstrap) or `"MC"` (Monte Carlo).
-#' @param repetitions Number of repetitions to use for the resampling method (default: 1000, should be >= 500).
+#' @param C (Optional) A user-defined contrast matrix for testing custom
+#' hypotheses. Must match dimensions with `Xi`.
+#' @param Xi (Optional) A numeric vector used in combination with `C` to
+#' specify a custom hypothesis.
+#' @param method A character indicating the resampling method:
+#' `"BT"` (Bootstrap) or `"MC"` (Monte Carlo).
+#' @param repetitions Number of repetitions to use for the resampling method
+#'  (default: 1000, should be >= 500).
 #' @param seed Optional random seed for reproducibility.
 #'
 #' @return An object of class \code{"CovTest"}.
@@ -41,7 +51,8 @@
 #' # Example with one group:
 #' set.seed(1)
 #' X <- matrix(rnorm(5 * 100), nrow = 5)
-#' test_correlation(X, hypothesis = "uncorrelated", method = "BT", repetitions = 100)
+#' test_correlation(X, hypothesis = "uncorrelated",
+#'                   method = "BT", repetitions = 100)
 #'
 #' @export
 test_correlation <- function(X, nv = NULL,
@@ -52,7 +63,8 @@ test_correlation <- function(X, nv = NULL,
                              seed = NULL) {
   method <- toupper(method)
   if(!(method %in% c("MC", "BT", "TAY"))){
-    stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or Taylor-based Monte-Carlo-approach('TAY')")
+    stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or
+         Taylor-based Monte-Carlo-approach('TAY')")
   }
 
   listcheck <- Listcheck(X, nv)
@@ -86,7 +98,8 @@ test_correlation <- function(X, nv = NULL,
 
     if (hypothesis == "uncorrelated") {
       if (!is.null(nv)) {
-        stop("the hypothesis 'uncorrelated' can only be tested for a single group")
+        stop("the hypothesis 'uncorrelated' can only be tested
+             for a single group")
       }
       C <- diag(1, p - d)
       Xi <- rep(0, p - d)
@@ -128,7 +141,7 @@ test_correlation <- function(X, nv = NULL,
   if(!is.matrix(C)){
     stop("C must be a matrix")
   }
-  if( (nrow(C) != length(Xi)) | (ncol(C) != groups*pu) ){
+  if( (nrow(C) != length(Xi)) || (ncol(C) != groups*pu) ){
     stop("dimensions of C and Xi do not align")
   }
 
@@ -274,7 +287,7 @@ test_correlation_structure <- function(X, structure, method = "BT",
   }
   structure <- tolower(structure)
   method <- toupper(method)
-  if(!(method == "MC" | method == "BT" | method == "TAY")){
+  if(!(method == "MC" || method == "BT" || method == "TAY")){
     stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or
          Taylor-based Monte-Carlos-approach('Tay')")
   }
@@ -333,7 +346,7 @@ test_correlation_structure <- function(X, structure, method = "BT",
   Upsidv <- QF(Atilde %*% MvrH1 %*% MvrH2, HatCov)
   Xi <- rep(0, pu)
 
-  if(structure == "hautoregressive" | structure == "har"){
+  if(structure == "hautoregressive" || structure == "har"){
     Jacobi <- Jacobian(vCorData, a, d, p, fun = "subdiagonal_mean_ratio_cor")
     Upsidvhtilde <- QF(Jacobi, Upsidv)
     C <- Pd(d - 1)
@@ -348,12 +361,13 @@ test_correlation_structure <- function(X, structure, method = "BT",
     if(method == "MC"){ ResamplingResult <- ATSwS(QF(C, Upsidvhtilde),
                                                   repetitions) }
     if(method == "BT"){ ResamplingResult <- vapply(X = 1:repetitions,
-                                              FUN = Bootstrap_trans,
-                                              FUN.VALUE = numeric(1),
-                                              n1, a, d,
-                                              p, C, MSroot(Upsidv),
-                                              vCorData,
-                                              fun = "subdiagonal_mean_ratio_cor") }
+                                            FUN = Bootstrap_trans,
+                                            FUN.VALUE = numeric(1),
+                                            n1, a, d,
+                                            p, C, MSroot(Upsidv),
+                                            vCorData,
+                                            fun = "subdiagonal_mean_ratio_cor")
+    }
     if(method == "TAY"){
       P <- diag(1, p, p)[a, ]
       StUpsi <- QF(MvrH2, HatCov)
@@ -364,13 +378,13 @@ test_correlation_structure <- function(X, structure, method = "BT",
     }
   }
   else{
-    if(structure == "diagonal" | structure == "diag"){
+    if(structure == "diagonal" || structure == "diag"){
       C <- diag(1, pu, pu)
     }
-    if(structure == "hcompoundsymmetry" | structure == "hcs"){
+    if(structure == "hcompoundsymmetry" || structure == "hcs"){
       C <- Pd(pu)
     }
-    if(structure == "htoeplitz" | structure == "htoep"){
+    if(structure == "htoeplitz" || structure == "htoep"){
       C <- Pd(d - 1)
       for(l in 3:d){
         C <- matrixcalc::direct.sum(C, Pd(d - l + 1))

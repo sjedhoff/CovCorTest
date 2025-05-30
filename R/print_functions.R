@@ -8,7 +8,8 @@
 #'   \item{\code{method}}{Character. Either 'Covariance' or 'Correlation'.}
 #'   \item{\code{pvalue}}{Numeric. The p-value of the test.}
 #'   \item{\code{Teststatistic}}{Numeric. The test statistic.}
-#'   \item{\code{CovarianceMatrix}}{Matrix. The covariance estimator for the teststatistic.}
+#'   \item{\code{CovarianceMatrix}}{Matrix. The covariance estimator for the
+#'   teststatistic.}
 #'   \item{\code{C}}{Numeric. A constant or vector of constants used in the
 #'   test.}
 #'   \item{\code{Xi}}{Numeric. A parameter related to the test.}
@@ -42,14 +43,18 @@ CovTest <- function() {
 #' CombTest Object
 #'
 #' This help page describes the structure of the \code{CombTest} class,
-#' which is used to represent the results the combined covariance and correlation test.
+#' which is used to represent the results the combined covariance and
+#' correlation test.
 #'
 #' A \code{CombTest} object is a list with the following components:
 #' \describe{
 #'   \item{\code{method}}{Character. Either 'Covariance' or 'Correlation'.}
-#'   \item{\code{pvalue-Variances}}{Numeric. The p-value of the test regarding the covariances.}
-#'   \item{\code{pvalue-Correlations}}{Numeric. The p-value of the test regarding the correlations.}
-#'   \item{\code{pvalue-Total}}{Numeric. The p-value of the whole test of the global hypothesis.}
+#'   \item{\code{pvalue-Variances}}{Numeric. The p-value of the test regarding
+#'   the covariances.}
+#'   \item{\code{pvalue-Correlations}}{Numeric. The p-value of the test
+#'   regarding the correlations.}
+#'   \item{\code{pvalue-Total}}{Numeric. The p-value of the whole test of the
+#'   global hypothesis.}
 #'   \item{\code{Teststatistic}}{Numeric. The test statistic.}
 #'   \item{\code{resampling_method}}{Character. The resampling method used in
 #'   the test.}
@@ -89,7 +94,8 @@ print.CovTest <- function(x, ...){
                                 "Taylor-based Monte-Carlo-approach"))
 
 
-  pval <- ifelse(x$pvalue < 10^(-4), paste0("p < 1e-", log10(x$repetitions)), paste0("p = ", round(x$pvalue, digits = 4)))
+  pval <- ifelse(x$pvalue < 10^(-4), paste0("p < 1e-", log10(x$repetitions)),
+                 paste0("p = ", round(x$pvalue, digits = 4)))
 
   group_text <- ifelse(length(x$nv) == 1, "one group", paste0("",length(x$nv),
                                                               " groups"))
@@ -101,7 +107,8 @@ print.CovTest <- function(x, ...){
       round(x$Teststatistic, digits = 4),
       "\n p-value: \t \t",
       pval,
-      "\n \n p-value computed using ", method_print, " with B=", x$repetitions, " repetitions \n",
+      "\n \n p-value computed using ", method_print, " with B=", x$repetitions,
+      " repetitions \n",
       sep = "")
 }
 
@@ -114,9 +121,15 @@ print.CovTest <- function(x, ...){
 #' @exportS3Method
 print.CombTest <- function(x, ...){
 
-  pvalCov <- ifelse(x$pvalue_Variances < 10^(-4), paste0("p < 1e-", log10(x$repetitions)), paste0("p = ", round(x$pvalue_Variances, digits = 4)))
-  pvalCorr <- ifelse(x$pvalue_Correlations < 10^(-4), paste0("p < 1e-", log10(x$repetitions)), paste0("p = ", round(x$pvalue_Correlations, digits = 4)))
-  pvalTotal <- ifelse(x$pvalue_Total < 10^(-4), paste0("p < 1e-", log10(x$repetitions)), paste0("p = ", round(x$pvalue_Total, digits = 4)))
+  pvalCov <- ifelse(x$pvalue_Variances < 10^(-4), paste0("p < 1e-",
+                log10(x$repetitions)),
+                paste0("p = ", round(x$pvalue_Variances, digits = 4)))
+  pvalCorr <- ifelse(x$pvalue_Correlations < 10^(-4), paste0("p < 1e-",
+                log10(x$repetitions)),
+                paste0("p = ", round(x$pvalue_Correlations, digits = 4)))
+  pvalTotal <- ifelse(x$pvalue_Total < 10^(-4), paste0("p < 1e-",
+                log10(x$repetitions)),
+                paste0("p = ", round(x$pvalue_Total, digits = 4)))
 
 
 
@@ -128,7 +141,8 @@ print.CombTest <- function(x, ...){
       pvalCorr,
       "\n p-value-Total: \t \t",
       pvalTotal,
-      "\n \n p-values computed using Taylor-based Monte-Carlo-approach with B=", x$repetitions, " repetitions \n",
+      "\n \n p-values computed using Taylor-based Monte-Carlo-approach with B=",
+      x$repetitions, " repetitions \n",
       sep = "")
 }
 

@@ -887,11 +887,19 @@ test_that("test_covariance_structure wrong dimension / hypothesis", {
 })
 
 
+
 ## Base
 C <- matrix(c(1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1),
             nrow = 1,
             ncol = 21)
 Xi <- 2
+
+test_that("test_covariance no hypothesis, C or Xi missing", {
+  expect_error(test_covariance(
+    X = X_list, nv = nv, C = C
+  ))
+})
+
 test_that("test_covariance pvalue,statistic", {
   expect_equal(
     test_covariance(
@@ -1015,7 +1023,7 @@ test_that("missing values one group", {
 test_that("missing values mutliple groups", {
   X <- list(
     matrix1 = matrix(
-      c(1, NA, 3, NA, 2, NA, 2, 4, 1, NA, 6, 7, 1 , 2 , 3, 4, 5, 6, 7, 8, 9),
+      c(1, NA, 3, NA, 2, NA, 2, 4, 1, NA, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9),
       nrow = 3,
       byrow = TRUE
     ),
@@ -1042,7 +1050,7 @@ test_that("missing values mutliple groups", {
   ))
   X <- list(
     matrix1 = matrix(
-      c(1, NA, 3, NA, 2, NA, 2, 4, 1, NA, 6, 7, 1 , 2 , 3, 4, 5, 6, 7, 8, 9),
+      c(1, NA, 3, NA, 2, NA, 2, 4, 1, NA, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9),
       nrow = 3,
       byrow = TRUE
     ),

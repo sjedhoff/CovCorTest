@@ -1,28 +1,31 @@
 #' @title The Taylor-based Monte-Carlo-approximation for a combined test
 #'
 #' @description An auxiliary function to calculate the values for the
-#' Taylor-based Monte-Carlo-approximation for the combined test. After receiving some
-#' auxiliary matrices and data, the Monte-Carlo observations are generated, and
-#' different parts of the final sum are defined. Based on this, a number of the
-#' Taylor-based vectors are calculated, where the number can be chosen.
-#' @param repetitions a number specifying the number of runs for the approximation
+#' Taylor-based Monte-Carlo-approximation for the combined test. After receiving
+#'  some auxiliary matrices and data, the Monte-Carlo observations are
+#'  generated, and different parts of the final sum are defined. Based on this,
+#'  a number of the Taylor-based vectors are calculated, where the number can be
+#'  chosen.
+#' @param repetitions a number specifying the number of runs for the
+#' approximation
 #' @param MSrootHatCov the matrix root of the covariance matrix for the Taylor
 #' observations
 #' @param CorData the calculated correlation matrix
-#' @param MvrH1 an auxiliary matrix for the transformation from vectorized covariances
-#' to vectorized correlations
-#' @param MvrH2 an auxiliary matrix for the transformation from vectorized covariances
-#' to vectorized correlations
-#' @param M4 an auxiliary matrix for the transformation from vectorized covariances
-#' to vectorized correlations
-#' @param L an auxiliary matrix for the transformation from vectorized covariances
-#' to vectorized correlations
-#' @param P an auxiliary matrix for the transformation from vectorized covariances
-#' to vectorized correlations
-#' @param Q an auxiliary matrix for the transformation from vectorized covariances
-#' to vectorized correlations
+#' @param MvrH1 an auxiliary matrix for the transformation from vectorized
+#' covariances to vectorized correlations
+#' @param MvrH2 an auxiliary matrix for the transformation from vectorized
+#' covariances to vectorized correlations
+#' @param M4 an auxiliary matrix for the transformation from vectorized
+#' covariances to vectorized correlations
+#' @param L an auxiliary matrix for the transformation from vectorized
+#'  covariances to vectorized correlations
+#' @param P an auxiliary matrix for the transformation from vectorized
+#' covariances to vectorized correlations
+#' @param Q an auxiliary matrix for the transformation from vectorized
+#' covariances to vectorized correlations
 #' @param nv vector of sample sizes
-#' @return a matrix containing the values of the test vector for a number of repetitions
+#' @return a matrix containing the values of the test vector for a number of
+#' repetitions
 #'
 #' @export
 TaylorCombined <- function(repetitions, MSrootHatCov, CorData, MvrH1, MvrH2,
@@ -51,27 +54,30 @@ TaylorCombined <- function(repetitions, MSrootHatCov, CorData, MvrH1, MvrH2,
   }, Part1, list(L), Part2, Part3, Part4, nv, SIMPLIFY = FALSE)
 
   TTaylor <- sqrt(sum(nv)) * (
-    1 / sqrt(nv[[1]]) * rbind(XTaylorUpper[[1]], XTaylorLower[[1]]) - 1 / sqrt(nv[[2]]) *
-      rbind(XTaylorUpper[[2]], XTaylorLower[[2]])
+    1 / sqrt(nv[[1]]) * rbind(XTaylorUpper[[1]], XTaylorLower[[1]]) - 1 /
+      sqrt(nv[[2]]) *rbind(XTaylorUpper[[2]], XTaylorLower[[2]])
   )
   return(TTaylor)
 }
 
 
-#' @title Combined test for equality of covariance matrices and correlation matrices
+#' @title Combined test for equality of covariance matrices and correlation
+#' matrices
 #'
-#' @description For two groups a combined test for equality of covariance matrices
-#' and equality of correlation matrices between these groups is conducted. Both hypotheses
-#' can be rejected or only the larger one, the equality of the covariance matrices
+#' @description For two groups a combined test for equality of covariance
+#' matrices and equality of correlation matrices between these groups is
+#' conducted. Both hypotheses can be rejected or only the larger one, the
+#' equality of the covariance matrices
 #' @param X  a list or matrix containing the observation vectors.
 #' In case of a list,each matrix in this list is another group, where the
 #' observation vectors are the columns. For a matrix, all groups are together in
 #' one matrix and nv is used to indicate the group sizes.
 #' @param nv vector of group sizes
-#' @param repetitions a scalar,  indicate the number of runs for the chosen method.
-#' The predefined value is 1.000, and the number should not be below 500.
-#' @param seed A seed, if it should be set for reproducibility. Predefined values
-#' is 0, which means no seed is set. A chosen seed is deleted at the end.
+#' @param repetitions a scalar,  indicate the number of runs for the chosen
+#' method. The predefined value is 1.000, and the number should not be
+#' below 500.
+#' @param seed A seed, if it should be set for reproducibility. Predefined
+#' values is 0, which means no seed is set. A chosen seed is deleted at the end.
 #' @return an object of the class \code{\link{CovTest}}.
 #'
 #' @import MANOVA.RM
@@ -138,7 +144,8 @@ test_combined <- function(X, nv = NULL, repetitions = 1000, seed = NULL) {
         stats::var(t(X)))
       CorData <- lapply(VarData, stats::cov2cor)
       vCorData <- lapply(CorData, vechp)
-      Teststatistic <- sqrt(N) * (c(diag(VarData[[1]]), vCorData[[1]]) - c(diag(VarData[[2]]), vCorData[[2]]))
+      Teststatistic <- sqrt(N) * (c(diag(VarData[[1]]), vCorData[[1]]) -
+                                    c(diag(VarData[[2]]), vCorData[[2]]))
       P <- diag(1, p, p)[a, ]
       Q <- diag(as.vector(matrixcalc::vech(diag(1, d, d))), p, p)
 
@@ -147,7 +154,7 @@ test_combined <- function(X, nv = NULL, repetitions = 1000, seed = NULL) {
         stats::var(t(X)))
       MvrH1 <- list()
       MvrH2 <- list()
-      for (i in 1:length(nv)) {
+      for (i in seq_along(nv)) {
         MvrH1[[i]] <- (L - 1 / 2 * vCorData[[i]] * M1)
         MvrH2[[i]] <- sqrt(diag(as.vector(1 / vtcrossprod(
           matrix(matrixcalc::vech(VarData[[i]])[a])
