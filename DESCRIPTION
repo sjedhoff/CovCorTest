@@ -8,11 +8,11 @@ Authors@R: c(
     person("Svenja", "Jedhoff", , "jedhoff@statistik.tu-dortmund.de", role = c("cre", "aut"),
            comment = c(ORCID = "0009-0008-2939-9103")),
     person("Markus", "Pauly", role = "ctb",
- comment = c(ORCID = "0000-0002-0976-7190")),
+           comment = c(ORCID = "0000-0002-0976-7190")),
     person("Arne C", "Bathke", role = "ctb",
- comment = c(ORCID = "0000-0002-6260-3726")),
+           comment = c(ORCID = "0000-0002-6260-3726")),
     person("Dennis", "Dobler", role = "ctb",
- comment = c(ORCID = "0000-0002-9040-0854"))
+           comment = c(ORCID = "0000-0002-9040-0854")))
 Maintainer: Svenja Jedhoff <jedhoff@statistik.tu-dortmund.de>
 Description: A compilation of tests for hypotheses regarding covariance
     and correlation matrices for one or more groups. The hypothesis can
