@@ -54,5 +54,5 @@ test_correlation_structure(X = X, structure = "diagonal", method = "MC")
 
 }
 \references{
-\insertRef{sattler_structures_2024}{CovCorTest}
+Sattler, P. and Dobler, D. (2024). Testing for patterns and structures in covariance and correlation matrices. \emph{arXiv preprint} \url{https://arxiv.org/abs/2310.11799}
 }

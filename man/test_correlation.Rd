@@ -61,5 +61,5 @@ test_correlation(X, hypothesis = "uncorrelated",
 
 }
 \references{
-\insertRef{sattler_cor_2024}{CovCorTest}
+Sattler, P. and Pauly, M. (2024). Testing hypotheses about correlation matrices in general MANOVA designs. \emph{TEST}, 33(2), 496--516. \doi{10.1007/s11749-023-00906-6}
 }

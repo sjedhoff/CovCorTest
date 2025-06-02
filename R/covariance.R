@@ -40,11 +40,11 @@
 #'
 #' @return An object of class \code{\link{CovTest}}.
 #'
-#' @references \insertRef{sattler_cov_2020}{CovCorTest}
+#' @references
+#' Sattler, P., Bathke, A. C., and Pauly, M. (2020). Testing Hypotheses about Covariance Matrices in General MANOVA Designs. \emph{arXiv preprint} \url{https://arxiv.org/abs/1909.06205}
 #' @export
 #'
 #' @import MANOVA.RM
-#' @importFrom Rdpack reprompt
 #' @examples
 #' # Load the data
 #' data("EEGwide", package = "MANOVA.RM")
@@ -296,7 +296,8 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
 #' @return an object of the class \code{\link{CovTest}}
 #'
 #'
-#' @references \insertRef{sattler_structures_2024}{CovCorTest}
+#' @references
+#' Sattler, P. and Dobler, D. (2024). Testing for patterns and structures in covariance and correlation matrices. \emph{arXiv preprint} \url{https://arxiv.org/abs/2310.11799}
 #'
 #' @examples
 #' # Load the data

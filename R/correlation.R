@@ -44,7 +44,8 @@
 #'
 #' @return An object of class \code{"CovTest"}.
 #'
-#' @references \insertRef{sattler_cor_2024}{CovCorTest}
+#' @references
+#' Sattler, P. and Pauly, M. (2024). Testing hypotheses about correlation matrices in general MANOVA designs. \emph{TEST}, 33(2), 496--516. \doi{10.1007/s11749-023-00906-6}
 #'
 #' @import MANOVA.RM
 #' @examples
@@ -257,7 +258,8 @@ test_correlation <- function(X, nv = NULL,
 #' @return an object of the class \code{\link{CovTest}}
 #'
 #'
-#' @references \insertRef{sattler_structures_2024}{CovCorTest}
+#' @references
+#' Sattler, P. and Dobler, D. (2024). Testing for patterns and structures in covariance and correlation matrices. \emph{arXiv preprint} \url{https://arxiv.org/abs/2310.11799}
 #'
 #' @import MANOVA.RM
 #' @examples

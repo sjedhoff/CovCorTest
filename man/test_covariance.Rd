@@ -84,5 +84,5 @@ test_covariance(X = X, nv = NULL, C = C, Xi = Xi, method = "BT",
             repetitions = 1000, seed = 31415)
 }
 \references{
-\insertRef{sattler_cov_2020}{CovCorTest}
+Sattler, P., Bathke, A. C., and Pauly, M. (2020). Testing Hypotheses about Covariance Matrices in General MANOVA Designs. \emph{arXiv preprint} \url{https://arxiv.org/abs/1909.06205}
 }
