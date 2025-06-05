@@ -13,7 +13,7 @@
 #' @param repetitions a scalar, number of runs
 #' @return a vector of the length of repetitions
 #'
-#' #' @keywords internal
+#' @keywords internal
 ATSwS <- function(A, repetitions){
   Chi <- matrix(stats::rchisq(dim(A)[1] * repetitions, df = 1),
                 ncol = repetitions)
