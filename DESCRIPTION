@@ -21,7 +21,10 @@ Description: A compilation of tests for hypotheses regarding covariance
     only the latter works. Thereby Monte-Carlo and Bootstrap-techniques
     are used, and the respective method must be chosen, and the functions
     provide p-values and mostly also estimators of calculated covariance
-    matrices of test statistics.
+    matrices of test statistics. For more details on the methodology, see 
+    Sattler et al. (2022) <doi:10.1016/j.jspi.2021.12.001>,
+    Sattler and Pauly (2024) <doi:10.1007/s11749-023-00906-6>, and
+    Sattler and Dobler (2024) <doi:10.48550/arXiv.2310.11799>.
 License: GPL (>= 3)
 Imports: 
     MANOVA.RM,
