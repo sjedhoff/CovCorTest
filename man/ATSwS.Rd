@@ -13,8 +13,9 @@ ATSwS(A, repetitions)
 }
 \value{
 a vector of the length of repetitions
+
+#' @keywords internal
 }
 \description{
 Calculation of a Anova-Type-Statistic using
 }
-\keyword{internal}

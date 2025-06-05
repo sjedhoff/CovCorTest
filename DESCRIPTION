@@ -24,7 +24,7 @@ Description: A compilation of tests for hypotheses regarding covariance
     matrices of test statistics. For more details on the methodology, see 
     Sattler et al. (2022) <doi:10.1016/j.jspi.2021.12.001>,
     Sattler and Pauly (2024) <doi:10.1007/s11749-023-00906-6>, and
-    Sattler and Dobler (2024) <doi:10.48550/arXiv.2310.11799>.
+    Sattler and Dobler (2025) <doi:10.48550/arXiv.2310.11799>.
 License: GPL (>= 3)
 Imports: 
     MANOVA.RM,

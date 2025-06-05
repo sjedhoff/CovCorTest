@@ -58,3 +58,4 @@ generated, and different parts of the final sum are defined. Based on this,
 a number of the Taylor-based vectors are calculated, where the number can be
 chosen.
 }
+\keyword{internal}

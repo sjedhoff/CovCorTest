@@ -27,7 +27,7 @@
 #' @return a matrix containing the values of the test vector for a number of
 #' repetitions
 #'
-#' @export
+#' @keywords internal
 TaylorCombined <- function(repetitions, MSrootHatCov, CorData, MvrH1, MvrH2,
                            M4, L, P, Q, nv) {
   XPB <- mapply(generateData, MSrootHatCov, repetitions, SIMPLIFY = FALSE)

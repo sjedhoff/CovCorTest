@@ -13,8 +13,7 @@
 #' @param repetitions a scalar, number of runs
 #' @return a vector of the length of repetitions
 #'
-#' @export
-#' @keywords internal
+#' #' @keywords internal
 ATSwS <- function(A, repetitions){
   Chi <- matrix(stats::rchisq(dim(A)[1] * repetitions, df = 1),
                 ncol = repetitions)
@@ -32,7 +31,7 @@ ATSwS <- function(A, repetitions){
 #'
 #' @return a vector
 #'
-#' @export
+#'
 #' @keywords internal
 ATS <- function(N, vVarData, C, HatCov, Xi = 0){
   CDiff <-  C %*% vVarData - Xi
@@ -47,7 +46,7 @@ ATS <- function(N, vVarData, C, HatCov, Xi = 0){
 #'
 #' @return a matrix
 #'
-#' @export
+#'
 #' @keywords internal
 generateData <- function(WSigma, nv){
   data <- WSigma %*% matrix(stats::rnorm(dim(WSigma)[1] * nv), ncol = nv)
@@ -86,7 +85,7 @@ Pd <- function(d){
 #' \item{nv}{ Number of subjects per group: NV for a single group and a vector
 #' for multiple groups.}
 #'
-#' @export
+#'
 #' @keywords internal
 Listcheck <- function(X, nv){
   #List containing elements which are no matrices
@@ -280,7 +279,7 @@ MSroot <- function(X){
 #' @return vector
 #'
 #' @keywords internal
-#' @export
+#'
 dvech <- function(X, a, d, p, inc_diag){
   if(!matrixcalc::is.square.matrix(X)){
     stop("argument X is not a square numeric matrix")
@@ -306,7 +305,7 @@ dvech <- function(X, a, d, p, inc_diag){
 #' @return vector
 #'
 #' @keywords internal
-#' @export
+#'
 vechp <- function(X){
   if(!matrixcalc::is.square.matrix(X)){
     stop("argument X is not a square numeric matrix")
@@ -327,7 +326,7 @@ vechp <- function(X){
 #' @return matrix
 #'
 #' @keywords internal
-#' @export
+#'
 WDirect.sumL <- function(X, w){
   groups <- length(X)
   if(groups == 1){
@@ -351,7 +350,7 @@ WDirect.sumL <- function(X, w){
 #' @param X matrix
 #' @return vector
 #'
-#' @export
+#'
 #' @keywords internal
 vtcrossprod <- function(X){
   return(matrixcalc::vech(tcrossprod(X,X)))
@@ -366,7 +365,7 @@ vtcrossprod <- function(X){
 #'
 #' @return vector
 #'
-#' @export
+#'
 #' @keywords internal
 vdtcrossprod <- function(X,a,d,p){
   return(dvech(tcrossprod(X,X),a,d,p, inc_diag = TRUE))
@@ -382,7 +381,7 @@ vdtcrossprod <- function(X,a,d,p){
 #'
 #' @return matrix
 #'
-#' @export
+#'
 #' @keywords internal
 Qvech <- function(X, n){
   return(matrix(apply(X,2,vtcrossprod), ncol=n))

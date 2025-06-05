@@ -11,7 +11,7 @@
 #' @return a transformed vector
 #'
 #' @keywords internal
-#' @export
+#'
 subdiagonal_mean_ratio_fct <- function(v, a, d){
   ratio <- rep(0, d - 1)
   ae <-  c(a, a[d] + 1)
@@ -40,7 +40,7 @@ subdiagonal_mean_ratio_fct <- function(v, a, d){
 #' @return the Jacobian matrix applied for the given vector
 #'
 #' @keywords internal
-#' @export
+#'
 Jacobian <- function(X, a, d, p, fun){
     if(fun == "subdiagonal_mean_ratio_fct"){
       J <-  matrix(0, d - 1, p)
@@ -94,7 +94,7 @@ Jacobian <- function(X, a, d, p, fun){
 #' @return a scalar, the value of the ATS
 #'
 #' @keywords internal
-#' @export
+#'
 ATS_fun <- function(N, X, C, v, a, d, p, fun){
   Xmean <-  rowMeans(X)
   CDiff <- C %*% (do.call(fun, list(Xmean, a, d)) - do.call(fun, list(v, a, d)))
@@ -127,7 +127,7 @@ ATS_fun <- function(N, X, C, v, a, d, p, fun){
 #' @return a scalar, the value of the ATS
 #'
 #' @keywords internal
-#' @export
+#'
 Bootstrap_trans <- function(N.sim, n1, a, d, p, C, MSrootHatCov, vX, fun){
   XPB <- generateData(MSrootHatCov, n1) + vX
   return(ATS_fun(n1, XPB, C, vX, a, d, p, fun))
@@ -152,7 +152,7 @@ Bootstrap_trans <- function(N.sim, n1, a, d, p, C, MSrootHatCov, vX, fun){
 #' @return a scalar, the value of the ATS
 #'
 #' @keywords internal
-#' @export
+#'
 Bootstrap <- function(N.sim, nv, C, MSrootHatCov){
   # one group
   if(length(nv) == 1){

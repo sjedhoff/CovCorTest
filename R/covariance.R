@@ -40,7 +40,9 @@
 #' @return An object of class \code{\link{CovTest}}.
 #'
 #' @references
-#' Sattler, P., Bathke, A. C., and Pauly, M. (2020). Testing Hypotheses about Covariance Matrices in General MANOVA Designs. \emph{arXiv preprint} \url{https://arxiv.org/abs/1909.06205}
+#' Sattler, P., Bathke, A. C., and Pauly, M. (2022).  "Testing hypotheses about covariance matrices in general MANOVA designs."
+#'  \emph{Journal of Statistical Planning and Inference}, 219, 134–146.
+#'  <doi:10.1016/j.jspi.2021.12.001>
 #' @export
 #'
 #' @import MANOVA.RM
@@ -283,7 +285,7 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
 #'
 #'
 #' @references
-#' Sattler, P. and Dobler, D. (2024). Testing for patterns and structures in covariance and correlation matrices. \emph{arXiv preprint} \url{https://arxiv.org/abs/2310.11799}
+#' Sattler, P. and Dobler, D. (2025). Testing for patterns and structures in covariance and correlation matrices. \emph{arXiv preprint} \url{https://arxiv.org/abs/2310.11799}
 #'
 #' @examples
 #' # Load the data

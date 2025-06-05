@@ -10,6 +10,7 @@
 [![Codecov test coverage](https://codecov.io/gh/sjedhoff/CovCorTest/graph/badge.svg)](https://app.codecov.io/gh/sjedhoff/CovCorTest)
 <!-- badges: end -->
 
+
 A compilation of tests for hypotheses regarding covariance and
 correlation matrices for one or more groups. The hypothesis can be
 specified through a corresponding hypothesis matrix and a vector or by
@@ -102,13 +103,13 @@ test_covariance_structure(X = data[[1]], structure = "diag")
 
 ## Literature
 
-- Sattler, P. & Dobler, D. (2024). Testing for patterns and structures
+- Sattler, P. & Dobler, D. (2025). Testing for patterns and structures
   in covariance and correlation matrices. <em>arXiv preprint</em>
   <https://arxiv.org/abs/2310.11799>
-- Sattler, P., Bathke, A.C. & Pauly, M. (2020). Testing Hypothese about
-  Covariance Matrixes in general MANOVA Designs. <em>Journal of
+- Sattler, P., Bathke, A.C. & Pauly, M. (2022). Testing hypotheses about covariance 
+  matrices in general MANOVA designs. <em>Journal of
   Statistical Planning and Inference</em> 219, 134-146
-  <https://doi.org/10.1016/j.jspi.2021.12.001>
+  <https://doi.org/10.1007/s11749-023-00906-6>
 - Sattler, P. & Pauly, M. (2024). Testing hypotheses about correlation
   matrices in general MANOVA designs. <em>TEST</em> 33, 496–516
   <https://doi.org/10.1007/s11749-023-00906-6>

@@ -13,7 +13,7 @@
 #' @return a transformed vector
 #'
 #' @keywords internal
-#' @export
+#'
 subdiagonal_mean_ratio_cor <- function(v, a, d){
   ratio <- rep(0, d - 2)
   ae <-  c(a, a[d] + 1)
@@ -64,7 +64,7 @@ subdiagonal_mean_ratio_cor <- function(v, a, d){
 #' repetitions
 #'
 #' @keywords internal
-#' @export
+#'
 Tayapp1G <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M4, L,
                      P, Q, n1, Atilde = NULL, Jacobi = NULL){
   vechCorData <- matrixcalc::vech(CorData)
@@ -126,7 +126,7 @@ Tayapp1G <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M4, L,
 #' of repetitions
 #'
 #' @keywords internal
-#' @export
+#'
 #'
 TayappMG <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M4, L,
                      P, Q, nv){
