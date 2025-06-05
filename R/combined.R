@@ -76,8 +76,6 @@ TaylorCombined <- function(repetitions, MSrootHatCov, CorData, MvrH1, MvrH2,
 #' @param repetitions a scalar,  indicate the number of runs for the chosen
 #' method. The predefined value is 1.000, and the number should not be
 #' below 500.
-#' @param seed A seed, if it should be set for reproducibility. Predefined
-#' values is 0, which means no seed is set. A chosen seed is deleted at the end.
 #' @return an object of the class \code{\link{CovTest}}.
 #'
 #' @import MANOVA.RM
@@ -92,21 +90,11 @@ TaylorCombined <- function(repetitions, MSrootHatCov, CorData, MvrH1, MvrH2,
 #'                t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="MCI",vars]))
 #'
 #' nv <- unlist(lapply(X_list, ncol))
-#'
-#' test_combined(X_list,nv,seed=31415)
+#' set.seed(31415)
+#' test_combined(X_list, nv)
 #'
 #' @export
-test_combined <- function(X, nv = NULL, repetitions = 1000, seed = NULL) {
-  if(!is.null(seed)){
-    if(exists(".Random.seed")) {
-      old_seed <- .Random.seed
-      on.exit({ .Random.seed <<- old_seed })
-    }
-    else{
-      on.exit({ set.seed(NULL) })
-    }
-    set.seed(seed)
-  }
+test_combined <- function(X, nv = NULL, repetitions = 1000) {
 
   listcheck <- Listcheck(X, nv)
 
@@ -171,8 +159,6 @@ test_combined <- function(X, nv = NULL, repetitions = 1000, seed = NULL) {
       alpha <- c(mean(apply((ResamplingResult > Tquantile[1, ]), 2, max)),
                  mean(apply((ResamplingResult > Tquantile[2, ]), 2, max)))
 
-      if (!is.null(seed))
-        (set.seed(NULL))
 
       CombTest <- list("pvalue_Variances" = alpha[1],
                        "pvalue_Correlations" = alpha[2],

@@ -12,8 +12,7 @@ test_covariance(
   hypothesis = NULL,
   A = NULL,
   method = "MC",
-  repetitions = 1000,
-  seed = NULL
+  repetitions = 1000
 )
 }
 \arguments{
@@ -53,8 +52,6 @@ or \code{"given-matrix"} (matrix). Ignored for other hypotheses.}
 
 \item{repetitions}{Number of repetitions to use for the resampling method
 (default: 1000, should be >= 500).}
-
-\item{seed}{Optional random seed for reproducibility.}
 }
 \value{
 An object of class \code{\link{CovTest}}.
@@ -79,9 +76,9 @@ X <- t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars])
 C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,1),
             nrow = 1, ncol = 21)
 Xi <- 2
-
+set.seed(31415)
 test_covariance(X = X, nv = NULL, C = C, Xi = Xi, method = "BT",
-            repetitions = 1000, seed = 31415)
+            repetitions = 1000)
 }
 \references{
 Sattler, P., Bathke, A. C., and Pauly, M. (2020). Testing Hypotheses about Covariance Matrices in General MANOVA Designs. \emph{arXiv preprint} \url{https://arxiv.org/abs/1909.06205}

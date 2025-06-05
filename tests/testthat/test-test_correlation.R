@@ -58,33 +58,33 @@ test_that("test_correlation multipe groups test statistics", {
 })
 
 test_that("test_correlation multiple groups pvalue", {
+  set.seed(31415)
   expect_equal(
     test_correlation(
       X = X_list,
       nv = nv,
       hypothesis = "equal-correlated",
-      method = "BT",
-      seed = 31415
+      method = "BT"
     )$pvalue,
     0.03
   )
+  set.seed(31415)
   expect_equal(
     test_correlation(
       X = X_list,
       nv = nv,
       hypothesis = "equal-correlated",
-      method = "MC",
-      seed = 31415
+      method = "MC"
     )$pvalue,
     0.023
   )
+  set.seed(31415)
   expect_equal(
     test_correlation(
       X = X_list,
       nv = nv,
       hypothesis = "equal-correlated",
-      method = "TAY",
-      seed = 31415
+      method = "TAY"
     )$pvalue,
     0.094
   )
@@ -115,8 +115,8 @@ test_that("test_correlation multi groups dimensions do not fit", {
       nv = nv,
       hypothesis = "equal-correlated",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   ))
   expect_warning(
@@ -125,8 +125,8 @@ test_that("test_correlation multi groups dimensions do not fit", {
       nv = nv[-1],
       hypothesis = "equal-correlated",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
 })
@@ -138,8 +138,8 @@ test_that("test_correlation multi groups different input formats", {
       nv = nv,
       hypothesis = "equal-correlated",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     1.93014066
   )
@@ -149,8 +149,8 @@ test_that("test_correlation multi groups different input formats", {
       nv = NULL,
       hypothesis = "equal-correlated",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     1.93014066
   ))
@@ -160,8 +160,8 @@ test_that("test_correlation multi groups different input formats", {
       nv = nv,
       hypothesis = "equal-correlated",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     1.93014066
   )
@@ -171,8 +171,8 @@ test_that("test_correlation multi groups different input formats", {
       nv = nv[-1],
       hypothesis = "equal-correlated",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
 })
@@ -239,23 +239,23 @@ test_that("test_correlation one group test statistics", {
 
 
 test_that("test_correlation one group pvalue", {
+  set.seed(31415)
   expect_equal(
     test_correlation(
       X = X,
       nv = NULL,
       hypothesis = "uncorrelated",
-      method = "BT",
-      seed = 31415
+      method = "BT"
     )$pvalue,
     0
   )
+  set.seed(31415)
   expect_equal(
     test_correlation(
       X = X,
       nv = NULL,
       hypothesis = "uncorrelated",
-      method = "MC",
-      seed = 31415
+      method = "MC"
     )$pvalue,
     0
   )
@@ -268,34 +268,33 @@ test_that("test_correlation one group pvalue", {
     )$pvalue,
     0
   )
-
+  set.seed(31415)
   expect_equal(
     test_correlation(
       X = X,
       nv = NULL,
       hypothesis = "equal-correlated",
-      method = "BT",
-      seed = 31415
+      method = "BT"
     )$pvalue,
     0.016
   )
+  set.seed(31415)
   expect_equal(
     test_correlation(
       X = X,
       nv = NULL,
       hypothesis = "equal-correlated",
-      method = "MC",
-      seed = 31415
+      method = "MC"
     )$pvalue,
     0.006
   )
+  set.seed(31415)
   expect_equal(
     test_correlation(
       X = X,
       nv = NULL,
       hypothesis = "equal-correlated",
-      method = "TAY",
-      seed = 31415
+      method = "TAY"
     )$pvalue,
     0.065
   )
@@ -319,8 +318,8 @@ test_that("test_correlation one group different input formats", {
       nv = nv,
       hypothesis = "uncorrelated",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
   expect_warning(
@@ -329,32 +328,32 @@ test_that("test_correlation one group different input formats", {
       nv = 17,
       hypothesis = "uncorrelated",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
 })
 
 
 test_that("test_correlation wrong method", {
+  set.seed(31415)
   expect_error(
     test_correlation(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "uncorrelated",
       method = "abc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )
   )
+  set.seed(31415)
   expect_equal(
     test_correlation(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "uncorrelated",
       method = "mc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$Teststatistic,
     68.9068261789833
   )
@@ -479,114 +478,111 @@ test_that("test_correlation_structure teststatic", {
 })
 
 test_that("test_correlation_structure pvalue", {
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = X_list[[1]],
       structure = "Har",
-      method = "BT",
-      seed = 31415
+      method = "BT"
     )$pvalue,
     0.021
   )
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = X_list[[1]],
       structure = "Har",
-      method = "TAY",
-      seed = 31415
+      method = "TAY"
     )$pvalue,
     0.104
   )
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = X_list[[1]],
       structure = "Har",
-      method = "MC",
-      seed = 31415
+      method = "MC"
     )$pvalue,
     0.02
   )
-
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = X_list[[2]],
       structure = "diag",
-      method = "BT",
-      seed = 31415
+      method = "BT"
     )$pvalue,
     0
   )
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = X_list[[1]],
       structure = "diag",
-      method = "TAY",
-      seed = 31415
+      method = "TAY"
     )$pvalue,
     0
   )
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = X_list[[1]],
       structure = "diag",
-      method = "MC",
-      seed = 31415
+      method = "MC"
     )$pvalue,
     0
   )
-
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = X_list[[1]],
       structure = "Hcs",
-      method = "BT",
-      seed = 31415
+      method = "BT"
     )$pvalue,
     0.007
   )
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = X_list[[1]],
       structure = "Hcs",
-      method = "TAY",
-      seed = 31415
+      method = "TAY"
     )$pvalue,
     0.065
   )
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = X_list[[1]],
       structure = "Hcs",
-      method = "MC",
-      seed = 31415
+      method = "MC"
     )$pvalue,
     0.006
   )
-
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = X_list[[1]],
       structure = "Htoep",
-      method = "BT",
-      seed = 31415
+      method = "BT"
     )$pvalue,
     0.009
   )
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = X_list[[1]],
       structure = "Htoep",
-      method = "TAY",
-      seed = 31415
+      method = "TAY"
     )$pvalue,
     0.124
   )
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = X_list[[1]],
       structure = "Htoep",
-      method = "MC",
-      seed = 31415
+      method = "MC"
     )$pvalue,
     0.006
   )
@@ -595,22 +591,22 @@ test_that("test_correlation_structure pvalue", {
 
 
 test_that("test_correlation_structure wrong method/hypothesis", {
+  set.seed(31415)
   expect_error(
     test_correlation_structure(
       X = X,
       structure = "hcs",
       method = "abc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )
   )
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = X,
       structure = "hcs",
       method = "mc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$Teststatistic,
     5.26105347405293
   )
@@ -618,23 +614,23 @@ test_that("test_correlation_structure wrong method/hypothesis", {
 })
 
 test_that("test_correlation_structure input list", {
+  set.seed(31415)
   expect_warning(expect_equal(
     test_correlation_structure(
       X = X_list,
       structure = "hcs",
       method = "mc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$pvalue,
     0.006
   ))
+  set.seed(31415)
   expect_equal(
     test_correlation_structure(
       X = list(X),
       structure = "hcs",
       method = "mc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$pvalue,
     0.006
   )
@@ -651,6 +647,7 @@ test_that("test_correlation pvalue,statistic", {
               nrow = 1,
               ncol = 15)
   Xi <- 2
+  set.seed(31415)
   expect_equal(
     test_correlation(
       X = X,
@@ -658,11 +655,11 @@ test_that("test_correlation pvalue,statistic", {
       C = C,
       Xi = Xi,
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$pvalue,
     0
   )
+  set.seed(31415)
   expect_equal(
     test_correlation(
       X = X,
@@ -670,11 +667,11 @@ test_that("test_correlation pvalue,statistic", {
       C = C,
       Xi = Xi,
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$Teststatistic,
     51.212638310026
   )
+  set.seed(31415)
   expect_equal(
     test_correlation(
       X = X,
@@ -683,7 +680,6 @@ test_that("test_correlation pvalue,statistic", {
       Xi = Xi,
       method = "BT",
       repetitions = 1000,
-      seed = 31415,
       hypothesis = NULL
     )$pvalue,
     0
@@ -695,6 +691,7 @@ test_that("TestCovariance_base dimensions", {
               nrow = 1,
               ncol = 21)
   Xi <- 2
+  set.seed(31415)
   expect_error(
     test_correlation(
       X = X,
@@ -702,10 +699,10 @@ test_that("TestCovariance_base dimensions", {
       C = C[1, 1:20],
       Xi = Xi,
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )
   )
+  set.seed(31415)
   expect_error(
     test_correlation(
       X = X,
@@ -713,8 +710,7 @@ test_that("TestCovariance_base dimensions", {
       C = C[1, 1:20, drop = FALSE],
       Xi = Xi,
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )
   )
 })
@@ -724,6 +720,7 @@ test_that("test_correlation wrong method", {
               nrow = 1,
               ncol = 15)
   Xi <- 2
+  set.seed(31415)
   expect_error(
     test_correlation(
       X = X,
@@ -731,8 +728,7 @@ test_that("test_correlation wrong method", {
       C = C,
       Xi = Xi,
       method = "abc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )
   )
 })

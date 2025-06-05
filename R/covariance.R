@@ -36,7 +36,6 @@
 #' `"BT"` (Bootstrap) or `"MC"` (Monte Carlo).
 #' @param repetitions Number of repetitions to use for the resampling method
 #' (default: 1000, should be >= 500).
-#' @param seed Optional random seed for reproducibility.
 #'
 #' @return An object of class \code{\link{CovTest}}.
 #'
@@ -57,12 +56,12 @@
 #' C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,1),
 #'             nrow = 1, ncol = 21)
 #' Xi <- 2
-#'
+#' set.seed(31415)
 #' test_covariance(X = X, nv = NULL, C = C, Xi = Xi, method = "BT",
-#'             repetitions = 1000, seed = 31415)
+#'             repetitions = 1000)
 test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
                            hypothesis = NULL, A = NULL,
-                           method = "MC", repetitions = 1000, seed = NULL) {
+                           method = "MC", repetitions = 1000) {
 
   method <- toupper(method)
   if(!(method %in% c("MC", "BT"))){
@@ -189,17 +188,6 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
     stop("Either provide 'hypothesis' or both 'C' and 'Xi'")
   }
 
-  # seed
-  if(!is.null(seed)){
-    if(exists(".Random.seed")){
-      old_seed <- .Random.seed
-      on.exit({ .Random.seed <<- old_seed })
-    }
-    if(!exists(".Random.seed")){
-      on.exit({ set.seed(NULL) })
-    }
-    set.seed(seed)
-  }
 
   # just one group is nv = NULL
   if(is.null(nv)){
@@ -291,8 +279,6 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
 #' @param repetitions a scalar, indicate the number of runs for the chosen
 #' method.
 #' The predefined value is 1,000, and the number should not be below 500.
-#' @param seed a seed, if it should be set for reproducibility. Predefined value
-#' is NULL, which means no seed is set.
 #' @return an object of the class \code{\link{CovTest}}
 #'
 #'
@@ -313,7 +299,7 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
 #'
 #' @export
 test_covariance_structure <- function(X, structure, method = "BT",
-                                     repetitions = 1000, seed = NULL){
+                                     repetitions = 1000){
 
   structure <- tolower(structure)
   method <- toupper(method)
@@ -321,16 +307,6 @@ test_covariance_structure <- function(X, structure, method = "BT",
     stop("method must be bootstrap ('BT') or Monte-Carlo-technique('MC')")
   }
 
-  if(!is.null(seed)){
-    if(exists(".Random.seed")) {
-      old_seed <- .Random.seed
-      on.exit({ .Random.seed <<- old_seed })
-    }
-    else{
-      on.exit({ set.seed(NULL) })
-    }
-    set.seed(seed)
-  }
 
   if(is.list(X)){
     if(length(X) > 1){

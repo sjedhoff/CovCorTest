@@ -32,8 +32,7 @@ test_that("test_covariance multi groups Teststatistic", {
       nv = nv,
       hypothesis = "equal-trace",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
     )$Teststatistic,
     4.9047045
   )
@@ -43,8 +42,7 @@ test_that("test_covariance multi groups Teststatistic", {
       nv = nv,
       hypothesis = "equal-trace",
       method = "BT",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
     )$Teststatistic,
     4.9047045
   )
@@ -55,8 +53,7 @@ test_that("test_covariance multi groups Teststatistic", {
       nv = nv,
       hypothesis = "equal",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
     )$Teststatistic,
     2.9384292
   )
@@ -66,8 +63,7 @@ test_that("test_covariance multi groups Teststatistic", {
       nv = nv,
       hypothesis = "equal",
       method = "BT",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
     )$Teststatistic,
     2.9384292
   )
@@ -78,8 +74,7 @@ test_that("test_covariance multi groups Teststatistic", {
       nv = nv,
       hypothesis = "equal-diagonals",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
     )$Teststatistic,
     2.7304562
   )
@@ -89,8 +84,7 @@ test_that("test_covariance multi groups Teststatistic", {
       nv = nv,
       hypothesis = "equal-diagonals",
       method = "BT",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
     )$Teststatistic,
     2.7304562
   )
@@ -98,71 +92,71 @@ test_that("test_covariance multi groups Teststatistic", {
 
 test_that("test_covariance multi groups pvalues", {
   # Equal-Trace
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X_list,
       nv = nv,
       hypothesis = "equal-trace",
       method = "MC",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$pvalue,
     0.027
   )
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X_list,
       nv = nv,
       hypothesis = "equal-trace",
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$pvalue,
     0.046
   )
   # Equal
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X_list,
       nv = nv,
       hypothesis = "equal",
       method = "MC",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$pvalue,
     0.035
   )
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X_list,
       nv = nv,
       hypothesis = "equal",
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$pvalue,
     0.065
   )
   # Equal-Diagonals
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X_list,
       nv = nv,
       hypothesis = "equal-diagonals",
       method = "MC",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$pvalue,
     0.064
   )
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X_list,
       nv = nv,
       hypothesis = "equal-diagonals",
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$pvalue,
     0.085
   )
@@ -175,8 +169,7 @@ test_that("test_covariance multi groups wrong hypothesis", {
       nv = nv,
       hypothesis = "uncorrelated",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
     )
   )
   expect_error(
@@ -185,8 +178,7 @@ test_that("test_covariance multi groups wrong hypothesis", {
       nv = nv,
       hypothesis = "given-trace",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
     )
   )
   expect_error(
@@ -195,8 +187,7 @@ test_that("test_covariance multi groups wrong hypothesis", {
       nv = nv,
       hypothesis = "given-matrix",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
     )
   )
   expect_error(
@@ -205,20 +196,9 @@ test_that("test_covariance multi groups wrong hypothesis", {
       nv = nv,
       hypothesis = "equals",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
     )
   )
-  expect_warning(expect_error(
-    test_covariance(
-      X = X_list,
-      nv = nv,
-      hypothesis = "equal",
-      method = "MC",
-      repetitions = 1000,
-      seed = "abc"
-    )
-  ))
 
 })
 
@@ -229,8 +209,8 @@ test_that("test_covariance multi groups dimensions do not fit", {
       nv = nv,
       hypothesis = "equal",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   ))
   expect_warning(
@@ -239,8 +219,8 @@ test_that("test_covariance multi groups dimensions do not fit", {
       nv = nv[-1],
       hypothesis = "equal",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
 })
@@ -252,8 +232,8 @@ test_that("test_covariance multi groups different input formats", {
       nv = nv,
       hypothesis = "equal-trace",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     4.9047045
   )
@@ -263,8 +243,8 @@ test_that("test_covariance multi groups different input formats", {
       nv = NULL,
       hypothesis = "equal-trace",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     4.9047045
   ))
@@ -274,8 +254,8 @@ test_that("test_covariance multi groups different input formats", {
       nv = nv,
       hypothesis = "equal-trace",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     4.9047045
   )
@@ -285,8 +265,8 @@ test_that("test_covariance multi groups different input formats", {
       nv = nv[-1],
       hypothesis = "equal-trace",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
 })
@@ -300,8 +280,8 @@ test_that("test_covariance single group teststatistics", {
       nv = NULL,
       hypothesis = "equal",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     1.59396724
   )
@@ -311,8 +291,8 @@ test_that("test_covariance single group teststatistics", {
       nv = NULL,
       hypothesis = "equal",
       method = "BT",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     1.59396724
   )
@@ -323,8 +303,8 @@ test_that("test_covariance single group teststatistics", {
       nv = NULL,
       hypothesis = "given-trace",
       method = "BT",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     7.1450555
   ))
@@ -334,8 +314,8 @@ test_that("test_covariance single group teststatistics", {
       nv = NULL,
       hypothesis = "given-trace",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     7.1450555
   ))
@@ -347,8 +327,8 @@ test_that("test_covariance single group teststatistics", {
       nv = NULL,
       hypothesis = "given-matrix",
       method = "BT",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     3.1849761
   ))
@@ -358,8 +338,8 @@ test_that("test_covariance single group teststatistics", {
       nv = NULL,
       hypothesis = "given-matrix",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     3.1849761
   ))
@@ -371,8 +351,8 @@ test_that("test_covariance single group teststatistics", {
       nv = NULL,
       hypothesis = "uncorrelated",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     4.8878026
   )
@@ -382,8 +362,8 @@ test_that("test_covariance single group teststatistics", {
       nv = NULL,
       hypothesis = "uncorrelated",
       method = "BT",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )$Teststatistic,
     4.8878026
   )
@@ -391,97 +371,105 @@ test_that("test_covariance single group teststatistics", {
 
 test_that("test_covariance single group pvalue", {
   # Equal
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "equal",
       method = "MC",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )$pvalue,
     0.212
   )
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "equal",
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )$pvalue,
     0.265
   )
 
   # Given Trace
+  set.seed(31415)
   expect_warning(expect_equal(
     test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "given-trace",
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )$pvalue,
     0.028
   ))
+  set.seed(31415)
   expect_warning(expect_equal(
     test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "given-trace",
       method = "MC",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )$pvalue,
     0.004
   ))
 
   # Given Matrix
+  set.seed(31415)
   expect_warning(expect_equal(
     test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "given-matrix",
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )$pvalue,
     0.083
   ))
+  set.seed(31415)
   expect_warning(expect_equal(
     test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "given-matrix",
       method = "MC",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )$pvalue,
     0.032
   ))
 
   # Uncorrelated
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "uncorrelated",
       method = "MC",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )$pvalue,
     0.017
   )
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "uncorrelated",
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )$pvalue,
     0.047
   )
@@ -496,8 +484,8 @@ test_that("test_covariance single group given trace/matrix", {
       hypothesis = "given-trace",
       method = "MC",
       A = c(1, 2, 3),
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
   expect_error(
@@ -507,10 +495,11 @@ test_that("test_covariance single group given trace/matrix", {
       hypothesis = "given-trace",
       method = "MC",
       A = "a",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X_list[[1]],
@@ -518,8 +507,8 @@ test_that("test_covariance single group given trace/matrix", {
       hypothesis = "given-trace",
       method = "MC",
       A = 18,
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )$pvalue,
     0.981
   )
@@ -532,8 +521,8 @@ test_that("test_covariance single group given trace/matrix", {
       hypothesis = "given-matrix",
       method = "MC",
       A = 1,
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
   expect_error(
@@ -543,11 +532,11 @@ test_that("test_covariance single group given trace/matrix", {
       hypothesis = "given-matrix",
       method = "MC",
       A = matrix(rnorm(10), 2, 5),
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
-
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X_list[[1]],
@@ -555,8 +544,8 @@ test_that("test_covariance single group given trace/matrix", {
       hypothesis = "given-matrix",
       method = "MC",
       A = var(t(X_list[[1]])) + seq(0, 0.7, length.out = 36),
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )$pvalue,
     0.954
   )
@@ -569,8 +558,8 @@ test_that("test_covariance single group wrong hypothesis", {
       nv = NULL,
       hypothesis = "equal-trace",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
   expect_error(
@@ -579,8 +568,8 @@ test_that("test_covariance single group wrong hypothesis", {
       nv = NULL,
       hypothesis = "equal-diagonals",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
   expect_warning(test_covariance(
@@ -604,8 +593,8 @@ test_that("test_covariance single group different input formats", {
       nv = nv,
       hypothesis = "equal",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
   expect_warning(
@@ -614,8 +603,8 @@ test_that("test_covariance single group different input formats", {
       nv = 17,
       hypothesis = "equal",
       method = "MC",
-      repetitions = 1000,
-      seed = NULL
+      repetitions = 1000
+
     )
   )
   expect_warning(test_covariance(
@@ -630,25 +619,28 @@ test_that("test_covariance single group different input formats", {
   ))
 })
 
+
 test_that("test_covariance wrong method", {
+  set.seed(31415)
   expect_error(
     test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "equal",
       method = "abc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )
   )
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "equal",
       method = "mc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )$Teststatistic,
     1.59396723756539
   )
@@ -717,156 +709,169 @@ test_that("test_covariance_structure teststatistics", {
 })
 
 test_that("test_covariance_structure pvalue", {
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X,
       structure = "autoregressive",
       method = "MC",
-      seed = 31415
+
     )$pvalue,
     0.129
   )
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X,
       structure = "ar",
       method = "BT",
-      seed = 31415
+
     )$pvalue,
     0.142
   )
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X,
       structure = "FO-autoregressive",
       method = "MC",
-      seed = 31415
+
     )$pvalue,
     0.197
   )
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X,
       structure = "FO-ar",
       method = "BT",
-      seed = 31415
+
     )$pvalue,
     0.214
   )
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X,
       structure = "diagonal",
       method = "MC",
-      seed = 31415
+
     )$pvalue,
     0.017
   )
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X,
       structure = "diag",
       method = "BT",
-      seed = 31415
+
     )$pvalue,
     0.053
   )
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X,
       structure = "sphericity",
       method = "MC",
-      seed = 31415
+
     )$pvalue,
     0.033
   )
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X,
       structure = "spher",
       method = "BT",
-      seed = 31415
+
     )$pvalue,
     0.077
   )
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X,
       structure = "compoundsymmetry",
       method = "MC",
-      seed = 31415
+
     )$pvalue,
     0.177
   )
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X,
       structure = "cs",
       method = "BT",
-      seed = 31415
+
     )$pvalue,
     0.227
   )
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X,
       structure = "toeplitz",
       method = "MC",
-      seed = 31415
+
     )$pvalue,
     0.18
   )
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X,
       structure = "toep",
       method = "BT",
-      seed = 31415
+
     )$pvalue,
     0.232
   )
 })
 
 test_that("test_covariance_structure wrong method", {
+  set.seed(31415)
   expect_error(
     test_covariance_structure(
       X = X,
       structure = "cs",
       method = "abc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )
   )
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X = X,
       structure = "cs",
       method = "mc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$Teststatistic,
     1.65692260204835
   )
 })
 
 test_that("test_covariance_structure input list", {
+  set.seed(31415)
   expect_warning(expect_equal(
     test_covariance_structure(
       X = X_list,
       structure = "cs",
       method = "mc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$pvalue,
     0.177
   ))
+  set.seed(31415)
   expect_equal(
     test_covariance_structure(
       X = list(X),
       structure = "cs",
       method = "mc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
     )$pvalue,
     0.177
   )
@@ -901,6 +906,7 @@ test_that("test_covariance no hypothesis, C or Xi missing", {
 })
 
 test_that("test_covariance pvalue,statistic", {
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X,
@@ -908,11 +914,12 @@ test_that("test_covariance pvalue,statistic", {
       C = C,
       Xi = Xi,
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )$pvalue,
     0.038
   )
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X,
@@ -920,11 +927,12 @@ test_that("test_covariance pvalue,statistic", {
       C = C,
       Xi = Xi,
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )$Teststatistic,
     6.32190311190589
   )
+  set.seed(31415)
   expect_equal(
     test_covariance(
       X = X,
@@ -932,8 +940,8 @@ test_that("test_covariance pvalue,statistic", {
       C = C,
       Xi = Xi,
       method = "BT",
-      repetitions = 1000,
-      seed = 31415,
+      repetitions = 1000
+      ,
       hypothesis = NULL
     )$pvalue,
     0.038
@@ -945,6 +953,7 @@ test_that("test_covariance dimensions", {
               nrow = 1,
               ncol = 21)
   Xi <- 2
+  set.seed(31415)
   expect_error(
     test_covariance(
       X = X,
@@ -952,10 +961,11 @@ test_that("test_covariance dimensions", {
       C = C[1, 1:20],
       Xi = Xi,
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )
   )
+  set.seed(31415)
   expect_error(
     test_covariance(
       X = X,
@@ -963,8 +973,8 @@ test_that("test_covariance dimensions", {
       C = C[1, 1:20, drop = FALSE],
       Xi = Xi,
       method = "BT",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )
   )
 })
@@ -974,6 +984,7 @@ test_that("test_covariance wrong method", {
               nrow = 1,
               ncol = 21)
   Xi <- 2
+  set.seed(31415)
   expect_error(
     test_covariance(
       X = X,
@@ -981,8 +992,8 @@ test_that("test_covariance wrong method", {
       C = C[1, 1:20],
       Xi = Xi,
       method = "abc",
-      repetitions = 1000,
-      seed = 31415
+      repetitions = 1000
+
     )
   )
 })

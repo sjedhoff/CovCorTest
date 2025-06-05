@@ -11,8 +11,7 @@ test_correlation(
   Xi = NULL,
   hypothesis = NULL,
   method = "BT",
-  repetitions = 1000,
-  seed = NULL
+  repetitions = 1000
 )
 }
 \arguments{
@@ -38,8 +37,6 @@ If supplied, \code{C} and \code{Xi} are ignored.}
 
 \item{repetitions}{Number of repetitions to use for the resampling method
 (default: 1000, should be >= 500).}
-
-\item{seed}{Optional random seed for reproducibility.}
 }
 \value{
 An object of class \code{"CovTest"}.
@@ -54,7 +51,7 @@ obtain the p-value of the ANOVA-type statistic (ATS).
 }
 \examples{
 # Example with one group:
-set.seed(1)
+set.seed(31415)
 X <- matrix(rnorm(5 * 100), nrow = 5)
 test_correlation(X, hypothesis = "uncorrelated",
                   method = "BT", repetitions = 100)

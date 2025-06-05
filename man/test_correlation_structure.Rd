@@ -4,13 +4,7 @@
 \alias{test_correlation_structure}
 \title{Test for structure of data's correlation matrix}
 \usage{
-test_correlation_structure(
-  X,
-  structure,
-  method = "BT",
-  repetitions = 1000,
-  seed = NULL
-)
+test_correlation_structure(X, structure, method = "BT", repetitions = 1000)
 }
 \arguments{
 \item{X}{a matrix containing the observation vectors as columns (one group)}
@@ -26,9 +20,6 @@ bootstrap is the predefined method.}
 \item{repetitions}{a scalar, indicate the number of runs for the chosen
 method.
 The predefined value is 1,000, and the number should not be below 500.}
-
-\item{seed}{a seed, if it should be set for reproducibility. Predefined value
-is NULL, which means no seed is set.}
 }
 \value{
 an object of the class \code{\link{CovTest}}

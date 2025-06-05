@@ -5,7 +5,7 @@
 \title{Combined test for equality of covariance matrices and correlation
 matrices}
 \usage{
-test_combined(X, nv = NULL, repetitions = 1000, seed = NULL)
+test_combined(X, nv = NULL, repetitions = 1000)
 }
 \arguments{
 \item{X}{a list or matrix containing the observation vectors.
@@ -18,9 +18,6 @@ one matrix and nv is used to indicate the group sizes.}
 \item{repetitions}{a scalar,  indicate the number of runs for the chosen
 method. The predefined value is 1.000, and the number should not be
 below 500.}
-
-\item{seed}{A seed, if it should be set for reproducibility. Predefined
-values is 0, which means no seed is set. A chosen seed is deleted at the end.}
 }
 \value{
 an object of the class \code{\link{CovTest}}.
@@ -42,7 +39,7 @@ X_list <- list(t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="AD",vars]),
                t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="MCI",vars]))
 
 nv <- unlist(lapply(X_list, ncol))
-
-test_combined(X_list,nv,seed=31415)
+set.seed(31415)
+test_combined(X_list, nv)
 
 }

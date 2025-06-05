@@ -31,7 +31,6 @@
 #'  \code{"TAY"} (Taylor approximation).
 #' @param repetitions Integer. Number of resampling repetitions
 #' (default is 1000).
-#' @param seed Optional integer. If provided, sets the seed for reproducibility.
 #' @param C (Optional) A user-defined contrast matrix for testing custom
 #' hypotheses. Must match dimensions with `Xi`.
 #' @param Xi (Optional) A numeric vector used in combination with `C` to
@@ -40,7 +39,6 @@
 #' `"BT"` (Bootstrap) or `"MC"` (Monte Carlo).
 #' @param repetitions Number of repetitions to use for the resampling method
 #'  (default: 1000, should be >= 500).
-#' @param seed Optional random seed for reproducibility.
 #'
 #' @return An object of class \code{"CovTest"}.
 #'
@@ -50,7 +48,7 @@
 #' @import MANOVA.RM
 #' @examples
 #' # Example with one group:
-#' set.seed(1)
+#' set.seed(31415)
 #' X <- matrix(rnorm(5 * 100), nrow = 5)
 #' test_correlation(X, hypothesis = "uncorrelated",
 #'                   method = "BT", repetitions = 100)
@@ -60,8 +58,7 @@ test_correlation <- function(X, nv = NULL,
                              C = NULL, Xi = NULL,
                              hypothesis = NULL,
                              method = "BT",
-                             repetitions = 1000,
-                             seed = NULL) {
+                             repetitions = 1000) {
   method <- toupper(method)
   if(!(method %in% c("MC", "BT", "TAY"))){
     stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or
@@ -112,16 +109,6 @@ test_correlation <- function(X, nv = NULL,
     }
   }
 
-  if(!is.null(seed)){
-    if(exists(".Random.seed")) {
-      old_seed <- .Random.seed
-      on.exit({ .Random.seed <<- old_seed })
-    }
-    else{
-      on.exit({ set.seed(NULL) })
-    }
-    set.seed(seed)
-  }
 
 
 
@@ -253,8 +240,6 @@ test_correlation <- function(X, nv = NULL,
 #' @param repetitions a scalar, indicate the number of runs for the chosen
 #' method.
 #' The predefined value is 1,000, and the number should not be below 500.
-#' @param seed a seed, if it should be set for reproducibility. Predefined value
-#' is NULL, which means no seed is set.
 #' @return an object of the class \code{\link{CovTest}}
 #'
 #'
@@ -276,17 +261,8 @@ test_correlation <- function(X, nv = NULL,
 #'
 #' @export
 test_correlation_structure <- function(X, structure, method = "BT",
-                                      repetitions = 1000, seed = NULL){
-  if(!is.null(seed)){
-    if(exists(".Random.seed")) {
-      old_seed <- .Random.seed
-      on.exit({ .Random.seed <<- old_seed })
-    }
-    else{
-      on.exit({ set.seed(NULL) })
-    }
-    set.seed(seed)
-  }
+                                      repetitions = 1000){
+
   structure <- tolower(structure)
   method <- toupper(method)
   if(!(method == "MC" || method == "BT" || method == "TAY")){
