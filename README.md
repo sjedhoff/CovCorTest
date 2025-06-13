@@ -8,6 +8,7 @@
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/sjedhoff/CovCorTest/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sjedhoff/CovCorTest/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/sjedhoff/CovCorTest/graph/badge.svg)](https://app.codecov.io/gh/sjedhoff/CovCorTest)
+[![CRAN status](https://www.r-pkg.org/badges/version/CovCorTest)](https://CRAN.R-project.org/package=CovCorTest)
 <!-- badges: end -->
 
 
