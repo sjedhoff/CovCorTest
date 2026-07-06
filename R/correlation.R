@@ -8,7 +8,7 @@
 #' obtain the p-value of the ANOVA-type statistic (ATS).
 #'
 #' @param X A list or a matrix containing the observation vectors. If a list,
-#'  each entry is a group, with observations as columns. If a matrix,
+#'  each entry is a group, with observations as rows. If a matrix,
 #'  all groups are combined, and `nv` must be used to indicate group sizes.
 #' @param nv (Optional) A vector indicating group sizes, needed when
 #'  `X` is a combined matrix or for multiple groups.
@@ -49,7 +49,7 @@
 #' @examples
 #' # Example with one group:
 #' set.seed(31415)
-#' X <- matrix(rnorm(5 * 100), nrow = 5)
+#' X <- matrix(rnorm(5 * 100), ncol = 5)
 #' test_correlation(X, hypothesis = "uncorrelated",
 #'                   method = "BT", repetitions = 100)
 #'
@@ -230,7 +230,7 @@ test_correlation <- function(X, nv = NULL,
 #' bootstrap, the Taylor-based Monte-Carlo approach or  Monte-Carlo-technique
 #' is used to calculate the p-value of the Anova-type-statistic(ATS) based on a
 #' specified number of runs.
-#' @param X  a matrix containing the observation vectors as columns (one group)
+#' @param X  a matrix containing the observation vectors as rows (one group)
 #' @param structure a character specifying the structure regarding them the
 #' correlation matrix should be checked. Options are "Hautoregressive" ("Har"),
 #' "diagonal" ("diag"), "Hcompoundsymmetry" ("Hcs") and "Htoeplitz" ("Hteop").
@@ -270,24 +270,19 @@ test_correlation_structure <- function(X, structure, method = "BT",
          Taylor-based Monte-Carlos-approach('Tay')")
   }
 
-  if(is.list(X)){
+  if(is.list(X) & !is.data.frame(X)){
     if(length(X) > 1){
-      warning("The input X must be a matrix but is a list. Only the first
-              element of the list is used.")
-      X <- X[[1]]
+      warning("The input X must be a matrix or data frame but is a list. Only the first element of the list is used.")
     }
-    if(length(X) == 1){
-      X <- X[[1]]
-    }
-
+    listcheck <- Listcheck(X[[1]])
+  }
+  else{
+    listcheck <- Listcheck(X)
   }
 
+  X <- listcheck[[1]]
   n1 <- dim(X)[2]
   d <- dim(X)[1]
-
-  if(d == 1){
-    stop("Correlation is only defined for dimension higher than one")
-  }
 
   if(!(structure %in% c("hautoregressive", "har", "diagonal", "diag" ,
                         "hcompoundsymmetry", "hcs", "htoeplitz", "htoep"))){

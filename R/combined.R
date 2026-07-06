@@ -69,7 +69,7 @@ TaylorCombined <- function(repetitions, MSrootHatCov, CorData, MvrH1, MvrH2,
 #' conducted. Both hypotheses can be rejected or only the larger one, the
 #' equality of the covariance matrices
 #' @param X  a list or matrix containing the observation vectors.
-#' In case of a list,each matrix in this list is another group, where the
+#' In case of a list, each matrix in this list is another group, where the
 #' observation vectors are the columns. For a matrix, all groups are together in
 #' one matrix and nv is used to indicate the group sizes.
 #' @param nv vector of group sizes
@@ -86,8 +86,8 @@ TaylorCombined <- function(repetitions, MSrootHatCov, CorData, MvrH1, MvrH2,
 #' vars <- colnames(EEGwide)[1:6]
 #'
 #' # Part the data into six groups of sex and diagnosis
-#' X_list <- list(t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="AD",vars]),
-#'                t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="MCI",vars]))
+#' X_list <- list(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="AD",vars],
+#'                EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="MCI",vars])
 #'
 #' nv <- unlist(lapply(X_list, ncol))
 #' set.seed(31415)
@@ -103,72 +103,72 @@ test_combined <- function(X, nv = NULL, repetitions = 1000) {
   groups <- length(nv)
 
   dimensions <- sapply(X, dim)[1, ]
-  if (max(dimensions) != mean(dimensions)) {
-    stop("dimensions do not accord")
+
+  d <- dimensions[1]
+  if (groups != 2) {
+    stop("This test is only defined for exactly two groups")
   }
-  else{
-    d <- dimensions[1]
-    if(d == 1) {
-      stop("Correlation is only defined for dimension higher than one")
+  if (d > 1) {
+    p <- d * (d + 1) / 2
+    a <- cumsum(c(1, (d):2))
+    N <- sum(nv)
+    H <- matrix(rep(a, d), d, d, byrow = TRUE)
+    L <- diag(1, p, p)[-a, ]
+    M <- matrix(0, p, p)
+    for (l in 1:p) {
+      M[l, c(vechp(H)[l], vechp(t(H))[l])] <- 1
     }
-    if(groups != 2) {
-      stop("This test is only defined for exactly two groups")
+    M1 <- L %*% M
+
+    Datac <- lapply(X, function(x)
+      x - rowMeans(x))
+    VarData <- lapply(X, function(X)
+      stats::var(t(X)))
+    CorData <- lapply(VarData, stats::cov2cor)
+    vCorData <- lapply(CorData, vechp)
+    Teststatistic <- sqrt(N) * (c(diag(VarData[[1]]), vCorData[[1]]) -
+                                  c(diag(VarData[[2]]), vCorData[[2]]))
+    P <- diag(1, p, p)[a, ]
+    Q <- diag(as.vector(matrixcalc::vech(diag(1, d, d))), p, p)
+
+    DataQ <- mapply(Qvech, Datac, nv, SIMPLIFY = FALSE)
+    HatCov <- lapply(DataQ, function(X)
+      stats::var(t(X)))
+    MvrH1 <- list()
+    MvrH2 <- list()
+    for (i in seq_along(nv)) {
+      MvrH1[[i]] <- (L - 1 / 2 * vCorData[[i]] * M1)
+      MvrH2[[i]] <- sqrt(diag(as.vector(1 / vtcrossprod(
+        matrix(matrixcalc::vech(VarData[[i]])[a])
+      )), p, p))
     }
-    if(d > 1) {
-      p <- d * (d + 1) / 2
-      a <- cumsum(c(1, (d):2))
-      N <- sum(nv)
-      H <- matrix(rep(a, d), d, d, byrow = TRUE)
-      L <- diag(1, p, p)[-a, ]
-      M <- matrix(0, p, p)
-      for (l in 1:p) {
-        M[l, c(vechp(H)[l], vechp(t(H))[l])] <- 1
-      }
-      M1 <- L %*% M
 
-      Datac <- lapply(X, function(x)
-        x - rowMeans(x))
-      VarData <- lapply(X, function(X)
-        stats::var(t(X)))
-      CorData <- lapply(VarData, stats::cov2cor)
-      vCorData <- lapply(CorData, vechp)
-      Teststatistic <- sqrt(N) * (c(diag(VarData[[1]]), vCorData[[1]]) -
-                                    c(diag(VarData[[2]]), vCorData[[2]]))
-      P <- diag(1, p, p)[a, ]
-      Q <- diag(as.vector(matrixcalc::vech(diag(1, d, d))), p, p)
-
-      DataQ <- mapply(Qvech, Datac, nv, SIMPLIFY = FALSE)
-      HatCov <- lapply(DataQ, function(X)
-        stats::var(t(X)))
-      MvrH1 <- list()
-      MvrH2 <- list()
-      for (i in seq_along(nv)) {
-        MvrH1[[i]] <- (L - 1 / 2 * vCorData[[i]] * M1)
-        MvrH2[[i]] <- sqrt(diag(as.vector(1 / vtcrossprod(
-          matrix(matrixcalc::vech(VarData[[i]])[a])
-        )), p, p))
-      }
-
-      MSrootHatCov <- lapply(HatCov, MSroot)
-      ResamplingResult <- TaylorCombined(repetitions, MSrootHatCov, CorData,
-                                         MvrH1, MvrH2, M, L, P, Q, nv)
-      beta <- 1 - c(max(rowMeans((ResamplingResult < Teststatistic)[1:d, ])),
-                    max(rowMeans((ResamplingResult < Teststatistic)[-(1:d), ])))
-      Tquantile <- apply(ResamplingResult, 1, stats::quantile, 1 - beta,
-                         Type = 2)
-      alpha <- c(mean(apply((ResamplingResult > Tquantile[1, ]), 2, max)),
-                 mean(apply((ResamplingResult > Tquantile[2, ]), 2, max)))
+    MSrootHatCov <- lapply(HatCov, MSroot)
+    ResamplingResult <- TaylorCombined(repetitions, MSrootHatCov, CorData, MvrH1, MvrH2, M, L, P, Q, nv)
+    beta <- 1 - c(max(rowMeans((
+      ResamplingResult < Teststatistic
+    )[1:d, ])), max(rowMeans((
+      ResamplingResult < Teststatistic
+    )[-(1:d), ])))
+    Tquantile <- apply(ResamplingResult, 1, stats::quantile, 1 - beta, Type = 2)
+    alpha <- c(mean(apply((
+      ResamplingResult > Tquantile[1, ]
+    ), 2, max)), mean(apply((
+      ResamplingResult > Tquantile[2, ]
+    ), 2, max)))
 
 
-      CombTest <- list("pvalue_Variances" = alpha[1],
-                       "pvalue_Correlations" = alpha[2],
-                       "pvalue_Total" = min(alpha),
-                       "Teststatistic" = max(Teststatistic),
-                       "repetitions" = repetitions,
-                       "nv" = nv)
+    CombTest <- list(
+      "pvalue_Variances" = alpha[1],
+      "pvalue_Correlations" = alpha[2],
+      "pvalue_Total" = min(alpha),
+      "Teststatistic" = max(Teststatistic),
+      "repetitions" = repetitions,
+      "nv" = nv
+    )
 
-      class(CombTest) <- "CombTest"
-      return(CombTest)
-    }
+    class(CombTest) <- "CombTest"
+    return(CombTest)
+
   }
 }

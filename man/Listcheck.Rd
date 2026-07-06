@@ -4,7 +4,7 @@
 \alias{Listcheck}
 \title{Function to transform the data into a list, if there are not already}
 \usage{
-Listcheck(X, nv)
+Listcheck(X, nv = NULL)
 }
 \arguments{
 \item{X}{object that should be checked}

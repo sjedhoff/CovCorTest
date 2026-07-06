@@ -6,20 +6,22 @@ d <- 6
 p <- d * (d + 1) / 2
 
 
-X_list <- list(t(EEGwide[EEGwide$sex == "M" &
-                           EEGwide$diagnosis == "AD", vars]),
-               t(EEGwide[EEGwide$sex == "M" &
-                           EEGwide$diagnosis == "MCI", vars]),
-               t(EEGwide[EEGwide$sex == "M" &
-                           EEGwide$diagnosis == "SCC", vars]),
-               t(EEGwide[EEGwide$sex == "W" &
-                           EEGwide$diagnosis == "AD", vars]),
-               t(EEGwide[EEGwide$sex == "W" &
-                           EEGwide$diagnosis == "MCI", vars]),
-               t(EEGwide[EEGwide$sex == "W" &
-                           EEGwide$diagnosis == "SCC", vars]))
-X_matrix <- matrix(unlist(X_list), nrow = 6)
+X_list <- list(EEGwide[EEGwide$sex == "M" &
+                         EEGwide$diagnosis == "AD", vars],
+               EEGwide[EEGwide$sex == "M" &
+                         EEGwide$diagnosis == "MCI", vars],
+               EEGwide[EEGwide$sex == "M" &
+                         EEGwide$diagnosis == "SCC", vars],
+               EEGwide[EEGwide$sex == "W" &
+                         EEGwide$diagnosis == "AD", vars],
+               EEGwide[EEGwide$sex == "W" &
+                         EEGwide$diagnosis == "MCI", vars],
+               EEGwide[EEGwide$sex == "W" &
+                         EEGwide$diagnosis == "SCC", vars])
+X_list_mat <- lapply(X_list, as.matrix)
+X_matrix <- do.call(rbind, X_list)
 X <- X_list[[1]]
+X_mat <- as.matrix(X)
 nv <- c(12, 27, 20, 24, 30, 47)
 
 
@@ -226,39 +228,50 @@ test_that("test_covariance multi groups dimensions do not fit", {
 })
 
 test_that("test_covariance multi groups different input formats", {
-  expect_equal(
-    test_covariance(
-      X = X_list,
-      nv = nv,
-      hypothesis = "equal-trace",
-      method = "MC",
-      repetitions = 1000
-
-    )$Teststatistic,
-    4.9047045
+  res_list <- test_covariance(
+    X = X_list,
+    nv = nv,
+    hypothesis = "equal-trace",
+    method = "MC",
+    repetitions = 1000
   )
-  expect_warning(expect_equal(
-    test_covariance(
+
+  res_list_mat <- test_covariance(
+    X = X_list_mat,
+    nv = nv,
+    hypothesis = "equal-trace",
+    method = "MC",
+    repetitions = 1000
+  )
+
+  expect_warning(
+    res_list_inferred_nv <- test_covariance(
       X = X_list,
       nv = NULL,
       hypothesis = "equal-trace",
       method = "MC",
       repetitions = 1000
-
-    )$Teststatistic,
-    4.9047045
-  ))
-  expect_equal(
-    test_covariance(
-      X = X_matrix,
-      nv = nv,
-      hypothesis = "equal-trace",
-      method = "MC",
-      repetitions = 1000
-
-    )$Teststatistic,
-    4.9047045
+    ),
+    "will proceed with nv"
   )
+
+  res_matrix <- test_covariance(
+    X = X_matrix,
+    nv = nv,
+    hypothesis = "equal-trace",
+    method = "MC",
+    repetitions = 1000
+  )
+
+  expect_equal(res_list$Teststatistic, 4.9047045)
+  expect_equal(res_list_mat$Teststatistic, 4.9047045)
+  expect_equal(res_list_inferred_nv$Teststatistic, 4.9047045)
+  expect_equal(res_matrix$Teststatistic, 4.9047045)
+
+  expect_equal(res_list$Teststatistic, res_list_mat$Teststatistic)
+  expect_equal(res_list$Teststatistic, res_list_inferred_nv$Teststatistic)
+  expect_equal(res_list$Teststatistic, res_matrix$Teststatistic)
+
   expect_error(
     test_covariance(
       X = X_matrix,
@@ -266,7 +279,6 @@ test_that("test_covariance multi groups different input formats", {
       hypothesis = "equal-trace",
       method = "MC",
       repetitions = 1000
-
     )
   )
 })
@@ -281,7 +293,6 @@ test_that("test_covariance single group teststatistics", {
       hypothesis = "equal",
       method = "MC",
       repetitions = 1000
-
     )$Teststatistic,
     1.59396724
   )
@@ -292,57 +303,55 @@ test_that("test_covariance single group teststatistics", {
       hypothesis = "equal",
       method = "BT",
       repetitions = 1000
-
     )$Teststatistic,
     1.59396724
   )
+
   # Given Trace
-  expect_warning(expect_equal(
-    test_covariance(
+  expect_warning(
+    res_given_trace_bt <- test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "given-trace",
       method = "BT",
       repetitions = 1000
+    )
+  )
+  expect_equal(res_given_trace_bt$Teststatistic, 7.1450555)
 
-    )$Teststatistic,
-    7.1450555
-  ))
-  expect_warning(expect_equal(
-    test_covariance(
+  expect_warning(
+    res_given_trace_mc <- test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "given-trace",
       method = "MC",
       repetitions = 1000
-
-    )$Teststatistic,
-    7.1450555
-  ))
+    )
+  )
+  expect_equal(res_given_trace_mc$Teststatistic, 7.1450555)
 
   # Given Matrix
-  expect_warning(expect_equal(
-    test_covariance(
+  expect_warning(
+    res_given_matrix_bt <- test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "given-matrix",
       method = "BT",
       repetitions = 1000
+    )
+  )
+  expect_equal(res_given_matrix_bt$Teststatistic, 3.1849761)
 
-    )$Teststatistic,
-    3.1849761
-  ))
-  expect_warning(expect_equal(
-    test_covariance(
+  expect_warning(
+    res_given_matrix_mc <- test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "given-matrix",
       method = "MC",
       repetitions = 1000
-
-    )$Teststatistic,
-    3.1849761
-  ))
+    )
+  )
+  expect_equal(res_given_matrix_mc$Teststatistic, 3.1849761)
 
   # Uncorrelated
   expect_equal(
@@ -352,7 +361,6 @@ test_that("test_covariance single group teststatistics", {
       hypothesis = "uncorrelated",
       method = "MC",
       repetitions = 1000
-
     )$Teststatistic,
     4.8878026
   )
@@ -363,7 +371,6 @@ test_that("test_covariance single group teststatistics", {
       hypothesis = "uncorrelated",
       method = "BT",
       repetitions = 1000
-
     )$Teststatistic,
     4.8878026
   )
@@ -379,7 +386,6 @@ test_that("test_covariance single group pvalue", {
       hypothesis = "equal",
       method = "MC",
       repetitions = 1000
-
     )$pvalue,
     0.212
   )
@@ -391,62 +397,59 @@ test_that("test_covariance single group pvalue", {
       hypothesis = "equal",
       method = "BT",
       repetitions = 1000
-
     )$pvalue,
     0.265
   )
 
   # Given Trace
   set.seed(31415)
-  expect_warning(expect_equal(
-    test_covariance(
+  expect_warning(
+    res_given_trace_bt <- test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "given-trace",
       method = "BT",
       repetitions = 1000
+    )
+  )
+  expect_equal(res_given_trace_bt$pvalue, 0.028)
 
-    )$pvalue,
-    0.028
-  ))
   set.seed(31415)
-  expect_warning(expect_equal(
-    test_covariance(
+  expect_warning(
+    res_given_trace_mc <- test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "given-trace",
       method = "MC",
       repetitions = 1000
-
-    )$pvalue,
-    0.004
-  ))
+    )
+  )
+  expect_equal(res_given_trace_mc$pvalue, 0.004)
 
   # Given Matrix
   set.seed(31415)
-  expect_warning(expect_equal(
-    test_covariance(
+  expect_warning(
+    res_given_matrix_bt <- test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "given-matrix",
       method = "BT",
       repetitions = 1000
+    )
+  )
+  expect_equal(res_given_matrix_bt$pvalue, 0.083)
 
-    )$pvalue,
-    0.083
-  ))
   set.seed(31415)
-  expect_warning(expect_equal(
-    test_covariance(
+  expect_warning(
+    res_given_matrix_mc <- test_covariance(
       X = X_list[[1]],
       nv = NULL,
       hypothesis = "given-matrix",
       method = "MC",
       repetitions = 1000
-
-    )$pvalue,
-    0.032
-  ))
+    )
+  )
+  expect_equal(res_given_matrix_mc$pvalue, 0.032)
 
   # Uncorrelated
   set.seed(31415)
@@ -457,7 +460,6 @@ test_that("test_covariance single group pvalue", {
       hypothesis = "uncorrelated",
       method = "MC",
       repetitions = 1000
-
     )$pvalue,
     0.017
   )
@@ -469,7 +471,6 @@ test_that("test_covariance single group pvalue", {
       hypothesis = "uncorrelated",
       method = "BT",
       repetitions = 1000
-
     )$pvalue,
     0.047
   )
@@ -543,7 +544,7 @@ test_that("test_covariance single group given trace/matrix", {
       nv = NULL,
       hypothesis = "given-matrix",
       method = "MC",
-      A = var(t(X_list[[1]])) + seq(0, 0.7, length.out = 36),
+      A = var(X_list[[1]]) + seq(0, 0.7, length.out = 36),
       repetitions = 1000
 
     )$pvalue,
@@ -650,7 +651,7 @@ test_that("test_covariance wrong method", {
 test_that("test_covariance_structure teststatistics", {
   expect_equal(
     test_covariance_structure(X, structure = "autoregressive",
-                             method = "MC")$Teststatistic,
+                              method = "MC")$Teststatistic,
     2.14534594320388
   )
   expect_equal(
@@ -659,37 +660,37 @@ test_that("test_covariance_structure teststatistics", {
   )
   expect_equal(
     test_covariance_structure(X, structure = "FO-autoregressive",
-                             method = "MC")$Teststatistic,
+                              method = "MC")$Teststatistic,
     1.63857996457449
   )
   expect_equal(
     test_covariance_structure(X, structure = "FO-ar",
-                             method = "BT")$Teststatistic,
+                              method = "BT")$Teststatistic,
     1.63857996457449
   )
   expect_equal(
     test_covariance_structure(X, structure = "diagonal",
-                             method = "MC")$Teststatistic,
+                              method = "MC")$Teststatistic,
     4.88780263620412
   )
   expect_equal(
     test_covariance_structure(X, structure = "diag",
-                             method = "BT")$Teststatistic,
+                              method = "BT")$Teststatistic,
     4.88780263620412
   )
   expect_equal(
     test_covariance_structure(X, structure = "sphericity",
-                             method = "MC")$Teststatistic,
+                              method = "MC")$Teststatistic,
     3.10441188918666
   )
   expect_equal(
     test_covariance_structure(X, structure = "spher",
-                             method = "BT")$Teststatistic,
+                              method = "BT")$Teststatistic,
     3.10441188918666
   )
   expect_equal(
     test_covariance_structure(X, structure = "compoundsymmetry",
-                             method = "MC")$Teststatistic,
+                              method = "MC")$Teststatistic,
     1.65692260204835
   )
   expect_equal(
@@ -698,12 +699,12 @@ test_that("test_covariance_structure teststatistics", {
   )
   expect_equal(
     test_covariance_structure(X, structure = "toeplitz",
-                             method = "MC")$Teststatistic,
+                              method = "MC")$Teststatistic,
     1.63921322978212
   )
   expect_equal(
     test_covariance_structure(X, structure = "toep",
-                             method = "BT")$Teststatistic,
+                              method = "BT")$Teststatistic,
     1.63921322978212
   )
 })
@@ -856,15 +857,16 @@ test_that("test_covariance_structure wrong method", {
 
 test_that("test_covariance_structure input list", {
   set.seed(31415)
-  expect_warning(expect_equal(
-    test_covariance_structure(
+  expect_warning(
+    res_list <- test_covariance_structure(
       X = X_list,
       structure = "cs",
       method = "mc",
       repetitions = 1000
-    )$pvalue,
-    0.177
-  ))
+    )
+  )
+  expect_equal(res_list$pvalue, 0.177)
+
   set.seed(31415)
   expect_equal(
     test_covariance_structure(
@@ -1012,96 +1014,232 @@ test_that("missing values one group", {
     nrow = 3,
     byrow = TRUE
   )
-  expect_error(expect_warning(
-    test_covariance(
-      X = matrix,
-      nv = NULL,
-      hypothesis = "uncorrelated"
+
+  expect_warning(
+    expect_error(
+      test_covariance(
+        X = matrix,
+        nv = NULL,
+        hypothesis = "uncorrelated"
+      )
     )
-  ))
-  matrix <- matrix(c(NA, NA, NA, NA, 1, NA, 2, 4, 4, NA, 6, 7),
-                   nrow = 3,
-                   byrow = TRUE)
-  expect_warning(expect_warning(
-    test_covariance(
-      X = matrix,
-      nv = NULL,
-      hypothesis = "uncorrelated"
+  )
+
+  matrix <- matrix(
+    c(NA, NA, NA, NA, 1, NA, 2, 4, 4, NA, 6, 7),
+    nrow = 3,
+    byrow = TRUE
+  )
+
+  expect_warning(
+    expect_warning(
+      test_covariance(
+        X = matrix,
+        nv = NULL,
+        hypothesis = "uncorrelated"
+      )
     )
-  ))
+  )
 })
 
 test_that("missing values mutliple groups", {
   X <- list(
-    matrix1 = matrix(
+    matrix1 = t(matrix(
       c(1, NA, 3, NA, 2, NA, 2, 4, 1, NA, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9),
       nrow = 3,
       byrow = TRUE
-    ),
-    matrix2 = matrix(
+    )),
+    matrix2 = t(matrix(
       c(5, NA, 1, NA, 9, NA, 4, NA, 3, 5, 8, NA),
       nrow = 3,
       byrow = TRUE
-    ),
-    matrix3 = matrix(
+    )),
+    matrix3 = t(matrix(
       c(2, NA, 2, NA, 4, NA, 2, 4, 1, NA, 6, 7),
       nrow = 3,
       byrow = TRUE
-    ),
-    matrix4 = matrix(
+    )),
+    matrix4 = t(matrix(
       c(7, NA, 6, NA, 7, NA, 4, NA, 3, 5, 8, NA),
       nrow = 3,
       byrow = TRUE
-    )
+    ))
   )
-  expect_warning(test_covariance(
-    X = X,
-    nv = c(7, 4, 4, 4),
-    hypothesis = "equal"
-  ))
-  X <- list(
-    matrix1 = matrix(
-      c(1, NA, 3, NA, 2, NA, 2, 4, 1, NA, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9),
-      nrow = 3,
-      byrow = TRUE
-    ),
-    matrix2 = matrix(
-      c(NA, NA, NA, NA, 9, NA, 4, NA, 3, 5, 8, NA),
-      nrow = 3,
-      byrow = TRUE
-    ),
-    matrix3 = matrix(
-      c(2, NA, 2, NA, 4, NA, 2, 4, 1, NA, 6, 7),
-      nrow = 3,
-      byrow = TRUE
-    ),
-    matrix4 = matrix(
-      c(7, NA, 6, NA, 7, NA, 4, NA, 3, 5, 8, NA),
-      nrow = 3,
-      byrow = TRUE
-    )
-  )
-  expect_warning(expect_warning(
+
+  expect_warning(
     test_covariance(
       X = X,
       nv = c(7, 4, 4, 4),
       hypothesis = "equal"
     )
-  ))
+  )
+
+  X <- list(
+    matrix1 = t(matrix(
+      c(1, NA, 3, NA, 2, NA, 2, 4, 1, NA, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+      nrow = 3,
+      byrow = TRUE
+    )),
+    matrix2 = t(matrix(
+      c(NA, NA, NA, NA, 9, NA, 4, NA, 3, 5, 8, NA),
+      nrow = 3,
+      byrow = TRUE
+    )),
+    matrix3 = t(matrix(
+      c(2, NA, 2, NA, 4, NA, 2, 4, 1, NA, 6, 7),
+      nrow = 3,
+      byrow = TRUE
+    )),
+    matrix4 = t(matrix(
+      c(7, NA, 6, NA, 7, NA, 4, NA, 3, 5, 8, NA),
+      nrow = 3,
+      byrow = TRUE
+    ))
+  )
+
+  expect_warning(
+    expect_warning(
+      test_covariance(
+        X = X,
+        nv = c(7, 4, 4, 4),
+        hypothesis = "equal"
+      )
+    )
+  )
 })
 
 ## wrong dimensions: only one subject, only one variable
 test_that("dim = 1 one group", {
-  X <- matrix(c(1, 2, 3, 4, 5, 6), nrow = 1)
-  expect_error(test_covariance(X, hypothesis = "equal"))
   X <- matrix(c(1, 2, 3, 4, 5, 6), ncol = 1)
+  expect_error(test_covariance(X, hypothesis = "equal"))
+  X <- matrix(c(1, 2, 3, 4, 5, 6), nrow = 1)
   expect_error(test_covariance(X, hypothesis = "equal"))
 })
 
 test_that("dim = 1 multiple groups", {
-  X <- list(matrix(c(1, 2, 3, 4, 5, 6), nrow = 3), matrix(c(1, 2, 3), nrow = 3))
+  X <- list(t(matrix(c(1, 2, 3, 4, 5, 6), nrow = 3)), t(matrix(c(1, 2, 3), nrow = 3)))
   expect_error(test_covariance(X, nv = c(2, 1), hypothesis = "equal"))
-  X <- list(matrix(c(1, 2, 3, 4, 5, 6), nrow = 1), matrix(c(1, 2, 3), nrow = 1))
+  X <- list(t(matrix(c(1, 2, 3, 4, 5, 6), nrow = 1)), t(matrix(c(1, 2, 3), nrow = 1)))
   expect_error(test_covariance(X, nv = c(6, 3), hypothesis = "equal"))
 
 })
+
+## Additional regression tests for input preprocessing and validation
+
+test_that("test_covariance returns expected object structure", {
+  res <- test_covariance(
+    X = X_list,
+    nv = nv,
+    hypothesis = "equal",
+    method = "MC",
+    repetitions = 1000
+  )
+
+  expect_true(is.list(res))
+  expect_true(all(c("Teststatistic", "pvalue") %in% names(res)))
+  expect_type(res$Teststatistic, "double")
+  expect_type(res$pvalue, "double")
+  expect_length(res$Teststatistic, 1)
+  expect_length(res$pvalue, 1)
+})
+
+test_that("test_covariance accepts lower-case method names", {
+  expect_no_error(
+    test_covariance(
+      X = X_list[[1]],
+      nv = NULL,
+      hypothesis = "equal",
+      method = "mc",
+      repetitions = 1000
+    )
+  )
+
+  expect_no_error(
+    test_covariance(
+      X = X_list[[1]],
+      nv = NULL,
+      hypothesis = "equal",
+      method = "bt",
+      repetitions = 1000
+    )
+  )
+})
+
+test_that("test_covariance rejects non-numeric data", {
+  expect_error(
+    test_covariance(
+      X = data.frame(a = 1:5, b = letters[1:5]),
+      hypothesis = "equal"
+    ),
+    "numeric"
+  )
+
+  expect_error(
+    test_covariance(
+      X = matrix(letters[1:25], 5, 5),
+      hypothesis = "equal"
+    ),
+    "numeric"
+  )
+
+  expect_error(
+    test_covariance(
+      X = list(
+        matrix(rnorm(25), 5, 5),
+        data.frame(a = 1:5, b = letters[1:5])
+      ),
+      hypothesis = "equal"
+    ),
+    "numeric"
+  )
+})
+
+test_that("test_covariance rejects invalid nv values", {
+  expect_error(test_covariance(X = X_matrix, nv = 0, hypothesis = "equal"), "positive")
+  expect_error(test_covariance(X = X_matrix, nv = -1, hypothesis = "equal"), "positive")
+  expect_error(test_covariance(X = X_matrix, nv = c(12, NA), hypothesis = "equal"), "positive")
+  expect_error(test_covariance(X = X_matrix, nv = c(12.5, 27), hypothesis = "equal"), "positive")
+  expect_error(test_covariance(X = X_matrix, nv = "12", hypothesis = "equal"), "positive")
+})
+
+
+
+test_that("test_covariance works with default method and repetitions", {
+  set.seed(31415)
+  expect_no_error(
+    res <- test_covariance(
+      X = X_list[[1]],
+      hypothesis = "equal"
+    )
+  )
+
+  expect_true(is.numeric(res$Teststatistic))
+  expect_true(is.numeric(res$pvalue))
+  expect_length(res$Teststatistic, 1)
+  expect_length(res$pvalue, 1)
+})
+
+test_that("test_covariance checks Xi dimensions", {
+  C <- matrix(c(1, rep(0, 20)), nrow = 1)
+
+  expect_error(
+    test_covariance(
+      X = X,
+      C = C,
+      Xi = c(1, 2),
+      method = "BT",
+      repetitions = 1000
+    )
+  )
+
+  expect_no_error(
+    test_covariance(
+      X = X,
+      C = C,
+      Xi = 2,
+      method = "BT",
+      repetitions = 1000
+    )
+  )
+})
+

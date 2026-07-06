@@ -7,7 +7,7 @@
 test_covariance_structure(X, structure, method = "BT", repetitions = 1000)
 }
 \arguments{
-\item{X}{a matrix containing the observation vectors as columns
+\item{X}{a matrix or data frame containing the observation vectors as rows
 (one group only)}
 
 \item{structure}{a character specifying the structure regarding the

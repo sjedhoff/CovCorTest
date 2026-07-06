@@ -34,9 +34,9 @@ matrix \code{E} for the complement of the model-implied space, and computes the 
 # Load the data
 data("EEGwide", package = "MANOVA.RM")
 
-X <- t(as.matrix(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",
+X <- as.matrix(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",
                          c("brainrate_temporal", "brainrate_frontal","brainrate_central",
-                            "complexity_temporal","complexity_frontal", "complexity_central")]))
+                            "complexity_temporal","complexity_frontal", "complexity_central")])
 v0 <- rep(0,21)
 v_auxiliary <- c(1, rep(0,5), 1, rep(0,4), 1, rep(0,3), 1, rep(0,2), 1, 0, 1)
 V <- cbind(v_auxiliary, 1-v_auxiliary)

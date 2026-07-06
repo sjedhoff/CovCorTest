@@ -16,7 +16,7 @@ test_correlation(
 }
 \arguments{
 \item{X}{A list or a matrix containing the observation vectors. If a list,
-each entry is a group, with observations as columns. If a matrix,
+each entry is a group, with observations as rows. If a matrix,
 all groups are combined, and \code{nv} must be used to indicate group sizes.}
 
 \item{nv}{(Optional) A vector indicating group sizes, needed when
@@ -52,7 +52,7 @@ obtain the p-value of the ANOVA-type statistic (ATS).
 \examples{
 # Example with one group:
 set.seed(31415)
-X <- matrix(rnorm(5 * 100), nrow = 5)
+X <- matrix(rnorm(5 * 100), ncol = 5)
 test_correlation(X, hypothesis = "uncorrelated",
                   method = "BT", repetitions = 100)
 

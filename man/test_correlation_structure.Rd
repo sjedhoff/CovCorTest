@@ -7,7 +7,7 @@
 test_correlation_structure(X, structure, method = "BT", repetitions = 1000)
 }
 \arguments{
-\item{X}{a matrix containing the observation vectors as columns (one group)}
+\item{X}{a matrix containing the observation vectors as rows (one group)}
 
 \item{structure}{a character specifying the structure regarding them the
 correlation matrix should be checked. Options are "Hautoregressive" ("Har"),

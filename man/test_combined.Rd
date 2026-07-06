@@ -9,7 +9,7 @@ test_combined(X, nv = NULL, repetitions = 1000)
 }
 \arguments{
 \item{X}{a list or matrix containing the observation vectors.
-In case of a list,each matrix in this list is another group, where the
+In case of a list, each matrix in this list is another group, where the
 observation vectors are the columns. For a matrix, all groups are together in
 one matrix and nv is used to indicate the group sizes.}
 
@@ -35,8 +35,8 @@ data("EEGwide", package = "MANOVA.RM")
 vars <- colnames(EEGwide)[1:6]
 
 # Part the data into six groups of sex and diagnosis
-X_list <- list(t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="AD",vars]),
-               t(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="MCI",vars]))
+X_list <- list(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="AD",vars],
+               EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="MCI",vars])
 
 nv <- unlist(lapply(X_list, ncol))
 set.seed(31415)

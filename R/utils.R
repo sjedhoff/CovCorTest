@@ -87,154 +87,283 @@ Pd <- function(d){
 #'
 #'
 #' @keywords internal
-Listcheck <- function(X, nv){
-  #List containing elements which are no matrices
-  if(is.list(X) && (min(sapply(X,is.matrix))==0)){stop("all list elements have
-                                                        to be matrices")}
-  # no nv
-  if(is.null(nv) || (length(nv) == 1)){
-    # one group
-    if(is.matrix(X)){
-      if(!is.null(nv) && (nv != ncol(X))){
-        warning(paste0("the number of columns of X (", ncol(X), ") and the group
-                       size (", nv, ") do not allign"))
-      }
-      data <- X
-      nv_ <- NULL
-    }
-    # list with one element
-    else{
-      if(is.list(X) && (length(X) == 1)){
-        data <- X[[1]]
-        if(!is.null(nv) && (nv != ncol(data))){
-          warning(paste0("the number of columns of X (", ncol(data), ") and the
-                         group size (", nv, ") do not allign"))
-        }
-        nv_ <- NULL
-      }
-      # list with more elements
+Listcheck <- function(X, nv = NULL) {
 
+  ## Helpers ---------------------------------------------------------------
 
-      else{
-        if(is.list(X) && (length(X) > 1)){
-          data <- X
-          nv_ <- unlist(lapply(X, ncol))
-          warning(paste0("no nv or unfitting nv is given, will procede with nv =
-                       c(",paste0(nv_, collapse = " "),")"))
-        }}
-    }
-
+  is_plain_list <- function(x) {
+    is.list(x) && !is.data.frame(x)
   }
 
-  # with nv
-  else{
-    # list
-    if(is.list(X)){
-      if(length(X) == 1){
-        data <- X[[1]]
-        if((length(nv) != 1) || (nv != ncol(data))){
-          warning(paste0("the number of columns of X (", ncol(data), ") and
-                         the group size (",paste(nv, collapse = ","), ") do not
-                         allign"))
-        }
-        nv_ <- NULL
-      }
-      else{
-        data <- X
-        nv_ <- unlist(lapply(X, ncol))
-        if(!identical(as.numeric(nv), as.numeric(nv_))){
-          warning(paste0("nv does not have the corresponding dimensions to X,
-                         will procede with nv = c(", paste0(nv_, collapse = " ")
-                         ,")"))
-        }
+  is_numeric_matrix_or_df <- function(x) {
+    if (is.matrix(x)) {
+      return(is.numeric(x))
+    }
+
+    if (is.data.frame(x)) {
+      return(all(vapply(x, is.numeric, logical(1))))
+    }
+
+    FALSE
+  }
+
+  transpose_element <- function(x) {
+    if (is.data.frame(x)) {
+      t(as.matrix(x))
+    } else {
+      t(x)
+    }
+  }
+
+  ## Input checks ----------------------------------------------------------
+
+  if (is_plain_list(X)) {
+    if (length(X) == 0) {
+      stop("X must not be an empty list.")
+    }
+
+    if (!all(vapply(X, function(x) is.matrix(x) || is.data.frame(x), logical(1)))) {
+      stop("All list elements have to be matrices or data frames.")
+    }
+
+    if (!all(vapply(X, is_numeric_matrix_or_df, logical(1)))) {
+      stop("All list elements have to be numeric matrices or numeric data frames.")
+    }
+  } else {
+    if (!is.matrix(X) && !is.data.frame(X)) {
+      stop("X has to be a numeric matrix, numeric data frame, or a list of those.")
+    }
+
+    if (!is_numeric_matrix_or_df(X)) {
+      stop("X has to be a numeric matrix or numeric data frame.")
+    }
+  }
+
+  if (!is.null(nv)) {
+    if (!is.numeric(nv) || any(is.na(nv)) || any(nv <= 0) || any(nv != floor(nv))) {
+      stop("nv has to contain positive integer group sizes.")
+    }
+
+    nv <- as.integer(nv)
+  }
+
+  ## Construct data --------------------------------------------------------
+
+  # Case 1: no nv or a single nv value
+  if (is.null(nv) || length(nv) == 1) {
+
+    # Single matrix/data frame input
+    if (!is_plain_list(X)) {
+      if (!is.null(nv) && nv != nrow(X)) {
+        warning(paste0(
+          "the number of rows of X (", nrow(X),
+          ") and the group size (", nv, ") do not align"
+        ))
       }
 
+      data <- transpose_element(X)
+      nv_ <- NULL
     }
-    # matrix
-    else{
-      if(ncol(X) != sum(nv)){
-        stop(paste0("the number of columns (", ncol(X),") and the sum of group
-                    sizes (", sum(nv),") do not allign"))
+
+    # List input
+    else {
+
+      # List with one element: treat as one group
+      if (length(X) == 1) {
+        data_raw <- X[[1]]
+
+        if (!is.null(nv) && nv != nrow(data_raw)) {
+          warning(paste0(
+            "the number of rows of X (", nrow(data_raw),
+            ") and the group size (", nv, ") do not align"
+          ))
+        }
+
+        data <- transpose_element(data_raw)
+        nv_ <- NULL
       }
-      v <- cumsum(c(1,nv))
-      data <- list()
-      for(i in seq_along(nv)){
-        data[[i]] <- matrix(X[,v[i]:(v[i+1]-1)], ncol=nv[i])
+
+      # List with multiple elements: infer nv from list elements
+      else {
+        data <- lapply(X, transpose_element)
+        nv_ <- vapply(data, ncol, integer(1))
+
+        warning(paste0(
+          "no nv or unfitting nv is given, will proceed with nv = c(",
+          paste(nv_, collapse = " "), ")"
+        ))
       }
+    }
+  }
+
+  # Case 2: nv with multiple group sizes
+  else {
+
+    # List input
+    if (is_plain_list(X)) {
+
+      # List with one element: treat as one group and warn if nv has multiple entries
+      if (length(X) == 1) {
+        data <- transpose_element(X[[1]])
+
+        warning(paste0(
+          "X contains only one group but nv has length ", length(nv),
+          "; will proceed with one group"
+        ))
+
+        nv_ <- NULL
+      }
+
+      # List with multiple elements
+      else {
+        data <- lapply(X, transpose_element)
+        nv_ <- vapply(data, ncol, integer(1))
+
+        if (!identical(as.numeric(nv), as.numeric(nv_))) {
+          warning(paste0(
+            "nv does not have the corresponding dimensions to X, will proceed with nv = c(",
+            paste(nv_, collapse = " "), ")"
+          ))
+        }
+      }
+    }
+
+    # Matrix/data frame input: split rows according to nv
+    else {
+      X_mat <- if (is.data.frame(X)) as.matrix(X) else X
+
+      if (nrow(X_mat) != sum(nv)) {
+        stop(paste0(
+          "the number of rows (", nrow(X_mat),
+          ") and the sum of group sizes (", sum(nv), ") do not align"
+        ))
+      }
+
+      starts <- cumsum(c(1, nv[-length(nv)]))
+      ends <- cumsum(nv)
+
+      data <- vector("list", length(nv))
+
+      for (i in seq_along(nv)) {
+        data[[i]] <- t(X_mat[starts[i]:ends[i], , drop = FALSE])
+      }
+
       nv_ <- nv
     }
   }
 
+  ## Check dimensions before missing-value handling ------------------------
 
+  if (!is.null(nv_)) {
+    dimensions <- vapply(data, nrow, integer(1))
 
+    if (length(unique(dimensions)) != 1) {
+      stop("All groups must have the same number of variables.")
+    }
+  }
 
-  ## Check for missing values
-  # one group
-  if(is.null(nv_) && any(is.na(data))){
+  ## Check for missing values ----------------------------------------------
+
+  # One group
+  if (is.null(nv_) && any(is.na(data))) {
     data_na <- data
-    # remove rows with NA all the way
-    data <- data[!apply(data, 1, function(x) all(is.na(x))), , drop = FALSE]
-    if(nrow(data) < nrow(data_na)){
-      warning(paste0(nrow(data_na) - nrow(data), " row(s) with only NA values
-                       were removed"))
+
+    # Remove rows where all values are NA
+    keep_rows <- !apply(data, 1, function(x) all(is.na(x)))
+    data <- data[keep_rows, , drop = FALSE]
+
+    if (nrow(data) < nrow(data_na)) {
+      warning(paste0(
+        nrow(data_na) - nrow(data),
+        " row(s) with only NA values were removed"
+      ))
     }
-    # remove columns with at least one NA
-    data <- data[, !apply(data, 2, function(x) any(is.na(x))), drop = FALSE]
-    if(ncol(data) < ncol(data_na)){
-      warning(paste0(ncol(data_na) - ncol(data), " subject(s) is/are removed
-                       due to missing values"))
+
+    data_after_rows <- data
+
+    # Remove columns with at least one NA
+    keep_cols <- !apply(data, 2, function(x) any(is.na(x)))
+    data <- data[, keep_cols, drop = FALSE]
+
+    if (ncol(data) < ncol(data_after_rows)) {
+      warning(paste0(
+        ncol(data_after_rows) - ncol(data),
+        " subject(s) is/are removed due to missing values"
+      ))
     }
   }
-  # more groups
-  if(!is.null(nv_) && any(unlist(lapply(X, function(x) any(is.na(x)))))){
+
+  # Multiple groups
+  if (!is.null(nv_) && any(vapply(data, function(x) any(is.na(x)), logical(1)))) {
     data_na <- data
-    # rows, where at least in one group only missing values are pres
-    na_rows <- apply(vapply(data, function(mat) apply(mat, 1, function(row)
-      all(is.na(row))), FUN.VALUE = logical(nrow(X[[1]]))), 1, any)
-    # remove these rows
-    data <- lapply(data, function(mat) mat[!na_rows, , drop=FALSE])
-    if(any(na_rows)){
-      warning(paste0(sum(na_rows)," row(s) with only NA values were removed"))
+
+    # Remove variable rows where at least one group has only NA values
+    na_rows_by_group <- vapply(
+      data,
+      function(mat) apply(mat, 1, function(row) all(is.na(row))),
+      FUN.VALUE = logical(nrow(data[[1]]))
+    )
+
+    na_rows <- apply(na_rows_by_group, 1, any)
+
+    data <- lapply(data, function(mat) mat[!na_rows, , drop = FALSE])
+
+    if (any(na_rows)) {
+      warning(paste0(
+        sum(na_rows),
+        " row(s) with only NA values were removed"
+      ))
     }
-    # remove columns with at least one NA
-    data <- lapply(data, function(mat) mat[, !apply(mat, 2,
-                                                    function(col)
-                                                      any(is.na(col))),
-                                           drop=FALSE])
-    if(sum(unlist(lapply(data_na, ncol)) - unlist(lapply(data, ncol))) > 0){
-      warning(paste0(sum(unlist(lapply(data_na, ncol)) -
-                           unlist(lapply(data, ncol))),
-                     " subject(s) is/are removed due to missing values"))
+
+    # Remove subjects/columns with at least one NA within each group
+    data <- lapply(data, function(mat) {
+      mat[, !apply(mat, 2, function(col) any(is.na(col))), drop = FALSE]
+    })
+
+    removed_subjects <- sum(
+      vapply(data_na, ncol, integer(1)) -
+        vapply(data, ncol, integer(1))
+    )
+
+    if (removed_subjects > 0) {
+      warning(paste0(
+        removed_subjects,
+        " subject(s) is/are removed due to missing values"
+      ))
     }
-    nv_ <- unlist(lapply(data, ncol))
+
+    nv_ <- vapply(data, ncol, integer(1))
   }
 
+  ## Final dimension checks ------------------------------------------------
 
-  ## Check dimensions: multiple groups
-  if(!is.null(nv_)){
-    dimensions <- unlist(lapply(data, nrow))
-    if(max(dimensions) != mean(dimensions)){
-      stop("dimensions do not accord")
+  # Multiple groups
+  if (!is.null(nv_)) {
+    dimensions <- vapply(data, nrow, integer(1))
+
+    if (length(unique(dimensions)) != 1) {
+      stop("All groups must have the same number of variables.")
     }
-    if(any(unlist(lapply(data, ncol)) == 1)){
-      stop("testing covariance/correlation not possible: at least one group has
-           only one subject")
+
+    if (any(vapply(data, ncol, integer(1)) == 1)) {
+      stop("testing covariance/correlation not possible: at least one group has only one subject")
     }
-    if(nrow(data[[1]]) == 1){
-      stop("testing covariance/correlation not possible: only one variable to
-           test")
+
+    if (nrow(data[[1]]) == 1) {
+      stop("testing covariance/correlation not possible: only one variable to test")
     }
   }
-  else{
-    if(nrow(data) == 1){
-      stop("testing covariance/correlation not possible with only one subject")
-    }
-    if(ncol(data) == 1){
+
+  # One group
+  else {
+    if (nrow(data) == 1) {
       stop("testing covariance/correlation not possible with only one variable")
     }
+
+    if (ncol(data) == 1) {
+      stop("testing covariance/correlation not possible with only one subject")
+    }
   }
-
-
 
   return(list(X = data, nv = nv_))
 }

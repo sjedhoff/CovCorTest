@@ -8,7 +8,7 @@
 #' obtain the p-value of the ANOVA-type statistic (ATS).
 #'
 #' @param X A list or a matrix containing the observation vectors. If a list,
-#'  each entry is a group, with observations as columns. If a matrix, all
+#'  each entry is a group, with observations as rows. If a matrix, all
 #'  groups are combined, and `nv` must be used to indicate group sizes.
 #' @param nv (Optional) A vector indicating group sizes, needed when `X` is a
 #' combined matrix or for multiple groups.
@@ -52,7 +52,7 @@
 #'
 #' vars <- colnames(EEGwide)[1:6]
 #'
-#' X <- t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars])
+#' X <- EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars]
 #'
 #' # Testing the trace
 #' C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,1),
@@ -116,8 +116,7 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
            },
            "equal-trace" = {
              if(groups == 1){
-               stop("the hypothesis 'equal-trace' can only be tested for
-           multiple groups")
+               stop("the hypothesis 'equal-trace' can only be tested for multiple groups")
              }
              tracevec <- matrix(0, 1, p)
              tracevec[1, a] <- 1
@@ -126,24 +125,21 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
            },
            "equal-diagonals" = {
              if(groups == 1){
-               stop("the hypothesis 'equal-diagonals' can only be tested for
-           multiple groups")
+               stop("the hypothesis 'equal-diagonals' can only be tested for multiple groups")
              }
              C <- Pd(groups) %x% diag(1, p, p)[a,]
              Xi <- rep(0, times = groups * d)
            },
            "given-trace" = {
              if(groups > 1){
-               stop("the hypothesis 'given-trace' can only be tested for
-                    one group")
+               stop("the hypothesis 'given-trace' can only be tested for one group")
              }
              tracevec <- matrix(0, 1, p)
              tracevec[1,a] <- 1
              C <- tracevec
              if(is.null(A)){
                A <- 1
-               warning("since no input A for a trace to be tested is given,
-               a trace of 1 is tested")
+               warning("since no input A for a trace to be tested is given, a trace of 1 is tested")
              }
              if(!is.numeric(A) | length(A) != 1){
                stop("for testing the trace the input A must be a scalar")
@@ -152,33 +148,28 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
            },
            "given-matrix" = {
              if(groups > 1){
-               stop("the hypothesis 'given-matrix' can only be tested for
-                    one group")
+               stop("the hypothesis 'given-matrix' can only be tested for one group")
              }
              C <- diag(1, p, p)
              if(is.null(A)){
                Xi <- matrixcalc::vech(diag(1, d, d))
-               warning("since no input A for a matrix to be tested is given, the
-              identity matrix is tested")
+               warning("since no input A for a matrix to be tested is given, the identity matrix is tested")
              }
              else{
                if(!is.matrix(A)){
-                 stop("the given matrix A must be a matrix with dimensions
-                      d x d")
+                 stop("the given matrix A must be a matrix with dimensions d x d")
                }
                if(matrixcalc::is.square.matrix(A) & dim(A)[1] == d){
                  Xi <- matrixcalc::vech(A)
                }
                else{
-                 stop("the given matrix A must be a square matrix with
-                      dimensions d x d")
+                 stop("the given matrix A must be a square matrix with dimensions d x d")
                }
              }
            },
            "uncorrelated" = {
              if(groups > 1){
-               stop("the hypothesis 'uncorrelated' can only be tested for
-                    one group")
+               stop("the hypothesis 'uncorrelated' can only be tested for one group")
              }
              C <- diag(1, p, p)[-a, , drop = FALSE]
              Xi <- rep(0, p - d)
@@ -269,7 +260,7 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
 #' data regarding structures. Depending on the chosen method a bootstrap or
 #' Monte-Carlo-technique is used to calculate p-value of the
 #' Anova-type-statistic(ATS) based on a specified number of runs.
-#' @param X a matrix containing the observation vectors as columns
+#' @param X a matrix or data frame containing the observation vectors as rows
 #' (one group only)
 #' @param structure a character specifying the structure regarding the
 #' covariance matrix should be checked. Options are "autoregressive" ("ar"),
@@ -309,23 +300,20 @@ test_covariance_structure <- function(X, structure, method = "BT",
     stop("method must be bootstrap ('BT') or Monte-Carlo-technique('MC')")
   }
 
-
-  if(is.list(X)){
+  if(is.list(X) & !is.data.frame(X)){
     if(length(X) > 1){
-      warning("The input X must be a matrix but is a list. Only the first
-              element of the list is used.")
-      X <- X[[1]]
+      warning("The input X must be a matrix or data frame but is a list. Only the first element of the list is used.")
     }
-    if(length(X) == 1){
-      X <- X[[1]]
-    }
-
+    listcheck <- Listcheck(X[[1]])
+  }
+  else{
+    listcheck <- Listcheck(X)
   }
 
+  X <- listcheck[[1]]
   n1 <- dim(X)[2]
   d <- dim(X)[1]
-  if(d==1){ stop("Structures can be only investigated for more than one
-                 dimension") }
+
   if(!(structure %in% c("autoregressive", "ar", "fo-autoregressive", "fo-ar",
                         "diagonal", "diag", "sphericity", "spher",
                         "compoundsymmetry", "cs", "toeplitz", "toep") )){

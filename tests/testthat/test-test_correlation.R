@@ -6,21 +6,24 @@ d <- 6
 p <- d * (d + 1) / 2
 
 
-X_list <- list(t(EEGwide[EEGwide$sex == "M" &
-                           EEGwide$diagnosis == "AD", vars]),
-               t(EEGwide[EEGwide$sex == "M" &
-                           EEGwide$diagnosis == "MCI", vars]),
-               t(EEGwide[EEGwide$sex == "M" &
-                           EEGwide$diagnosis == "SCC", vars]),
-               t(EEGwide[EEGwide$sex == "W" &
-                           EEGwide$diagnosis == "AD", vars]),
-               t(EEGwide[EEGwide$sex == "W" &
-                           EEGwide$diagnosis == "MCI", vars]),
-               t(EEGwide[EEGwide$sex == "W" &
-                           EEGwide$diagnosis == "SCC", vars]))
-X_matrix <- matrix(unlist(X_list), nrow = 6)
+X_list <- list(EEGwide[EEGwide$sex == "M" &
+                         EEGwide$diagnosis == "AD", vars],
+               EEGwide[EEGwide$sex == "M" &
+                         EEGwide$diagnosis == "MCI", vars],
+               EEGwide[EEGwide$sex == "M" &
+                         EEGwide$diagnosis == "SCC", vars],
+               EEGwide[EEGwide$sex == "W" &
+                         EEGwide$diagnosis == "AD", vars],
+               EEGwide[EEGwide$sex == "W" &
+                         EEGwide$diagnosis == "MCI", vars],
+               EEGwide[EEGwide$sex == "W" &
+                         EEGwide$diagnosis == "SCC", vars])
+X_list_mat <- lapply(X_list, as.matrix)
+X_matrix <- do.call(rbind, X_list)
 X <- X_list[[1]]
+X_mat <- as.matrix(X)
 nv <- c(12, 27, 20, 24, 30, 47)
+
 
 
 
@@ -361,7 +364,7 @@ test_that("test_correlation wrong method", {
 
 test_that("test_correlation d=1", {
   expect_error(test_correlation(
-    X = X_list[[1]][1, 1:12, drop = FALSE],
+    X = X_list[[1]][1:12, 1, drop = FALSE],
     nv = NULL,
     hypothesis = "uncorrelated"
   ))
@@ -637,7 +640,7 @@ test_that("test_correlation_structure input list", {
 })
 
 test_that("test_correlation_structure d=1", {
-expect_error(test_correlation_structure(X = X_list[[1]][1, 1:12, drop = FALSE],
+expect_error(test_correlation_structure(X = X_list[[1]][1:12, 1, drop = FALSE],
                                          structure = "Har"))
 })
 

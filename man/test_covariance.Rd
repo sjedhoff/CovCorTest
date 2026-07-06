@@ -17,7 +17,7 @@ test_covariance(
 }
 \arguments{
 \item{X}{A list or a matrix containing the observation vectors. If a list,
-each entry is a group, with observations as columns. If a matrix, all
+each entry is a group, with observations as rows. If a matrix, all
 groups are combined, and \code{nv} must be used to indicate group sizes.}
 
 \item{nv}{(Optional) A vector indicating group sizes, needed when \code{X} is a
@@ -70,7 +70,7 @@ data("EEGwide", package = "MANOVA.RM")
 
 vars <- colnames(EEGwide)[1:6]
 
-X <- t(EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars])
+X <- EEGwide[EEGwide$sex == "M" & EEGwide$diagnosis == "AD",vars]
 
 # Testing the trace
 C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,1),
