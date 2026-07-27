@@ -225,21 +225,12 @@ variance, correlation, and global p-values.
 \section{Citation}{
 
 
-When using \pkg{CovCorTest}, cite the package paper:
-\insertRef{SattlerJedhoff2025}{CovCorTest}
-
-Depending on the procedures used, also cite the corresponding methodological
-references below.
+When using \pkg{CovCorTest}, cite the package paper
+\insertCite{SattlerJedhoff2025}{CovCorTest}.
 }
 
 \references{
-\insertRef{sattler_cov_2020}{CovCorTest}
-
-\insertRef{sattler_cor_2024}{CovCorTest}
-
-\insertRef{sattler_structures_2024}{CovCorTest}
-
-\insertRef{Sattler2025}{CovCorTest}
+\insertAllCited{}
 }
 \seealso{
 \code{\link[=test_covariance]{test_covariance()}}, \code{\link[=test_correlation]{test_correlation()}},

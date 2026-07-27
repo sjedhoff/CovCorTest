@@ -1,72 +1,77 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # CovCorTest
 
 ## Statistical Tests for Covariance and Correlation Matrices and Their Structures
 
 <!-- badges: start -->
-
 [![R-CMD-check](https://github.com/sjedhoff/CovCorTest/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sjedhoff/CovCorTest/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/sjedhoff/CovCorTest/graph/badge.svg)](https://app.codecov.io/gh/sjedhoff/CovCorTest)
-[![CRAN
-status](https://www.r-pkg.org/badges/version/CovCorTest)](https://CRAN.R-project.org/package=CovCorTest)
+[![Codecov test coverage](https://codecov.io/gh/sjedhoff/CovCorTest/graph/badge.svg)](https://app.codecov.io/gh/sjedhoff/CovCorTest)
+[![CRAN status](https://www.r-pkg.org/badges/version/CovCorTest)](https://CRAN.R-project.org/package=CovCorTest)
 <!-- badges: end -->
 
 `CovCorTest` provides statistical tests for hypotheses about covariance
 matrices, correlation matrices, and structured covariance or correlation
 matrices in one-sample and multiple-group designs.
 
-The package offers predefined hypotheses as well as custom linear
-hypotheses specified through a hypothesis matrix `C` and null vector
-`Xi`. Depending on the selected test, p-values are approximated using
-bootstrap (`"BT"`), Monte Carlo (`"MC"`), or Taylor-based Monte Carlo
-(`"TAY"`) procedures.
+The package offers predefined hypotheses as well as custom linear hypotheses
+specified through a hypothesis matrix `C` and null vector `Xi`. Depending on
+the selected test, p-values are approximated using bootstrap (`"BT"`), Monte
+Carlo (`"MC"`), or Taylor-based Monte Carlo (`"TAY"`) procedures.
 
 ## Installation
 
 Install the released version from CRAN:
 
-``` r
+```{r installation-cran, eval = FALSE}
 install.packages("CovCorTest")
 ```
 
 Install the development version from GitHub:
 
-``` r
+```{r installation-github, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("sjedhoff/CovCorTest")
 ```
 
 ## Main functions
 
-- `test_covariance()` tests predefined or custom hypotheses about
-  covariance matrices.
-- `test_correlation()` tests predefined or custom hypotheses about
-  correlation matrices.
-- `test_covariance_structure()` tests covariance structures such as
-  diagonal, compound symmetry, Toeplitz, autoregressive, and banded
-  structures.
+- `test_covariance()` tests predefined or custom hypotheses about covariance
+  matrices.
+- `test_correlation()` tests predefined or custom hypotheses about correlation
+  matrices.
+- `test_covariance_structure()` tests covariance structures such as diagonal,
+  compound symmetry, Toeplitz, autoregressive, and banded structures.
 - `test_correlation_structure()` tests correlation structures such as
   diagonal, heterogeneous compound symmetry, heterogeneous Toeplitz,
   heterogeneous autoregressive, and banded structures.
-- `test_combined()` compares the variances and correlations of exactly
-  two groups.
-- `get_hypothesis()` constructs `C` and `Xi` for a linear covariance
-  model.
+- `test_combined()` compares the variances and correlations of exactly two
+  groups.
+- `get_hypothesis()` constructs `C` and `Xi` for a linear covariance model.
 
-Observations must be stored in rows and variables in columns. Multiple
-groups can be supplied as a list of matrices or data frames.
-Alternatively, they can be combined in one matrix and their sample sizes
-supplied through `nv`.
+Observations must be stored in rows and variables in columns. Multiple groups
+can be supplied as a list of matrices or data frames. Alternatively, they can
+be combined in one matrix and their sample sizes supplied through `nv`.
 
 ## Quick start
 
-The following example uses two groups from the `EEGwide` data included
-with `MANOVA.RM`:
+The following example uses two groups from the `EEGwide` data included with
+`MANOVA.RM`:
 
-``` r
+```{r example-data, eval = FALSE}
 library(CovCorTest)
 
 data("EEGwide", package = "MANOVA.RM")
@@ -88,7 +93,7 @@ nv <- vapply(data, nrow, integer(1))
 
 Test equality of the covariance matrices:
 
-``` r
+```{r covariance-test, eval = FALSE}
 set.seed(31415)
 
 cov_result <- test_covariance(
@@ -105,7 +110,7 @@ cov_result$pvalue
 
 Test equality of the correlation matrices:
 
-``` r
+```{r correlation-test, eval = FALSE}
 set.seed(31415)
 
 cor_result <- test_correlation(
@@ -121,7 +126,7 @@ cor_result
 
 Perform the combined test:
 
-``` r
+```{r combined-test, eval = FALSE}
 set.seed(31415)
 
 combined_result <- test_combined(
@@ -136,7 +141,7 @@ combined_result$pvalue_Total
 
 Test whether the covariance matrix of one group is diagonal:
 
-``` r
+```{r covariance-structure, eval = FALSE}
 set.seed(31415)
 
 structure_result <- test_covariance_structure(
@@ -152,7 +157,7 @@ structure_result
 For banded structures, specify the number of off-diagonals that may be
 nonzero:
 
-``` r
+```{r banded-structure, eval = FALSE}
 set.seed(31415)
 
 banded_result <- test_correlation_structure(
@@ -166,27 +171,25 @@ banded_result <- test_correlation_structure(
 banded_result
 ```
 
-Other predefined hypotheses and structures are documented on the
-individual function help pages:
+Other predefined hypotheses and structures are documented on the individual
+function help pages:
 
-``` r
+```{r function-help, eval = FALSE}
 ?test_covariance
 ?test_correlation
 ?test_covariance_structure
 ?test_correlation_structure
 ```
 
-At least 500 resampling repetitions are recommended. Larger values
-generally provide more precise p-values but require more computation
-time.
+At least 500 resampling repetitions are recommended. Larger values generally
+provide more precise p-values but require more computation time.
 
 ## Custom hypotheses
 
-Advanced users can supply a custom hypothesis matrix `C` and null vector
-`Xi` directly. `get_hypothesis()` can construct them for a linear
-covariance model:
+Advanced users can supply a custom hypothesis matrix `C` and null vector `Xi`
+directly. `get_hypothesis()` can construct them for a linear covariance model:
 
-``` r
+```{r custom-hypothesis, eval = FALSE}
 d <- ncol(data$AD)
 p <- d * (d + 1) / 2
 diagonal_positions <- cumsum(c(1, d:2))
@@ -217,23 +220,21 @@ custom_result <- test_covariance(
 custom_result
 ```
 
-By default, the tests use `AM = 1`, which replaces the original
-hypothesis matrix with a lower-dimensional companion matrix without
-changing the ANOVA-type test statistic. Set `AM = 0` to disable this
-transformation.
+By default, the tests use `AM = 1`, which replaces the original hypothesis
+matrix with a lower-dimensional companion matrix without changing the
+ANOVA-type test statistic. Set `AM = 0` to disable this transformation.
 
 ## Citation
 
 If you use `CovCorTest` in a scientific publication, please cite:
 
-Sattler, P. and Jedhoff, S. (2025). Testing Hypotheses Regarding
-Covariance and Correlation Matrices with the R Package CovCorTest.
-*arXiv:2507.03406*.  
+Sattler, P. and Jedhoff, S. (2025). Testing Hypotheses Regarding Covariance
+and Correlation Matrices with the R Package CovCorTest. *arXiv:2507.03406*.  
 <https://doi.org/10.48550/arXiv.2507.03406>
 
 The citation and BibTeX entry are also available in R:
 
-``` r
+```{r citation, eval = FALSE}
 citation("CovCorTest")
 toBibtex(citation("CovCorTest"))
 ```
@@ -244,9 +245,9 @@ methodological paper.
 ## Methodological references
 
 - **Covariance matrix hypotheses (`test_covariance()`):**  
-  Sattler, P., Bathke, A. C. & Pauly, M. (2022). Testing hypotheses
-  about covariance matrices in general MANOVA designs. *Journal of
-  Statistical Planning and Inference* 219, 134–146.  
+  Sattler, P., Bathke, A. C. & Pauly, M. (2022). Testing hypotheses about
+  covariance matrices in general MANOVA designs. *Journal of Statistical
+  Planning and Inference* 219, 134–146.  
   <https://doi.org/10.1016/j.jspi.2021.12.001>
 
 - **Correlation matrix hypotheses and the combined test
@@ -256,14 +257,13 @@ methodological paper.
   <https://doi.org/10.1007/s11749-023-00906-6>
 
 - **Covariance and correlation structure tests:**  
-  Sattler, P. & Dobler, D. (2026). Testing for patterns and structures
-  in covariance and correlation matrices. *Journal of Multivariate
-  Analysis* 211, 105517.  
+  Sattler, P. & Dobler, D. (2026). Testing for patterns and structures in
+  covariance and correlation matrices. *Journal of Multivariate Analysis*
+  211, 105517.  
   <https://doi.org/10.1016/j.jmva.2025.105517>
 
 - **Alternative hypothesis matrices (`AM = 1`):**  
-  Sattler, P. & Rosenbaum, M. (2025). Choice of the hypothesis matrix
-  for using the ANOVA-type-statistic. *Statistics & Probability Letters*
-  219,
-
-  110356. <https://doi.org/10.1016/j.spl.2025.110356>
+  Sattler, P. & Rosenbaum, M. (2025). Choice of the hypothesis matrix for
+  using the ANOVA-type-statistic. *Statistics & Probability Letters* 219,
+  110356.  
+  <https://doi.org/10.1016/j.spl.2025.110356>

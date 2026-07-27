@@ -199,20 +199,11 @@
 #'
 #' @section Citation:
 #'
-#' When using \pkg{CovCorTest}, cite the package paper:
-#' \insertRef{SattlerJedhoff2025}{CovCorTest}
-#'
-#' Depending on the procedures used, also cite the corresponding methodological
-#' references below.
+#' When using \pkg{CovCorTest}, cite the package paper
+#' \insertCite{SattlerJedhoff2025}{CovCorTest}.
 #'
 #' @references
-#' \insertRef{sattler_cov_2020}{CovCorTest}
-#'
-#' \insertRef{sattler_cor_2024}{CovCorTest}
-#'
-#' \insertRef{sattler_structures_2024}{CovCorTest}
-#'
-#' \insertRef{Sattler2025}{CovCorTest}
+#' \insertAllCited{}
 #'
 #' @seealso
 #' [test_covariance()], [test_correlation()],

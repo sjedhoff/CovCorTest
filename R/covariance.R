@@ -45,7 +45,7 @@
 #' @return An object of class \code{\link{CovTest}}.
 #'
 #' @references
-#' \insertRef{sattler_structures_2024}{CovCorTest}
+#' \insertRef{sattler_cov_2020}{CovCorTest}
 #' @export
 #' @importFrom Rdpack reprompt
 #'
@@ -311,7 +311,7 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
 #'
 #'
 #' @references
-#' Sattler, P. and Dobler, D. (2025). Testing for patterns and structures in covariance and correlation matrices. \emph{arXiv preprint} \url{https://arxiv.org/abs/2310.11799}
+#' \insertRef{sattler_structures_2024}{CovCorTest}
 #'
 #' @examples
 #' # Load the data

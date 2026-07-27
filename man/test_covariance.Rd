@@ -88,5 +88,5 @@ test_covariance(X = X, nv = NULL, C = C, Xi = Xi, AM = 1,
                 method = "BT", repetitions = 1000)
 }
 \references{
-\insertRef{sattler_structures_2024}{CovCorTest}
+\insertRef{sattler_cov_2020}{CovCorTest}
 }

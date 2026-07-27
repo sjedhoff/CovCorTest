@@ -39,6 +39,16 @@ get_extended_matrix <- function(V, tol = sqrt(.Machine$double.eps)) {
     stop("V must have fewer columns than rows.")
   }
 
+  if (
+    !is.numeric(tol) ||
+    length(tol) != 1L ||
+    is.na(tol) ||
+    !is.finite(tol) ||
+    tol < 0
+  ) {
+    stop("tol must be a single non-negative finite number.")
+  }
+
   rank_V <- qr(V, tol = tol)$rank
 
   if (rank_V < q) {
@@ -86,8 +96,8 @@ get_extended_matrix <- function(V, tol = sqrt(.Machine$double.eps)) {
 #'
 #' @return A list with two elements:
 #'   \describe{
-#'     \item{`Hypothesenmatrix`}{A numeric matrix `C` such that the hypothesis can be written as `C %*% theta = zeta`}
-#'     \item{`Hypothesenvector`}{The numeric vector `zeta`, computed as `C %*% v0`}
+#'     \item{`hypothesis_matrix`}{A numeric matrix `C` such that the hypothesis can be written as `C %*% theta = zeta`}
+#'     \item{`hypothesis_vector`}{The numeric vector `zeta`, computed as `C %*% v0`}
 #'   }
 #'
 #' @details

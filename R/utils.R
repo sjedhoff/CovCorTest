@@ -696,10 +696,24 @@ CheckRepetitions <- function(repetitions, minimum_recommended = 500L) {
     is.na(repetitions) ||
     !is.finite(repetitions) ||
     repetitions <= 0 ||
-    repetitions != floor(repetitions)
+    repetitions != floor(repetitions) ||
+    repetitions > .Machine$integer.max
   ) {
     stop("repetitions must be a single positive integer.")
   }
+  if (
+    !is.numeric(minimum_recommended) ||
+    length(minimum_recommended) != 1L ||
+    is.na(minimum_recommended) ||
+    !is.finite(minimum_recommended) ||
+    minimum_recommended <= 0 ||
+    minimum_recommended != floor(minimum_recommended) ||
+    minimum_recommended > .Machine$integer.max
+  ) {
+    stop("minimum_recommended must be a single positive integer.")
+  }
+
+  minimum_recommended <- as.integer(minimum_recommended)
 
   repetitions <- as.integer(repetitions)
 

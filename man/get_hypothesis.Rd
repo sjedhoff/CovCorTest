@@ -17,8 +17,8 @@ V.}
 \value{
 A list with two elements:
 \describe{
-\item{\code{Hypothesenmatrix}}{A numeric matrix \code{C} such that the hypothesis can be written as \code{C \%*\% theta = zeta}}
-\item{\code{Hypothesenvector}}{The numeric vector \code{zeta}, computed as \code{C \%*\% v0}}
+\item{\code{hypothesis_matrix}}{A numeric matrix \code{C} such that the hypothesis can be written as \code{C \%*\% theta = zeta}}
+\item{\code{hypothesis_vector}}{The numeric vector \code{zeta}, computed as \code{C \%*\% v0}}
 }
 }
 \description{
