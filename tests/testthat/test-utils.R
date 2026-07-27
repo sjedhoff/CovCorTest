@@ -61,3 +61,59 @@ test_that("CheckBandwidth", {
   expect_error(CheckBandwidth(d - 1, d))
   expect_error(CheckBandwidth(1, 2))
 })
+
+
+test_that("CheckRepetitions accepts positive integers", {
+  expect_identical(CheckRepetitions(500), 500L)
+  expect_identical(CheckRepetitions(1000L), 1000L)
+})
+
+test_that("CheckRepetitions warns for small positive integers", {
+  expect_warning(
+    expect_identical(CheckRepetitions(100), 100L),
+    "Fewer than 500 repetitions"
+  )
+})
+
+test_that("CheckRepetitions rejects invalid values", {
+  expect_error(CheckRepetitions(0), "single positive integer")
+  expect_error(CheckRepetitions(-1), "single positive integer")
+  expect_error(CheckRepetitions(10.5), "single positive integer")
+  expect_error(CheckRepetitions(NA_real_), "single positive integer")
+  expect_error(CheckRepetitions(Inf), "single positive integer")
+  expect_error(CheckRepetitions(c(500, 1000)), "single positive integer")
+  expect_error(CheckRepetitions("1000"), "single positive integer")
+  expect_error(CheckRepetitions(NULL), "single positive integer")
+})
+
+test_that("zero resampling p-values use the correct resolution", {
+  expect_identical(
+    format_resampling_pvalue(0, 1000),
+    "p < 1e-03"
+  )
+
+  expect_identical(
+    format_resampling_pvalue(0, 3000),
+    "p < 3.333e-04"
+  )
+})
+
+test_that("nonzero resampling p-values are printed directly", {
+  expect_identical(
+    format_resampling_pvalue(0.025, 1000),
+    "p = 0.02500"
+  )
+})
+
+test_that("p-value formatting validates its inputs", {
+  expect_error(
+    format_resampling_pvalue(-0.1, 1000),
+    "between 0 and 1"
+  )
+
+  expect_error(
+    format_resampling_pvalue(1.1, 1000),
+    "between 0 and 1"
+  )
+
+})

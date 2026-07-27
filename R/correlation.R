@@ -54,6 +54,8 @@ test_correlation <- function(X, nv = NULL,
                              hypothesis = NULL,
                              method = "BT",
                              repetitions = 1000) {
+
+  repetitions <- CheckRepetitions(repetitions)
   method <- toupper(method)
   if(!(method %in% c("MC", "BT", "TAY"))){
     stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or
@@ -284,6 +286,7 @@ test_correlation <- function(X, nv = NULL,
 test_correlation_structure <- function(X, structure, AM = 1, method = "BT",
                                       repetitions = 1000, bandwidth = NA){
 
+  repetitions <- CheckRepetitions(repetitions)
   structure <- tolower(structure)
   method <- toupper(method)
   if(!(method == "MC" || method == "BT" || method == "TAY")){

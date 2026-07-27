@@ -5,6 +5,11 @@
 #' ensuring that each added column increases the rank.
 #'
 #' @param V A numeric matrix with `p` rows and fewer than `p` columns.
+#' @param tol A non-negative numeric scalar specifying the tolerance used by
+#'   \code{\link[base]{qr}} when determining the numerical rank of \code{V}.
+#'   Columns associated with values smaller than this tolerance are treated as
+#'   linearly dependent. The default is
+#'   \code{sqrt(.Machine$double.eps)}.
 #'
 #' @return A numeric matrix of dimension `p x p` with full column rank.
 #'
@@ -14,35 +19,57 @@
 #' and stops when full rank is achieved.
 #'
 #'
-get_extended_matrix <- function(V) {
-  p <- nrow(V)  # Number of rows of V (assumed to be the dimension of the parameter space)
-
-  # If V is square, it's already p x p, and extending it makes no sense in the model
-  if(p == ncol(V)){
-    stop("V is already a square matrix.")  # Error: V should not already be square
+get_extended_matrix <- function(V, tol = sqrt(.Machine$double.eps)) {
+  if (!is.matrix(V) || !is.numeric(V)) {
+    stop("V must be a numeric matrix.")
   }
 
-  unit_vec <- diag(p)  # Identity matrix of size p (used to extract standard basis vectors)
-  i <- 1  # Index for standard basis vectors
+  if (any(!is.finite(V))) {
+    stop("V must contain finite values only.")
+  }
 
-  rk <- qr(V)$rank  # Compute the current rank of V
+  p <- nrow(V)
+  q <- ncol(V)
 
-  # Keep adding standard basis vectors as columns until full rank is reached
-  while(rk < p){
-    V_new <- cbind(V, unit_vec[, i])  # Add the i-th standard basis vector to V
+  if (p == 0L) {
+    stop("V must have at least one row.")
+  }
 
-    # Only accept the new column if it increases the rank
-    if (qr(V_new)$rank > rk) {
-      V <- V_new           # Update V
-      rk <- qr(V_new)$rank  # Update rank
+  if (q >= p) {
+    stop("V must have fewer columns than rows.")
+  }
+
+  rank_V <- qr(V, tol = tol)$rank
+
+  if (rank_V < q) {
+    stop(
+      paste0(
+        "The columns of V must be linearly independent; ",
+        "V has ", q, " columns but rank ", rank_V, "."
+      )
+    )
+  }
+
+  identity <- diag(p)
+
+  for (i in seq_len(p)) {
+    if (ncol(V) == p) {
+      break
     }
 
-    i <- i + 1  # Move to the next basis vector
+    candidate <- cbind(V, identity[, i])
+
+    if (qr(candidate, tol = tol)$rank > ncol(V)) {
+      V <- candidate
+    }
   }
 
-  return(V)  # Return the extended matrix
-}
+  if (ncol(V) != p || qr(V, tol = tol)$rank != p) {
+    stop("Could not extend V to a square, full-rank matrix.")
+  }
 
+  V
+}
 
 
 #' Construct hypothesis matrix and vector from linear covariance model structure
@@ -88,26 +115,30 @@ get_extended_matrix <- function(V) {
 # containing the vectorised matrices from the linear covariance structure model
 #'
 #' @references
-#' Sattler, P. and Dobler, D. (2025). Testing for patterns and structures in covariance and correlation matrices. \emph{arXiv preprint} \url{https://arxiv.org/abs/2310.11799}
+#' \insertRef{sattler_structures_2024}{CovCorTest}
 #'
 get_hypothesis <- function(v0, V) {
-  if(!is.matrix(V)){
-    stop("V must be a matrix.")
+  if (!is.matrix(V) || !is.numeric(V)) {
+    stop("V must be a numeric matrix.")
   }
-  if(!is.vector(v0)){
-    stop("v0 must be a vector.")
+
+  if (!is.numeric(v0) || is.matrix(v0) || !is.null(dim(v0))) {
+    stop("v0 must be a numeric vector.")
   }
-  if(!is.numeric(V) | !is.numeric(v0)){
-    stop("V and v0 have to be numeric.")
+
+  if (any(!is.finite(V)) || any(!is.finite(v0))) {
+    stop("V and v0 must contain finite values only.")
   }
-  p <- nrow(V)  # Number of parameters (rows in V)
-  q <- ncol(V)  # Number of constraints or model dimensions (columns in V)
-  if(q >= p){
-    stop("The matrix V must have more columns than rows.")
+
+  p <- nrow(V)
+  q <- ncol(V)
+
+  if (q >= p) {
+    stop("V must have fewer columns than rows.")
   }
-  # Error handling: v0 must be of the same dimension as the number of parameters
-  if(length(v0) != p){
-    stop("v0 must have the same length as rows in V.")
+
+  if (length(v0) != p) {
+    stop("v0 must have the same length as the number of rows in V.")
   }
 
   V_ext <- get_extended_matrix(V)  # Extend V to full rank (if not already)

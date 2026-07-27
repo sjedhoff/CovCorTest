@@ -45,10 +45,9 @@
 #' @return An object of class \code{\link{CovTest}}.
 #'
 #' @references
-#' Sattler, P., Bathke, A. C., and Pauly, M. (2022).  "Testing hypotheses about covariance matrices in general MANOVA designs."
-#'  \emph{Journal of Statistical Planning and Inference}, 219, 134–146.
-#'  <doi:10.1016/j.jspi.2021.12.001>
+#' \insertRef{sattler_structures_2024}{CovCorTest}
 #' @export
+#' @importFrom Rdpack reprompt
 #'
 #' @import MANOVA.RM
 #' @examples
@@ -69,7 +68,7 @@
 test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
                            AM = 1, hypothesis = NULL, A = NULL,
                            method = "MC", repetitions = 1000) {
-
+  repetitions <- CheckRepetitions(repetitions)
   method <- toupper(method)
   if(!(method %in% c("MC", "BT"))){
     stop("method must be 'MC' or 'BT'")
@@ -330,6 +329,7 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
 test_covariance_structure <- function(X, structure, AM=1, method = "BT",
                                      repetitions = 1000, bandwidth = NA){
 
+  repetitions <- CheckRepetitions(repetitions)
   structure <- tolower(structure)
   method <- toupper(method)
   if(!(method == "MC" || method == "BT")){

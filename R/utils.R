@@ -676,3 +676,42 @@ CheckBandwidth <- function(bandwidth, d) {
   return(bandwidth)
 }
 
+#' Validate the number of resampling repetitions
+#'
+#' Checks that the requested number of repetitions is a single, finite,
+#' positive integer. A warning is issued when the number is below the
+#' recommended minimum because the resulting p-value may be imprecise.
+#'
+#' @param repetitions A single positive integer specifying the number of
+#'   resampling repetitions.
+#' @param minimum_recommended A single positive integer specifying the number
+#'   of repetitions below which a warning is issued. The default is 500.
+#'
+#' @return The validated number of repetitions as an integer.
+#'
+CheckRepetitions <- function(repetitions, minimum_recommended = 500L) {
+  if (
+    !is.numeric(repetitions) ||
+    length(repetitions) != 1L ||
+    is.na(repetitions) ||
+    !is.finite(repetitions) ||
+    repetitions <= 0 ||
+    repetitions != floor(repetitions)
+  ) {
+    stop("repetitions must be a single positive integer.")
+  }
+
+  repetitions <- as.integer(repetitions)
+
+  if (repetitions < minimum_recommended) {
+    warning(
+      paste0(
+        "Fewer than ", minimum_recommended,
+        " repetitions may result in an imprecise p-value."
+      ),
+      call. = FALSE
+    )
+  }
+
+  repetitions
+}

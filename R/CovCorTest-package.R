@@ -1,0 +1,228 @@
+#' CovCorTest: Tests for covariance and correlation matrices
+#'
+#' @description
+#' The \pkg{CovCorTest} package provides statistical tests for hypotheses about
+#' covariance matrices, correlation matrices, and structured covariance or
+#' correlation matrices. It also provides a combined procedure for comparing
+#' the covariance and correlation matrices of two groups.
+#'
+#' The procedures are based on ANOVA-type statistics and use bootstrap,
+#' Monte Carlo, or Taylor-based Monte Carlo approximations, depending on the
+#' selected test. The methods require comparatively weak distributional
+#' assumptions and support both one-sample and multiple-group designs.
+#'
+#' @section Data format:
+#'
+#' The main testing functions accept observations in either of two forms:
+#'
+#' \itemize{
+#'   \item A numeric matrix or data frame with observations in rows and
+#'     variables in columns.
+#'   \item A list of numeric matrices or data frames, with one element per
+#'     group. Within every element, observations are stored in rows and
+#'     variables in columns.
+#' }
+#'
+#' If multiple groups are combined into one matrix, the argument \code{nv}
+#' specifies the sample size of each group. When a list is supplied, the group
+#' sizes can be inferred from the numbers of rows.
+#'
+#' All groups must contain the same variables. Observations containing missing
+#' values are removed before the test is calculated.
+#'
+#' @section Tests for covariance matrices:
+#'
+#' [test_covariance()] tests hypotheses about one or more covariance matrices.
+#' A predefined hypothesis can be selected using the \code{hypothesis}
+#' argument. The available hypotheses are:
+#'
+#' \describe{
+#'   \item{\code{"equal"}}{
+#'     Tests equality of covariance matrices across groups. For a single group,
+#'     it tests equality of the diagonal elements.
+#'   }
+#'   \item{\code{"equal-trace"}}{
+#'     Tests equality of covariance-matrix traces across multiple groups.
+#'   }
+#'   \item{\code{"equal-diagonals"}}{
+#'     Tests equality of the diagonal elements across multiple groups.
+#'   }
+#'   \item{\code{"given-trace"}}{
+#'     Tests whether the trace of a single covariance matrix is equal to a
+#'     specified scalar.
+#'   }
+#'   \item{\code{"given-matrix"}}{
+#'     Tests whether a single covariance matrix is equal to a specified matrix.
+#'   }
+#'   \item{\code{"uncorrelated"}}{
+#'     Tests whether all off-diagonal elements of a single covariance matrix
+#'     are zero.
+#'   }
+#' }
+#'
+#' Custom linear hypotheses can be specified using a hypothesis matrix
+#' \code{C} and a corresponding null vector \code{Xi}. The underlying
+#' covariance-testing methodology is described by
+#' \insertCite{sattler_cov_2020;textual}{CovCorTest}.
+#'
+#' @section Tests for correlation matrices:
+#'
+#' [test_correlation()] tests hypotheses about one or more correlation
+#' matrices. The predefined hypotheses are:
+#'
+#' \describe{
+#'   \item{\code{"equal-correlated"}}{
+#'     Tests equality of correlation matrices across groups.
+#'   }
+#'   \item{\code{"uncorrelated"}}{
+#'     Tests whether all correlations in a single group are zero.
+#'   }
+#' }
+#'
+#' As with [test_covariance()], custom linear hypotheses can be supplied using
+#' \code{C} and \code{Xi}. The correlation-testing methodology is described by
+#' \insertCite{sattler_cor_2024;textual}{CovCorTest}.
+#'
+#' @section Covariance-structure tests:
+#'
+#' [test_covariance_structure()] tests whether the covariance matrix of one
+#' group has a specified structure. The implemented structures include:
+#'
+#' \itemize{
+#'   \item autoregressive, \code{"autoregressive"} or \code{"ar"};
+#'   \item first-order autoregressive, \code{"FO-autoregressive"} or
+#'     \code{"FO-ar"};
+#'   \item diagonal, \code{"diagonal"} or \code{"diag"};
+#'   \item sphericity, \code{"sphericity"} or \code{"spher"};
+#'   \item compound symmetry, \code{"compoundsymmetry"} or \code{"cs"};
+#'   \item Toeplitz, \code{"toeplitz"} or \code{"toep"};
+#'   \item constant off-diagonal, \code{"constant-offdiagonal"} or
+#'     \code{"const-offdiag"};
+#'   \item standard Toeplitz, \code{"standard-toeplitz"} or
+#'     \code{"std-toep"};
+#'   \item banded, \code{"banded"} or \code{"band"};
+#'   \item banded Toeplitz, \code{"banded-toeplitz"} or
+#'     \code{"band-toep"}.
+#' }
+#'
+#' For banded structures, \code{bandwidth} specifies the number of
+#' off-diagonals that may be nonzero.
+#'
+#' @section Correlation-structure tests:
+#'
+#' [test_correlation_structure()] tests whether the correlation matrix of one
+#' group has a specified structure. The implemented structures include:
+#'
+#' \itemize{
+#'   \item heterogeneous autoregressive, \code{"Hautoregressive"} or
+#'     \code{"Har"};
+#'   \item diagonal, \code{"diagonal"} or \code{"diag"};
+#'   \item heterogeneous compound symmetry,
+#'     \code{"Hcompoundsymmetry"} or \code{"Hcs"};
+#'   \item heterogeneous Toeplitz, \code{"Htoeplitz"} or \code{"Htoep"};
+#'   \item banded, \code{"banded"} or \code{"band"};
+#'   \item banded Toeplitz, \code{"banded-toeplitz"} or
+#'     \code{"band-toep"}.
+#' }
+#'
+#' The covariance- and correlation-structure procedures are described by
+#' \insertCite{sattler_structures_2024;textual}{CovCorTest}.
+#'
+#' @section Combined test:
+#'
+#' [test_combined()] simultaneously compares the variances and correlations of
+#' exactly two groups. It returns separate p-values for equality of the
+#' variances and equality of the correlations, together with a p-value for the
+#' global combined hypothesis.
+#'
+#' The combined procedure is based on the correlation-testing methodology of
+#' \insertCite{sattler_cor_2024;textual}{CovCorTest}.
+#'
+#' @section Resampling methods:
+#'
+#' Depending on the function, the following methods are available:
+#'
+#' \describe{
+#'   \item{\code{"BT"}}{
+#'     A parametric bootstrap approximation.
+#'   }
+#'   \item{\code{"MC"}}{
+#'     A Monte Carlo approximation based on the estimated asymptotic
+#'     distribution.
+#'   }
+#'   \item{\code{"TAY"}}{
+#'     A Taylor-based Monte Carlo approximation available for correlation
+#'     procedures.
+#'   }
+#' }
+#'
+#' The \code{repetitions} argument controls the number of generated resampling
+#' observations. At least 500 repetitions are recommended. Larger values
+#' generally provide more precise p-values but require more computation time.
+#'
+#' @section Alternative hypothesis matrices:
+#'
+#' By default, the main procedures use \code{AM = 1}. This replaces the
+#' original hypothesis matrix with a lower-dimensional companion matrix that
+#' yields the same ANOVA-type test statistic. The original and transformed
+#' hypothesis matrices are retained in the returned object. This approach is
+#' described by \insertCite{Sattler2025;textual}{CovCorTest}.
+#'
+#' Setting \code{AM = 0} disables this transformation.
+#'
+#' @section Constructing custom hypotheses:
+#'
+#' [get_hypothesis()] constructs a hypothesis matrix and vector for a linear
+#' covariance model. It can be used together with [test_covariance()] when the
+#' required hypothesis is not among the predefined alternatives.
+#'
+#' @section Returned objects:
+#'
+#' Covariance, correlation, and structure tests return an object of class
+#' [CovTest]. Important components include:
+#'
+#' \itemize{
+#'   \item \code{pvalue}: the estimated p-value;
+#'   \item \code{Teststatistic}: the observed ANOVA-type statistic;
+#'   \item \code{CovarianceMatrix}: the estimated covariance matrix of the
+#'     statistic;
+#'   \item \code{C} and \code{Xi}: the hypothesis used in the calculation;
+#'   \item \code{C_original} and \code{Xi_original}: the hypothesis before the
+#'     optional companion-matrix transformation;
+#'   \item \code{resampling_method}: the selected approximation;
+#'   \item \code{repetitions}: the number of resampling repetitions;
+#'   \item \code{nv}: the sample sizes.
+#' }
+#'
+#' The combined test returns an object of class [CombTest] containing separate
+#' variance, correlation, and global p-values.
+#'
+#' @section Citation:
+#'
+#' When using \pkg{CovCorTest}, cite the package paper:
+#' \insertRef{SattlerJedhoff2025}{CovCorTest}
+#'
+#' Depending on the procedures used, also cite the corresponding methodological
+#' references below.
+#'
+#' @references
+#' \insertRef{sattler_cov_2020}{CovCorTest}
+#'
+#' \insertRef{sattler_cor_2024}{CovCorTest}
+#'
+#' \insertRef{sattler_structures_2024}{CovCorTest}
+#'
+#' \insertRef{Sattler2025}{CovCorTest}
+#'
+#' @seealso
+#' [test_covariance()], [test_correlation()],
+#' [test_covariance_structure()], [test_correlation_structure()],
+#' [test_combined()], and [get_hypothesis()].
+#'
+#' @importFrom Rdpack reprompt
+#'
+#' @name CovCorTest-package
+#' @aliases CovCorTest
+#' @docType package
+#' @keywords package
+"_PACKAGE"

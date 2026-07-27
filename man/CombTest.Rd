@@ -2,34 +2,70 @@
 % Please edit documentation in R/print_functions.R
 \name{CombTest}
 \alias{CombTest}
-\title{CombTest Object}
+\title{Combined covariance and correlation test result}
 \usage{
-CombTest()
+CombTest(
+  pvalue_Variances = NA_real_,
+  pvalue_Correlations = NA_real_,
+  pvalue_Total = NA_real_,
+  Teststatistic = NA_real_,
+  repetitions = NA_integer_,
+  nv = integer()
+)
+}
+\arguments{
+\item{pvalue_Variances}{Numeric. The p-value for equality of the variances.}
+
+\item{pvalue_Correlations}{Numeric. The p-value for equality of the
+correlations.}
+
+\item{pvalue_Total}{Numeric. The p-value for the global combined hypothesis.}
+
+\item{Teststatistic}{Numeric. The value of the combined test statistic.}
+
+\item{repetitions}{Integer. The number of resampling repetitions.}
+
+\item{nv}{Integer vector containing the sample sizes of the two groups.}
 }
 \value{
 An object of class \code{CombTest}.
 }
 \description{
-This help page describes the structure of the \code{CombTest} class,
-which is used to represent the results the combined covariance and
-correlation test.
+Constructs an object of class \code{CombTest}. Objects of this class
+represent results from the combined test for equality of covariance and
+correlation matrices.
 }
 \details{
-A \code{CombTest} object is a list with the following components:
+A \code{CombTest} object contains the following components:
 \describe{
-\item{\code{method}}{Character. Either 'Covariance' or 'Correlation'.}
-\item{\code{pvalue-Variances}}{Numeric. The p-value of the test regarding
-the covariances.}
-\item{\code{pvalue-Correlations}}{Numeric. The p-value of the test
-regarding the correlations.}
-\item{\code{pvalue-Total}}{Numeric. The p-value of the whole test of the
-global hypothesis.}
-\item{\code{Teststatistic}}{Numeric. The test statistic.}
-\item{\code{resampling_method}}{Character. The resampling method used in
-the test.}
-\item{\code{repetitions}}{Integer. The number of repetitions used in
-resampling.}
-\item{\code{nv}}{Numeric. The sample size or the number of variables.}
+\item{\code{pvalue_Variances}}{
+Numeric. The p-value for equality of the variances.
+}
+\item{\code{pvalue_Correlations}}{
+Numeric. The p-value for equality of the correlations.
+}
+\item{\code{pvalue_Total}}{
+Numeric. The p-value for the global combined hypothesis.
+}
+\item{\code{Teststatistic}}{
+Numeric. The value of the combined test statistic.
+}
+\item{\code{repetitions}}{
+Integer. The number of resampling repetitions.
+}
+\item{\code{nv}}{
+Integer vector. The sample sizes of the two groups.
 }
 }
-\keyword{internal}
+}
+\examples{
+result <- CombTest(
+  pvalue_Variances = 0.12,
+  pvalue_Correlations = 0.08,
+  pvalue_Total = 0.08,
+  Teststatistic = 2.4,
+  repetitions = 1000L,
+  nv = c(20L, 25L)
+)
+
+}

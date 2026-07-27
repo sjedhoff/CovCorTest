@@ -52,45 +52,152 @@ CovTest <- function() {
 
 
 
-#' CombTest Object
+#' Combined covariance and correlation test result
 #'
-#' This help page describes the structure of the \code{CombTest} class,
-#' which is used to represent the results the combined covariance and
-#' correlation test.
+#' Constructs an object of class \code{CombTest}. Objects of this class
+#' represent results from the combined test for equality of covariance and
+#' correlation matrices.
 #'
-#' A \code{CombTest} object is a list with the following components:
+#' A \code{CombTest} object contains the following components:
 #' \describe{
-#'   \item{\code{method}}{Character. Either 'Covariance' or 'Correlation'.}
-#'   \item{\code{pvalue-Variances}}{Numeric. The p-value of the test regarding
-#'   the covariances.}
-#'   \item{\code{pvalue-Correlations}}{Numeric. The p-value of the test
-#'   regarding the correlations.}
-#'   \item{\code{pvalue-Total}}{Numeric. The p-value of the whole test of the
-#'   global hypothesis.}
-#'   \item{\code{Teststatistic}}{Numeric. The test statistic.}
-#'   \item{\code{resampling_method}}{Character. The resampling method used in
-#'   the test.}
-#'   \item{\code{repetitions}}{Integer. The number of repetitions used in
-#'   resampling.}
-#'   \item{\code{nv}}{Numeric. The sample size or the number of variables.}
+#'   \item{\code{pvalue_Variances}}{
+#'     Numeric. The p-value for equality of the variances.
+#'   }
+#'   \item{\code{pvalue_Correlations}}{
+#'     Numeric. The p-value for equality of the correlations.
+#'   }
+#'   \item{\code{pvalue_Total}}{
+#'     Numeric. The p-value for the global combined hypothesis.
+#'   }
+#'   \item{\code{Teststatistic}}{
+#'     Numeric. The value of the combined test statistic.
+#'   }
+#'   \item{\code{repetitions}}{
+#'     Integer. The number of resampling repetitions.
+#'   }
+#'   \item{\code{nv}}{
+#'     Integer vector. The sample sizes of the two groups.
+#'   }
 #' }
 #'
+#' @param pvalue_Variances Numeric. The p-value for equality of the variances.
+#' @param pvalue_Correlations Numeric. The p-value for equality of the
+#'   correlations.
+#' @param pvalue_Total Numeric. The p-value for the global combined hypothesis.
+#' @param Teststatistic Numeric. The value of the combined test statistic.
+#' @param repetitions Integer. The number of resampling repetitions.
+#' @param nv Integer vector containing the sample sizes of the two groups.
+#'
 #' @return An object of class \code{CombTest}.
+#'
+#' @examples
+#' result <- CombTest(
+#'   pvalue_Variances = 0.12,
+#'   pvalue_Correlations = 0.08,
+#'   pvalue_Total = 0.08,
+#'   Teststatistic = 2.4,
+#'   repetitions = 1000L,
+#'   nv = c(20L, 25L)
+#' )
+#'
 #' @export
-#' @keywords internal
-CombTest <- function() {
-  structure(list("pvalue_Variances" = 0.1,
-                 "pvalue_Correlations" = 0.1,
-                 "pvalue_Total" = 0.1,
-                 "Teststatistic" = numeric(1),
-                 #"CovarianceMatrix" = matrix(),
-                 "repetitions" = integer(1),
-                 "nv" = numeric(1)),
-            class = "CombTest")
+CombTest <- function(
+    pvalue_Variances = NA_real_,
+    pvalue_Correlations = NA_real_,
+    pvalue_Total = NA_real_,
+    Teststatistic = NA_real_,
+    repetitions = NA_integer_,
+    nv = integer()
+) {
+  structure(
+    list(
+      pvalue_Variances = pvalue_Variances,
+      pvalue_Correlations = pvalue_Correlations,
+      pvalue_Total = pvalue_Total,
+      Teststatistic = Teststatistic,
+      repetitions = repetitions,
+      nv = nv
+    ),
+    class = "CombTest"
+  )
 }
 
+#' Format a resampling-based p-value
+#'
+#' Formats a p-value obtained from a finite number of resampling repetitions.
+#' If none of the resampled statistics is at least as extreme as the observed
+#' statistic, the estimated p-value is zero and is displayed using the
+#' resolution bound \code{1 / repetitions}.
+#'
+#' @param pvalue A single numeric p-value between zero and one.
+#' @param repetitions A single positive integer specifying the number of
+#'   resampling repetitions.
+#' @param digits A single positive integer specifying the number of significant
+#'   digits used for a nonzero p-value.
+#'
+#' @return A character string containing the formatted p-value.
+#'
+#' @keywords internal
+format_resampling_pvalue <- function(pvalue, repetitions, digits = 4L) {
+  if (
+    !is.numeric(pvalue) ||
+    length(pvalue) != 1L ||
+    (!is.na(pvalue) && (
+      !is.finite(pvalue) ||
+      pvalue < 0 ||
+      pvalue > 1
+    ))
+  ) {
+    stop(
+      "pvalue must be NA or a single finite number between 0 and 1."
+    )
+  }
 
+  if (
+    !is.numeric(digits) ||
+    length(digits) != 1L ||
+    is.na(digits) ||
+    !is.finite(digits) ||
+    digits <= 0 ||
+    digits != floor(digits)
+  ) {
+    stop("digits must be a single positive integer.")
+  }
 
+  digits <- as.integer(digits)
+
+  # Permit empty result objects such as CombTest().
+  if (is.na(pvalue)) {
+    return("p = NA")
+  }
+
+  # The number of repetitions is only needed for a zero p-value.
+  if (pvalue == 0) {
+    repetitions <- CheckRepetitions(
+      repetitions,
+      minimum_recommended = 1L
+    )
+
+    bound <- format(
+      1 / repetitions,
+      scientific = TRUE,
+      digits = digits,
+      trim = TRUE
+    )
+
+    return(paste0("p < ", bound))
+  }
+
+  paste0(
+    "p = ",
+    formatC(
+      pvalue,
+      format = "fg",
+      digits = digits,
+      flag = "#"
+    )
+  )
+}
 
 
 #' Print function for CovTest object
@@ -99,15 +206,17 @@ CombTest <- function() {
 #' @param ... additional parameters
 #'
 #' @return no return, just print
-#' @exportS3Method
+#' @export
 print.CovTest <- function(x, ...){
   method_print <- ifelse(x$resampling_method == "MC", "Monte-Carlo-technique",
                          ifelse(x$resampling_method == "BT", "Bootstrap",
                                 "Taylor-based Monte-Carlo-approach"))
 
 
-  pval <- ifelse(x$pvalue < 10^(-4), paste0("p < 1e-", log10(x$repetitions)),
-                 paste0("p = ", round(x$pvalue, digits = 4)))
+  pval <- format_resampling_pvalue(
+    pvalue = x$pvalue,
+    repetitions = x$repetitions
+  )
 
   group_text <- ifelse(length(x$nv) == 1, "one group", paste0("",length(x$nv),
                                                               " groups"))
@@ -130,18 +239,23 @@ print.CovTest <- function(x, ...){
 #' @param ... additional parameters
 #'
 #' @return no return, just print
-#' @exportS3Method
+#' @export
 print.CombTest <- function(x, ...){
 
-  pvalCov <- ifelse(x$pvalue_Variances < 10^(-4), paste0("p < 1e-",
-                log10(x$repetitions)),
-                paste0("p = ", round(x$pvalue_Variances, digits = 4)))
-  pvalCorr <- ifelse(x$pvalue_Correlations < 10^(-4), paste0("p < 1e-",
-                log10(x$repetitions)),
-                paste0("p = ", round(x$pvalue_Correlations, digits = 4)))
-  pvalTotal <- ifelse(x$pvalue_Total < 10^(-4), paste0("p < 1e-",
-                log10(x$repetitions)),
-                paste0("p = ", round(x$pvalue_Total, digits = 4)))
+  pvalCov <- format_resampling_pvalue(
+    pvalue = x$pvalue_Variances,
+    repetitions = x$repetitions
+  )
+
+  pvalCorr <- format_resampling_pvalue(
+    pvalue = x$pvalue_Correlations,
+    repetitions = x$repetitions
+  )
+
+  pvalTotal <- format_resampling_pvalue(
+    pvalue = x$pvalue_Total,
+    repetitions = x$repetitions
+  )
 
 
 

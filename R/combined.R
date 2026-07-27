@@ -70,7 +70,7 @@ TaylorCombined <- function(repetitions, MSrootHatCov, CorData, MvrH1, MvrH2,
 #' equality of the covariance matrices
 #' @param X  a list or matrix containing the observation vectors.
 #' In case of a list, each matrix in this list is another group, where the
-#' observation vectors are the columns. For a matrix, all groups are together in
+#' observation vectors are the rows. For a matrix, all groups are together in
 #' one matrix and nv is used to indicate the group sizes.
 #' @param nv vector of group sizes
 #' @param repetitions a scalar,  indicate the number of runs for the chosen
@@ -89,13 +89,14 @@ TaylorCombined <- function(repetitions, MSrootHatCov, CorData, MvrH1, MvrH2,
 #' X_list <- list(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="AD",vars],
 #'                EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="MCI",vars])
 #'
-#' nv <- unlist(lapply(X_list, ncol))
+#' nv <- unlist(lapply(X_list, nrow))
 #' set.seed(31415)
 #' test_combined(X_list, nv)
 #'
 #' @export
 test_combined <- function(X, nv = NULL, repetitions = 1000) {
 
+  repetitions <- CheckRepetitions(repetitions)
   listcheck <- Listcheck(X, nv)
 
   X <- listcheck[[1]]
@@ -158,17 +159,16 @@ test_combined <- function(X, nv = NULL, repetitions = 1000) {
     ), 2, max)))
 
 
-    CombTest <- list(
-      "pvalue_Variances" = alpha[1],
-      "pvalue_Correlations" = alpha[2],
-      "pvalue_Total" = min(alpha),
-      "Teststatistic" = max(Teststatistic),
-      "repetitions" = repetitions,
-      "nv" = nv
+    result <- CombTest(
+      pvalue_Variances = alpha[1],
+      pvalue_Correlations = alpha[2],
+      pvalue_Total = min(alpha),
+      Teststatistic = max(Teststatistic),
+      repetitions = repetitions,
+      nv = nv
     )
 
-    class(CombTest) <- "CombTest"
-    return(CombTest)
+    return(result)
 
   }
 }

@@ -4,10 +4,16 @@
 \alias{get_extended_matrix}
 \title{Extend a matrix to full rank using identity columns}
 \usage{
-get_extended_matrix(V)
+get_extended_matrix(V, tol = sqrt(.Machine$double.eps))
 }
 \arguments{
 \item{V}{A numeric matrix with \code{p} rows and fewer than \code{p} columns.}
+
+\item{tol}{A non-negative numeric scalar specifying the tolerance used by
+\code{\link[base]{qr}} when determining the numerical rank of \code{V}.
+Columns associated with values smaller than this tolerance are treated as
+linearly dependent. The default is
+\code{sqrt(.Machine$double.eps)}.}
 }
 \value{
 A numeric matrix of dimension \verb{p x p} with full column rank.
