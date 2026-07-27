@@ -4,14 +4,30 @@
 \alias{test_correlation_structure}
 \title{Test for structure of data's correlation matrix}
 \usage{
-test_correlation_structure(X, structure, method = "BT", repetitions = 1000)
+test_correlation_structure(
+  X,
+  structure,
+  AM = 1,
+  method = "BT",
+  repetitions = 1000,
+  bandwidth = NA
+)
 }
 \arguments{
 \item{X}{a matrix containing the observation vectors as rows (one group)}
 
 \item{structure}{a character specifying the structure regarding them the
 correlation matrix should be checked. Options are "Hautoregressive" ("Har"),
-"diagonal" ("diag"), "Hcompoundsymmetry" ("Hcs") and "Htoeplitz" ("Hteop").}
+"diagonal" ("diag"), "Hcompoundsymmetry" ("Hcs") and "Htoeplitz" ("Htoep"),
+"banded" ("band"), and "banded-toeplitz" ("band-toep"). For banded structures,
+all correlations outside the specified bandwidth, i.e. from the
+bandwidth + 1-th off-diagonal onward, are assumed to be zero.}
+
+\item{AM}{Binary variable indicating whether the computations should use an
+alternative hypothesis matrix as proposed by
+\insertCite{Sattler2025;textual}{CovCorTest}. This matrix has fewer rows than
+the original hypothesis matrix while leaving the resulting test statistics
+unchanged. By default, this alternative matrix is used.}
 
 \item{method}{a character, to chose whether bootstrap("BT") or Taylor-based
 Monte-Carlo-approach("TAY") or Monte-Carlo-technique("MC") is used, while
@@ -20,6 +36,11 @@ bootstrap is the predefined method.}
 \item{repetitions}{a scalar, indicate the number of runs for the chosen
 method.
 The predefined value is 1,000, and the number should not be below 500.}
+
+\item{bandwidth}{Optional positive integer specifying the number of
+off-diagonals allowed to be non-zero for banded correlation structures.
+Only used for \code{"banded"} and \code{"banded-toeplitz"} structures,
+with default \code{NA}.}
 }
 \value{
 an object of the class \code{\link{CovTest}}
@@ -45,5 +66,5 @@ test_correlation_structure(X = X, structure = "diagonal", method = "MC")
 
 }
 \references{
-Sattler, P. and Dobler, D. (2025). Testing for patterns and structures in covariance and correlation matrices. \emph{arXiv preprint} \url{https://arxiv.org/abs/2310.11799}
+\insertRef{sattler_structures_2024}{CovCorTest}
 }

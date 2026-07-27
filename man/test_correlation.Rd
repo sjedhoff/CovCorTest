@@ -9,6 +9,7 @@ test_correlation(
   nv = NULL,
   C = NULL,
   Xi = NULL,
+  AM = 1,
   hypothesis = NULL,
   method = "BT",
   repetitions = 1000
@@ -22,21 +23,32 @@ all groups are combined, and \code{nv} must be used to indicate group sizes.}
 \item{nv}{(Optional) A vector indicating group sizes, needed when
 \code{X} is a combined matrix or for multiple groups.}
 
-\item{C}{(Optional) A user-defined contrast matrix for testing custom
-hypotheses. Must match dimensions with \code{Xi}.}
+\item{C}{A hypothesis matrix specifying the null hypothesis.
+Optional if \code{hypothesis} is provided.}
 
-\item{Xi}{(Optional) A numeric vector used in combination with \code{C} to
-specify a custom hypothesis.}
+\item{Xi}{A numeric vector specifying the expected values of the contrasts
+under the null hypothesis. Optional if \code{hypothesis} is provided.}
 
-\item{hypothesis}{A character string describing the null hypothesis.
-Must be one of \code{"equal-correlated"} or \code{"uncorrelated"}.
-If supplied, \code{C} and \code{Xi} are ignored.}
+\item{AM}{Binary variable indicating whether the computations should use an
+alternative hypothesis matrix as proposed by
+\insertCite{Sattler2025;textual}{CovCorTest}. This matrix has fewer rows than
+the original hypothesis matrix while leaving the resulting test statistics
+unchanged. By default, this alternative matrix is used.}
 
-\item{method}{A character indicating the resampling method:
-\code{"BT"} (Bootstrap) or \code{"MC"} (Monte Carlo).}
+\item{hypothesis}{A character specifying one of the predefined hypotheses:
+\itemize{
+\item \code{"equal-correlated"} — equal correlation matrices
+\item \code{"uncorrelated"} — test if variables are uncorrelated
+(single group only)
+}
+If \code{C} and \code{Xi} are provided, this can be set to \code{NULL}.}
 
-\item{repetitions}{Number of repetitions to use for the resampling method
-(default: 1000, should be >= 500).}
+\item{method}{Character string indicating the resampling method to use.
+One of \code{"BT"} (bootstrap), \code{"MC"} (Monte Carlo), or
+\code{"TAY"} (Taylor approximation).}
+
+\item{repetitions}{Integer. Number of resampling repetitions
+(default is 1000).}
 }
 \value{
 An object of class \code{"CovTest"}.

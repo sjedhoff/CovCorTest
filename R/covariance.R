@@ -32,6 +32,11 @@
 #' hypotheses. Must match dimensions with `Xi`.
 #' @param Xi (Optional) A numeric vector used in combination with `C` to
 #' specify a custom hypothesis.
+#' @param AM Binary variable indicating whether the computations should use an
+#' alternative hypothesis matrix as proposed by
+#' \insertCite{Sattler2025;textual}{CovCorTest}. This matrix has fewer rows than
+#' the original hypothesis matrix while leaving the resulting test statistics
+#' unchanged. By default, this alternative matrix is used.
 #' @param method A character indicating the resampling method:
 #' `"BT"` (Bootstrap) or `"MC"` (Monte Carlo).
 #' @param repetitions Number of repetitions to use for the resampling method
@@ -59,15 +64,19 @@
 #'             nrow = 1, ncol = 21)
 #' Xi <- 2
 #' set.seed(31415)
-#' test_covariance(X = X, nv = NULL, C = C, Xi = Xi, method = "BT",
-#'             repetitions = 1000)
+#' test_covariance(X = X, nv = NULL, C = C, Xi = Xi, AM = 1,
+#'                 method = "BT", repetitions = 1000)
 test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
-                           hypothesis = NULL, A = NULL,
+                           AM = 1, hypothesis = NULL, A = NULL,
                            method = "MC", repetitions = 1000) {
 
   method <- toupper(method)
   if(!(method %in% c("MC", "BT"))){
     stop("method must be 'MC' or 'BT'")
+  }
+
+  if (!(AM %in% c(0, 1))) {
+    stop("AM must be either 0 or 1.")
   }
 
   listcheck <- Listcheck(X, nv)
@@ -220,6 +229,17 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
     stop("dimensions of C and Xi do not align")
   }
 
+  C_original <- C
+  Xi_original <- Xi
+
+  if (AM == 1) {
+    AlternativeHypothesis <- CompanionHypothesis(C, Xi)
+    C <- AlternativeHypothesis$L
+    Xi <- AlternativeHypothesis$ytilde
+  }
+
+
+
   if(method == "MC"){
     ResamplingResult <- ATSwS(QF(C, HatCov), repetitions)
   }
@@ -241,6 +261,9 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
                   "CovarianceMatrix" = HatCov,
                   "C" = C,
                   "Xi" = Xi,
+                  "AM" = AM,
+                  "C_original" = C_original,
+                  "Xi_original" = Xi_original,
                   "resampling_method" = method,
                   "repetitions" = repetitions,
                   "hypothesis" = hypothesis,
@@ -265,13 +288,26 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
 #' @param structure a character specifying the structure regarding the
 #' covariance matrix should be checked. Options are "autoregressive" ("ar"),
 #' "FO-autoregressive" ("FO-ar"), "diagonal" ("diag"), "sphericity" ("spher"),
-#' "compoundsymmetry" ("cs") and "toeplitz" ("toep").
+#' "compoundsymmetry" ("cs") and "toeplitz" ("toep"), "constant-offdiagonal"
+#' ("const-offdiag"), "standard-toeplitz" ("std-toep"), "banded" ("band"), and
+#' "banded-toeplitz" ("band-toep"). For banded structures, all entries outside
+#' the specified bandwidth, i.e. from the bandwidth + 1-th off-diagonal onward,
+#' are assumed to be zero.
+#' @param AM Binary variable indicating whether the computations should use an
+#' alternative hypothesis matrix as proposed by
+#' \insertCite{Sattler2025;textual}{CovCorTest}. This matrix has fewer rows than
+#' the original hypothesis matrix while leaving the resulting test statistics
+#' unchanged. By default, this alternative matrix is used.
 #' @param method a character, to chose whether bootstrap("BT") or
 #' Monte-Carlo-technique("MC") is used, while bootstrap is the
 #' predefined method.
 #' @param repetitions a scalar, indicate the number of runs for the chosen
-#' method.
-#' The predefined value is 1,000, and the number should not be below 500.
+#' method. The predefined value is 1,000, and the number should not be
+#' below 500.
+#' @param bandwidth Optional positive integer specifying the number of
+#' off-diagonals allowed to be non-zero for banded covariance structures.
+#' Only used for "banded" and "banded-toeplitz" structures,
+#' with default \code{NA}.
 #' @return an object of the class \code{\link{CovTest}}
 #'
 #'
@@ -291,13 +327,16 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
 #' test_covariance_structure(X = X, structure = "diagonal", method = "MC")
 #'
 #' @export
-test_covariance_structure <- function(X, structure, method = "BT",
-                                     repetitions = 1000){
+test_covariance_structure <- function(X, structure, AM=1, method = "BT",
+                                     repetitions = 1000, bandwidth = NA){
 
   structure <- tolower(structure)
   method <- toupper(method)
   if(!(method == "MC" || method == "BT")){
     stop("method must be bootstrap ('BT') or Monte-Carlo-technique('MC')")
+  }
+  if (!(AM %in% c(0, 1))) {
+    stop("AM must be either 0 or 1.")
   }
 
   if(is.list(X) & !is.data.frame(X)){
@@ -314,10 +353,18 @@ test_covariance_structure <- function(X, structure, method = "BT",
   n1 <- dim(X)[2]
   d <- dim(X)[1]
 
-  if(!(structure %in% c("autoregressive", "ar", "fo-autoregressive", "fo-ar",
-                        "diagonal", "diag", "sphericity", "spher",
-                        "compoundsymmetry", "cs", "toeplitz", "toep") )){
+  if (!(structure %in% c("autoregressive", "ar", "fo-autoregressive", "fo-ar",
+                         "diagonal", "diag", "sphericity", "spher",
+                         "compoundsymmetry", "cs", "toeplitz", "toep",
+                         "constant-offdiagonal", "const-offdiag",
+                         "standard-toeplitz", "std-toep",
+                         "banded", "band",
+                         "banded-toeplitz", "band-toep"))) {
+
     stop("no predefined hypothesis")
+  }
+  if (structure %in% c("banded", "band", "banded-toeplitz", "band-toep")) {
+    bandwidth <- CheckBandwidth(bandwidth, d)
   }
 
   if(d > 1){
@@ -337,6 +384,17 @@ test_covariance_structure <- function(X, structure, method = "BT",
       Xi <- c(rep(1,d),rep(0, times = p - 1))
       Jacobi <- Jacobian(vX, a, d, p, 'subdiagonal_mean_ratio_fct')
       HatCovg <- QF(Jacobi, HatCov)
+
+
+
+      C_original <- C
+      Xi_original <- Xi
+
+      if (AM == 1) {
+        AlternativeHypothesis <- CompanionHypothesis(C, Xi)
+        C <- AlternativeHypothesis$L
+        Xi <- AlternativeHypothesis$ytilde
+      }
 
       if(method == "MC"){
         ResamplingResult <- ATSwS(QF(C, HatCovg), repetitions)
@@ -360,8 +418,19 @@ test_covariance_structure <- function(X, structure, method = "BT",
       }
       C <- matrixcalc::direct.sum(C, Pd(d - 1))
       Xi <- rep(0, times = p + d - 1)
+
+
       Jacobi <- Jacobian(vX, a, d, p, 'subdiagonal_mean_ratio_fct')
       HatCovg <- QF(Jacobi, HatCov)
+
+      C_original <- C
+      Xi_original <- Xi
+
+      if (AM == 1) {
+        AlternativeHypothesis <- CompanionHypothesis(C, Xi)
+        C <- AlternativeHypothesis$L
+        Xi <- AlternativeHypothesis$ytilde
+      }
 
       if(method == "MC"){
         ResamplingResult <- ATSwS(QF(C, HatCovg), repetitions)
@@ -379,7 +448,11 @@ test_covariance_structure <- function(X, structure, method = "BT",
     }
 
     if(structure %in% c("diagonal", "diag", "sphericity", "spher",
-                        "compoundsymmetry", "cs", "toeplitz", "toep")){
+                        "compoundsymmetry", "cs", "toeplitz", "toep",
+                        "constant-offdiagonal", "const-offdiag",
+                        "standard-toeplitz", "std-toep",
+                        "banded", "band",
+                        "banded-toeplitz", "band-toep")){
 
       Xi <- rep(0, p)
 
@@ -398,6 +471,65 @@ test_covariance_structure <- function(X, structure, method = "BT",
           C <- matrixcalc::direct.sum(C, Pd(d - l + 1))
         }
       }
+      if (structure == "constant-offdiagonal" | structure == "const-offdiag") {
+
+        if (d < 3) {
+          stop("constant-offdiagonal requires dimension d >= 3.")
+        }
+
+        C <- cbind(
+          matrix(0, nrow = p - d, ncol = d),
+          Pd(p - d)
+        )
+
+        Xi <- rep(0, nrow(C))
+      }
+
+      if (structure == "standard-toeplitz" | structure == "std-toep") {
+
+        C <- diag(1, d, d)
+
+        for (l in 2:d) {
+          C <- matrixcalc::direct.sum(C, Pd(d - l + 1))
+        }
+
+        Xi <- c(rep(1, d), rep(0, p - d))
+      }
+
+      if (structure == "banded" | structure == "band") {
+
+        allowed <- d * (bandwidth + 1) - bandwidth * (bandwidth + 1) / 2
+        outside_positions <- (allowed + 1):p
+
+        C <- diag(1, p, p)[outside_positions, , drop = FALSE]
+        Xi <- rep(0, nrow(C))
+      }
+
+      if (structure == "banded-toeplitz" | structure == "band-toep") {
+
+        allowed <- d * (bandwidth + 1) - bandwidth * (bandwidth + 1) / 2
+        n_outside <- p - allowed
+
+        C <- Pd(d)
+
+        for (l in 2:(bandwidth + 1)) {
+          C <- matrixcalc::direct.sum(C, Pd(d - l + 1))
+        }
+
+        C <- matrixcalc::direct.sum(C, diag(1, n_outside, n_outside))
+
+        Xi <- rep(0, nrow(C))
+      }
+
+      C_original <- C
+      Xi_original <- Xi
+
+      if (AM == 1) {
+        AlternativeHypothesis <- CompanionHypothesis(C, Xi)
+        C <- AlternativeHypothesis$L
+        Xi <- AlternativeHypothesis$ytilde
+      }
+
 
       if(method == "MC"){
         ResamplingResult <- ATSwS(QF(C, HatCov), repetitions)
@@ -420,6 +552,9 @@ test_covariance_structure <- function(X, structure, method = "BT",
                   "CovarianceMatrix" = HatCov,
                   "C" = C,
                   "Xi" = Xi,
+                  "AM" = AM,
+                  "C_original" = C_original,
+                  "Xi_original" = Xi_original,
                   "resampling_method" = method,
                   "repetitions" = repetitions,
                   "hypothesis" = structure,

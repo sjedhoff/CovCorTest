@@ -429,9 +429,9 @@ dvech <- function(X, a, d, p, inc_diag){
 
 #' Vectorization of the upper triangular part of the matrix
 #'
-#' @param X
+#' @param X A square numeric matrix.
 #'
-#' @return vector
+#' @return A vector containing the upper triangular part of \code{X}.
 #'
 #' @keywords internal
 #'
@@ -443,9 +443,7 @@ vechp <- function(X){
   return(as.vector(t(X)[!upper.tri(X,TRUE)]))
 }
 
-
 #' @title Weighted direct sums for lists
-#' @description Hereby the matrices which are part of a list are multiplied with
 #' the corresponding components of a matrix w, containing the weights. These,
 #' now weighted matrices are put together to one larger block-diagonal matrix.
 #'
@@ -514,5 +512,167 @@ vdtcrossprod <- function(X,a,d,p){
 #' @keywords internal
 Qvech <- function(X, n){
   return(matrix(apply(X,2,vtcrossprod), ncol=n))
+}
+
+#' Compact matrix square root
+#'
+#' @param X Numeric positive semidefinite matrix.
+#' @param tol Numeric tolerance used for the rank calculation.
+#'
+#' @return A compact matrix square root L such that t(L) %*% L is approximately X.
+#'
+#' @noRd
+.MSrootcompact <- function(X, tol = 1e-10) {
+
+  r <- qr(X, tol = tol)$rank
+
+  if (r == 0) {
+    return(matrix(0, nrow = 0, ncol = ncol(X)))
+  }
+
+  SVD <- svd(X)
+
+  L <- sqrt(diag(SVD$d[seq_len(r)], nrow = r, ncol = r)) %*%
+    t(SVD$u[, seq_len(r), drop = FALSE])
+
+  return(L)
+}
+
+#' Check hypothesis matrix and vector
+#'
+#' @param H Numeric hypothesis matrix.
+#' @param y Numeric hypothesis vector.
+#' @param tol Numeric tolerance.
+#'
+#' @return A list containing checked H and y.
+#'
+#' @noRd
+HypoCheck <- function(H, y, tol = 1e-10) {
+
+  if (!is.matrix(H)) {
+    stop("The hypothesis must be specified by a matrix.")
+  }
+
+  if (!is.numeric(H)) {
+    stop("The hypothesis matrix must be numeric.")
+  }
+
+  if (is.matrix(y) && ncol(y) == 1) {
+    y <- as.numeric(y)
+  }
+
+  if (!is.vector(y) || !is.numeric(y)) {
+    stop("The corresponding hypothesis vector must be numeric.")
+  }
+
+  y <- as.numeric(y)
+
+  if (nrow(H) != length(y)) {
+    stop("Dimensions of hypothesis matrix and vector must match.")
+  }
+
+  if (any(!is.finite(H)) || any(!is.finite(y))) {
+    stop("Hypothesis matrix and vector must contain finite values only.")
+  }
+
+  qH <- qr(H, tol = tol)
+  rH <- qH$rank
+
+  qty <- qr.qty(qH, y)
+
+  if (length(y) > rH && any(abs(qty[(rH + 1):length(y)]) > tol)) {
+    stop("The hypothesis H v = y is inconsistent.")
+  }
+
+  return(list(H = H, y = y))
+}
+
+
+#' Companion hypothesis matrix
+#'
+#' Constructs an internal companion representation of a hypothesis matrix. If
+#' the matrix has full row rank, the original matrix is returned. Otherwise, a
+#' compact matrix square root of t(H) %*% H is computed, yielding a matrix with
+#' fewer rows but equivalent quadratic forms. If a non-zero vector y is supplied,
+#' it is transformed accordingly.
+#'
+#' @param H Numeric hypothesis matrix.
+#' @param y Optional numeric vector corresponding to the right-hand side of the
+#'   hypothesis. If omitted, a zero vector is used.
+#' @param tol Numeric tolerance used for rank calculations.
+#'
+#' @return A list containing the matrix L and the transformed vector ytilde.
+#'
+#' @noRd
+CompanionHypothesis <- function(H, y = NULL, tol = 1e-10) {
+
+  if (is.null(y)) {
+    y <- rep(0, nrow(H))
+  }
+
+  checked <- HypoCheck(H, y, tol = tol)
+  H <- checked$H
+  y <- checked$y
+
+  if (qr(H, tol = tol)$rank == nrow(H)) {
+
+    L <- H
+    ytilde <- y
+
+  } else {
+
+    L <- .MSrootcompact(t(H) %*% H, tol = tol)
+
+    if (all(y == 0)) {
+      ytilde <- rep(0, nrow(L))
+    } else {
+      ytilde <- qr.solve(t(L), t(H) %*% y)
+    }
+  }
+
+  return(list(
+    L = L,
+    ytilde = ytilde
+  ))
+}
+#' Check bandwidth argument
+#'
+#' Checks whether the bandwidth argument is valid for banded covariance or
+#' correlation structures. The bandwidth specifies the number of off-diagonals
+#' that are allowed to be non-zero. It must be a positive integer and smaller
+#' than the maximal possible bandwidth, since bandwidth zero corresponds to a
+#' diagonal structure and the maximal bandwidth would impose no restriction.
+#'
+#' @param bandwidth A positive integer specifying the number of allowed
+#'   off-diagonals.
+#' @param d Integer. Dimension of the covariance or correlation matrix.
+#'
+#' @return The checked bandwidth as an integer.
+CheckBandwidth <- function(bandwidth, d) {
+
+  if (length(bandwidth) != 1) {
+    stop("bandwidth must be a single value.")
+  }
+
+  if (is.na(bandwidth)) {
+    stop("bandwidth must be specified for banded structures.")
+  }
+
+  if (!is.numeric(bandwidth) || !is.finite(bandwidth) ||
+      bandwidth != floor(bandwidth)) {
+    stop("bandwidth must be a positive integer.")
+  }
+
+  bandwidth <- as.integer(bandwidth)
+
+  if (d < 3) {
+    stop("A banded structure with positive bandwidth requires dimension d >= 3.")
+  }
+
+  if (bandwidth <= 0 || bandwidth >= d - 1) {
+    stop("bandwidth must be between 1 and d - 2.")
+  }
+
+  return(bandwidth)
 }
 

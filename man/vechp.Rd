@@ -7,10 +7,10 @@
 vechp(X)
 }
 \arguments{
-\item{X}{}
+\item{X}{A square numeric matrix.}
 }
 \value{
-vector
+A vector containing the upper triangular part of \code{X}.
 }
 \description{
 Vectorization of the upper triangular part of the matrix

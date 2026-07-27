@@ -10,9 +10,18 @@
 #'   \item{\code{Teststatistic}}{Numeric. The test statistic.}
 #'   \item{\code{CovarianceMatrix}}{Matrix. The covariance estimator for the
 #'   teststatistic.}
-#'   \item{\code{C}}{Numeric. A constant or vector of constants used in the
-#'   test.}
-#'   \item{\code{Xi}}{Numeric. A parameter related to the test.}
+#'    \item{\code{C}}{Numeric matrix. The hypothesis matrix used for the
+#'   computation of the test statistic. If \code{AM = 1}, this may be the
+#'   alternative hypothesis matrix used internally.}
+#'   \item{\code{Xi}}{Numeric vector. The hypothesis vector used together with
+#'   \code{C}. If \code{AM = 1}, this may be the transformed hypothesis vector
+#'   used internally.}
+#'   \item{\code{AM}}{Integer. Indicates whether the alternative hypothesis
+#'   matrix was used.}
+#'   \item{\code{C_original}}{Numeric matrix. The original hypothesis matrix
+#'   before the optional transformation by \code{AM}, if applicable.}
+#'   \item{\code{Xi_original}}{Numeric vector. The original hypothesis vector
+#'   before the optional transformation by \code{AM}, if applicable.}
 #'   \item{\code{resampling_method}}{Character. The resampling method used in
 #'   the test.}
 #'   \item{\code{repetitions}}{Integer. The number of repetitions used in
@@ -31,6 +40,9 @@ CovTest <- function() {
                  "CovarianceMatrix" = matrix(),
                  "C" = numeric(1),
                  "Xi" = numeric(1),
+                 "AM" = integer(1),
+                 "C_original" = matrix(),
+                 "Xi_original" = numeric(1),
                  "resampling_method" = character(1),
                  "repetitions" = integer(1),
                  "hypothesis" = character(1),

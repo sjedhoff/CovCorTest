@@ -19,26 +19,20 @@
 #'     (single group only)
 #'   }
 #'  If `C` and `Xi` are provided, this can be set to `NULL`.
-#' @param C A contrast matrix specifying the null hypothesis.
+#' @param C A hypothesis matrix specifying the null hypothesis.
 #'  Optional if \code{hypothesis} is provided.
 #' @param Xi A numeric vector specifying the expected values of the contrasts
 #' under the null hypothesis. Optional if \code{hypothesis} is provided.
-#' @param hypothesis A character string describing the null hypothesis.
-#' Must be one of \code{"equal-correlated"} or \code{"uncorrelated"}.
-#' If supplied, \code{C} and \code{Xi} are ignored.
+#' @param AM Binary variable indicating whether the computations should use an
+#' alternative hypothesis matrix as proposed by
+#' \insertCite{Sattler2025;textual}{CovCorTest}. This matrix has fewer rows than
+#'  the original hypothesis matrix while leaving the resulting test statistics
+#'  unchanged. By default, this alternative matrix is used.
 #' @param method Character string indicating the resampling method to use.
 #'  One of \code{"BT"} (bootstrap), \code{"MC"} (Monte Carlo), or
 #'  \code{"TAY"} (Taylor approximation).
 #' @param repetitions Integer. Number of resampling repetitions
 #' (default is 1000).
-#' @param C (Optional) A user-defined contrast matrix for testing custom
-#' hypotheses. Must match dimensions with `Xi`.
-#' @param Xi (Optional) A numeric vector used in combination with `C` to
-#' specify a custom hypothesis.
-#' @param method A character indicating the resampling method:
-#' `"BT"` (Bootstrap) or `"MC"` (Monte Carlo).
-#' @param repetitions Number of repetitions to use for the resampling method
-#'  (default: 1000, should be >= 500).
 #'
 #' @return An object of class \code{"CovTest"}.
 #'
@@ -56,6 +50,7 @@
 #' @export
 test_correlation <- function(X, nv = NULL,
                              C = NULL, Xi = NULL,
+                             AM = 1,
                              hypothesis = NULL,
                              method = "BT",
                              repetitions = 1000) {
@@ -63,6 +58,9 @@ test_correlation <- function(X, nv = NULL,
   if(!(method %in% c("MC", "BT", "TAY"))){
     stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or
          Taylor-based Monte-Carlo-approach('TAY')")
+  }
+  if (!(AM %in% c(0, 1))) {
+    stop("AM must be either 0 or 1.")
   }
 
   listcheck <- Listcheck(X, nv)
@@ -181,6 +179,15 @@ test_correlation <- function(X, nv = NULL,
     kappainvv <- N / nv
     Upsi <- WDirect.sumL(Upsi_list, kappainvv)
   }
+  C_original <- C
+  Xi_original <- Xi
+
+  if (AM == 1) {
+    AlternativeHypothesis <- CompanionHypothesis(C, Xi)
+    C <- AlternativeHypothesis$L
+    Xi <- AlternativeHypothesis$ytilde
+  }
+
 
   if(method == "MC"){ ResamplingResult <- ATSwS(QF(C, Upsi), repetitions) }
   if(method == "BT"){ ResamplingResult <- vapply(X = 1:repetitions,
@@ -212,6 +219,9 @@ test_correlation <- function(X, nv = NULL,
                   "CovarianceMatrix" = Upsi,
                   "C" = C,
                   "Xi" = Xi,
+                  "AM" = AM,
+                  "C_original" = C_original,
+                  "Xi_original" = Xi_original,
                   "resampling_method" = method,
                   "repetitions" = repetitions,
                   "hypothesis" = hypothesis,
@@ -233,18 +243,29 @@ test_correlation <- function(X, nv = NULL,
 #' @param X  a matrix containing the observation vectors as rows (one group)
 #' @param structure a character specifying the structure regarding them the
 #' correlation matrix should be checked. Options are "Hautoregressive" ("Har"),
-#' "diagonal" ("diag"), "Hcompoundsymmetry" ("Hcs") and "Htoeplitz" ("Hteop").
+#' "diagonal" ("diag"), "Hcompoundsymmetry" ("Hcs") and "Htoeplitz" ("Htoep"),
+#' "banded" ("band"), and "banded-toeplitz" ("band-toep"). For banded structures,
+#' all correlations outside the specified bandwidth, i.e. from the
+#' bandwidth + 1-th off-diagonal onward, are assumed to be zero.
+#' @param AM Binary variable indicating whether the computations should use an
+#' alternative hypothesis matrix as proposed by
+#' \insertCite{Sattler2025;textual}{CovCorTest}. This matrix has fewer rows than
+#' the original hypothesis matrix while leaving the resulting test statistics
+#' unchanged. By default, this alternative matrix is used.
 #' @param method a character, to chose whether bootstrap("BT") or Taylor-based
 #' Monte-Carlo-approach("TAY") or Monte-Carlo-technique("MC") is used, while
 #' bootstrap is the predefined method.
 #' @param repetitions a scalar, indicate the number of runs for the chosen
 #' method.
 #' The predefined value is 1,000, and the number should not be below 500.
+#' @param bandwidth Optional positive integer specifying the number of
+#' off-diagonals allowed to be non-zero for banded correlation structures.
+#' Only used for \code{"banded"} and \code{"banded-toeplitz"} structures,
+#' with default \code{NA}.
 #' @return an object of the class \code{\link{CovTest}}
 #'
 #'
-#' @references
-#' Sattler, P. and Dobler, D. (2025). Testing for patterns and structures in covariance and correlation matrices. \emph{arXiv preprint} \url{https://arxiv.org/abs/2310.11799}
+#' @references \insertRef{sattler_structures_2024}{CovCorTest}
 #'
 #' @import MANOVA.RM
 #' @examples
@@ -260,14 +281,17 @@ test_correlation <- function(X, nv = NULL,
 #' test_correlation_structure(X = X, structure = "diagonal", method = "MC")
 #'
 #' @export
-test_correlation_structure <- function(X, structure, method = "BT",
-                                      repetitions = 1000){
+test_correlation_structure <- function(X, structure, AM = 1, method = "BT",
+                                      repetitions = 1000, bandwidth = NA){
 
   structure <- tolower(structure)
   method <- toupper(method)
   if(!(method == "MC" || method == "BT" || method == "TAY")){
     stop("method must be bootstrap ('BT'), Monte-Carlo-technique('MC') or
          Taylor-based Monte-Carlos-approach('Tay')")
+  }
+  if (!(AM %in% c(0, 1))) {
+    stop("AM must be either 0 or 1.")
   }
 
   if(is.list(X) & !is.data.frame(X)){
@@ -284,10 +308,18 @@ test_correlation_structure <- function(X, structure, method = "BT",
   n1 <- dim(X)[2]
   d <- dim(X)[1]
 
-  if(!(structure %in% c("hautoregressive", "har", "diagonal", "diag" ,
-                        "hcompoundsymmetry", "hcs", "htoeplitz", "htoep"))){
+  if(!(structure %in% c("hautoregressive", "har",
+                        "diagonal", "diag",
+                        "hcompoundsymmetry", "hcs",
+                        "htoeplitz", "htoep",
+                        "banded", "band",
+                        "banded-toeplitz", "band-toep"))){
     stop("no predefined hypothesis")
   }
+  if (structure %in% c("banded", "band", "banded-toeplitz", "band-toep")) {
+    bandwidth <- CheckBandwidth(bandwidth, d)
+  }
+
 
   p <- d * (d + 1) / 2
   pu <- d * (d - 1) / 2
@@ -326,8 +358,17 @@ test_correlation_structure <- function(X, structure, method = "BT",
     for(l in 3:d){
       C <- matrixcalc::direct.sum(C, Pd(d - l + 1))
     }
-    C <- matrixcalc::direct.sum(C, Pd(d-2))
-    Xi <- rep(0,p-2)
+    C <- matrixcalc::direct.sum(C, Pd(d - 2))
+    Xi <- rep(0, p - 2)
+
+    C_original <- C
+    Xi_original <- Xi
+
+    if (AM == 1) {
+      AlternativeHypothesis <- CompanionHypothesis(C, Xi)
+      C <- AlternativeHypothesis$L
+      Xi <- AlternativeHypothesis$ytilde
+    }
 
     Teststatistic <- ATS(n1, subdiagonal_mean_ratio_cor(vCorData, a, d), C,
                          Upsidvhtilde, Xi)
@@ -357,11 +398,46 @@ test_correlation_structure <- function(X, structure, method = "BT",
     if(structure == "hcompoundsymmetry" || structure == "hcs"){
       C <- Pd(pu)
     }
-    if(structure == "htoeplitz" || structure == "htoep"){
+    if(structure == "htoeplitz" | structure == "htoep"){
       C <- Pd(d - 1)
       for(l in 3:d){
         C <- matrixcalc::direct.sum(C, Pd(d - l + 1))
       }
+    }
+
+    if(structure == "banded" | structure == "band"){
+
+      allowed <- bandwidth * d - bandwidth * (bandwidth + 1) / 2
+      outside_positions <- (allowed + 1):pu
+
+      C <- diag(1, pu, pu)[outside_positions, , drop = FALSE]
+      Xi <- rep(0, nrow(C))
+    }
+
+    if(structure == "banded-toeplitz" | structure == "band-toep"){
+
+      allowed <- bandwidth * d - bandwidth * (bandwidth + 1) / 2
+      n_outside <- pu - allowed
+
+      C <- Pd(d - 1)
+
+      if(bandwidth >= 2){
+        for(l in 2:bandwidth){
+          C <- matrixcalc::direct.sum(C, Pd(d - l))
+        }
+      }
+
+      C <- matrixcalc::direct.sum(C, diag(1, n_outside, n_outside))
+
+      Xi <- rep(0, nrow(C))
+    }
+    C_original <- C
+    Xi_original <- Xi
+
+    if (AM == 1) {
+      AlternativeHypothesis <- CompanionHypothesis(C, Xi)
+      C <- AlternativeHypothesis$L
+      Xi <- AlternativeHypothesis$ytilde
     }
     Teststatistic <- ATS(n1, vCorData, C, Upsidv, Xi)
 
@@ -389,6 +465,9 @@ test_correlation_structure <- function(X, structure, method = "BT",
                   "CovarianceMatrix" = Upsidv,
                   "C" = C,
                   "Xi" = Xi,
+                  "AM" = AM,
+                  "C_original" = C_original,
+                  "Xi_original" = Xi_original,
                   "resampling_method" = method,
                   "repetitions" = repetitions,
                   "hypothesis" = structure,

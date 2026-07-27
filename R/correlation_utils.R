@@ -110,8 +110,6 @@ Tayapp1G <- function(repetitions, C, MSrootStUpsi, CorData, MvrH, Trace, M4, L,
 #' @param CorData the calculated correlation matrix
 #' @param MvrH an auxiliary matrix for the transformation from vectorized
 #'  covariances to vectorized correlations
-#' @param MvrH an auxiliary matrix for the transformation from vectorized
-#'  covariances to vectorized correlations
 #' @param Trace a trace used in the ATS for the test statistic
 #' @param M4 an auxiliary matrix for the transformation from vectorized
 #'  covariances to vectorized correlations

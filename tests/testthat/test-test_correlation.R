@@ -79,7 +79,7 @@ test_that("test_correlation multiple groups pvalue", {
       hypothesis = "equal-correlated",
       method = "MC"
     )$pvalue,
-    0.023
+    0.029
   )
   set.seed(31415)
   expect_equal(
@@ -289,7 +289,7 @@ test_that("test_correlation one group pvalue", {
       hypothesis = "equal-correlated",
       method = "MC"
     )$pvalue,
-    0.006
+    0.012
   )
   set.seed(31415)
   expect_equal(
@@ -309,6 +309,16 @@ test_that("test_correlation one group wrong hypothesis", {
     X = X,
     nv = NULL,
     hypothesis = "equaltity",
+    method = "BT"
+  ))
+})
+
+test_that("test_correlation one group wrong AM", {
+  expect_error(test_correlation(
+    X = X,
+    nv = NULL,
+    AM = 2,
+    hypothesis = "equal-correlated",,
     method = "BT"
   ))
 })
@@ -374,6 +384,44 @@ test_that("test_correlation no hypothesis, C or Xi missing", {
   expect_error(test_correlation(
     X = X_list, nv = nv, C = c(1,2,3)
   ))
+})
+
+test_that("test_correlation AM", {
+  expect_equal(
+    test_correlation(
+      X = X_list,
+      nv = nv,
+      hypothesis = "equal-correlated",
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_correlation(
+      X = X_list,
+      nv = nv,
+      hypothesis = "equal-correlated",
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
+  )
+
+  expect_equal(
+    test_correlation(
+      X = X,
+      nv = NULL,
+      hypothesis = "equal-correlated",
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_correlation(
+      X = X,
+      nv = NULL,
+      hypothesis = "equal-correlated",
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
+  )
 })
 
 ## Structure
@@ -477,7 +525,87 @@ test_that("test_correlation_structure teststatic", {
     )$Teststatistic,
     4.88304727273834
   )
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "banded",
+      bandwidth = 3,
+      method = "BT"
+    )$Teststatistic,
+    14.96135,
+    tolerance = 1e-6
+  )
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "banded",
+      bandwidth = 3,
+      method = "TAY"
+    )$Teststatistic,
+    14.96135,
+    tolerance = 1e-6
+  )
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "banded",
+      bandwidth = 3,
+      method = "MC"
+    )$Teststatistic,
+    14.96135,
+    tolerance = 1e-6
+  )
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "band",
+      bandwidth = 3,
+      method = "MC"
+    )$Teststatistic,
+    14.96135,
+    tolerance = 1e-6
+  )
 
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "banded-toeplitz",
+      bandwidth = 3,
+      method = "BT"
+    )$Teststatistic,
+    11.85518,
+    tolerance = 1e-6
+  )
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "banded-toeplitz",
+      bandwidth = 3,
+      method = "TAY"
+    )$Teststatistic,
+    11.85518,
+    tolerance = 1e-6
+  )
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "banded-toeplitz",
+      bandwidth = 3,
+      method = "MC"
+    )$Teststatistic,
+    11.85518,
+    tolerance = 1e-6
+  )
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "band-toep",
+      bandwidth = 3,
+      method = "MC"
+    )$Teststatistic,
+    11.85518,
+    tolerance = 1e-6
+  )
 })
 
 test_that("test_correlation_structure pvalue", {
@@ -506,7 +634,7 @@ test_that("test_correlation_structure pvalue", {
       structure = "Har",
       method = "MC"
     )$pvalue,
-    0.02
+    0.029
   )
   set.seed(31415)
   expect_equal(
@@ -560,7 +688,7 @@ test_that("test_correlation_structure pvalue", {
       structure = "Hcs",
       method = "MC"
     )$pvalue,
-    0.006
+    0.012
   )
   set.seed(31415)
   expect_equal(
@@ -587,11 +715,224 @@ test_that("test_correlation_structure pvalue", {
       structure = "Htoep",
       method = "MC"
     )$pvalue,
-    0.006
+    0.009
+  )
+  set.seed(31415)
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "banded",
+      bandwidth = 3,
+      method = "BT"
+    )$pvalue,
+    0
   )
 
+  set.seed(31415)
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "banded",
+      bandwidth = 3,
+      method = "TAY"
+    )$pvalue,
+    0.001
+  )
+
+  set.seed(31415)
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "banded",
+      bandwidth = 3,
+      method = "MC"
+    )$pvalue,
+    0
+  )
+
+  set.seed(31415)
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "band",
+      bandwidth = 3,
+      method = "MC"
+    )$pvalue,
+    0
+  )
+
+  set.seed(31415)
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "banded-toeplitz",
+      bandwidth = 3,
+      method = "BT"
+    )$pvalue,
+    0
+  )
+
+  set.seed(31415)
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "banded-toeplitz",
+      bandwidth = 3,
+      method = "TAY"
+    )$pvalue,
+    0.02
+  )
+
+  set.seed(31415)
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "banded-toeplitz",
+      bandwidth = 3,
+      method = "MC"
+    )$pvalue,
+    0
+  )
+
+  set.seed(31415)
+  expect_equal(
+    test_correlation_structure(
+      X = X_list[[1]],
+      structure = "band-toep",
+      bandwidth = 3,
+      method = "MC"
+    )$pvalue,
+    0
+  )
 })
 
+test_that("test_correlation_structure bandwidth", {
+  expect_error(
+    test_correlation_structure(
+      X = X,
+      structure = "banded",
+      method = "MC"
+    )
+  )
+  expect_error(
+    test_correlation_structure(
+      X = X,
+      structure = "banded-toeplitz",
+      method = "MC"
+    )
+  )
+  expect_error(
+    test_correlation_structure(
+      X = X,
+      structure = "banded",
+      bandwidth = 0,
+      method = "MC"
+    )
+  )
+  expect_error(
+    test_correlation_structure(
+      X = X,
+      structure = "banded",
+      bandwidth = d - 1,
+      method = "MC"
+    )
+  )
+  expect_error(
+    test_correlation_structure(
+      X = X,
+      structure = "banded",
+      bandwidth = 1.5,
+      method = "MC"
+    )
+  )
+  expect_error(
+    test_correlation_structure(
+      X = X,
+      structure = "banded",
+      bandwidth = "1",
+      method = "MC"
+    )
+  )
+  expect_error(
+    test_correlation_structure(
+      X = X,
+      structure = "banded",
+      bandwidth = Inf,
+      method = "MC"
+    )
+  )
+})
+
+
+test_that("test_correlation_structure AM", {
+  expect_equal(
+    test_correlation_structure(
+      X,
+      structure = "hcs",
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_correlation_structure(
+      X,
+      structure = "hcs",
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
+  )
+
+  expect_equal(
+    test_correlation_structure(
+      X,
+      structure = "htoep",
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_correlation_structure(
+      X,
+      structure = "htoep",
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
+  )
+
+  expect_equal(
+    test_correlation_structure(
+      X,
+      structure = "banded",
+      bandwidth = 3,
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_correlation_structure(
+      X,
+      structure = "banded",
+      bandwidth = 3,
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
+  )
+
+  expect_equal(
+    test_correlation_structure(
+      X,
+      structure = "banded-toeplitz",
+      bandwidth = 3,
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_correlation_structure(
+      X,
+      structure = "banded-toeplitz",
+      bandwidth = 3,
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
+  )
+})
 
 test_that("test_correlation_structure wrong method/hypothesis", {
   set.seed(31415)
@@ -614,6 +955,13 @@ test_that("test_correlation_structure wrong method/hypothesis", {
     5.26105347405293
   )
   expect_error(test_correlation_structure(X = X, structure = "a"))
+  expect_error(test_correlation_structure(
+    X = X,
+    AM = -1,
+    structure = "hcs",
+    method = "mc",
+    repetitions = 1000
+  ))
 })
 
 test_that("test_correlation_structure input list", {
@@ -625,7 +973,7 @@ test_that("test_correlation_structure input list", {
       method = "mc",
       repetitions = 1000
     )$pvalue,
-    0.006
+    0.012
   ))
   set.seed(31415)
   expect_equal(
@@ -635,13 +983,13 @@ test_that("test_correlation_structure input list", {
       method = "mc",
       repetitions = 1000
     )$pvalue,
-    0.006
+    0.012
   )
 })
 
 test_that("test_correlation_structure d=1", {
-expect_error(test_correlation_structure(X = X_list[[1]][1:12, 1, drop = FALSE],
-                                         structure = "Har"))
+  expect_error(test_correlation_structure(X = X_list[[1]][1:12, 1, drop = FALSE],
+                                          structure = "Har"))
 })
 
 ## Base
@@ -689,7 +1037,7 @@ test_that("test_correlation pvalue,statistic", {
   )
 })
 
-test_that("TestCovariance_base dimensions", {
+test_that("test_correlation dimensions", {
   C <- matrix(c(1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1),
               nrow = 1,
               ncol = 21)

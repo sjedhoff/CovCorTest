@@ -1,0 +1,25 @@
+citHeader(
+  "To cite CovCorTest in publications, please use:"
+)
+
+bibentry(
+  bibtype = "Article",
+  key = "SattlerJedhoff2025CovCorTest",
+  title = paste(
+    "Testing Hypotheses regarding Covariance and Correlation matrices",
+    "with the R package CovCorTest"
+  ),
+  author = c(
+    person("Paavo", "Sattler"),
+    person("Svenja", "Jedhoff")
+  ),
+  year = "2025",
+  journal = "arXiv",
+  note = "arXiv:2507.03406",
+  doi = "10.48550/arXiv.2507.03406",
+  url = "https://arxiv.org/abs/2507.03406"
+)
+
+citFooter(
+  'BibTeX: toBibtex(citation("CovCorTest"))'
+)

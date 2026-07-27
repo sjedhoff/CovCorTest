@@ -103,7 +103,7 @@ test_that("test_covariance multi groups pvalues", {
       method = "MC",
       repetitions = 1000
     )$pvalue,
-    0.027
+    0.019
   )
   set.seed(31415)
   expect_equal(
@@ -126,7 +126,7 @@ test_that("test_covariance multi groups pvalues", {
       method = "MC",
       repetitions = 1000
     )$pvalue,
-    0.035
+    0.042
   )
   set.seed(31415)
   expect_equal(
@@ -149,7 +149,7 @@ test_that("test_covariance multi groups pvalues", {
       method = "MC",
       repetitions = 1000
     )$pvalue,
-    0.064
+    0.074
   )
   set.seed(31415)
   expect_equal(
@@ -387,7 +387,7 @@ test_that("test_covariance single group pvalue", {
       method = "MC",
       repetitions = 1000
     )$pvalue,
-    0.212
+    0.221
   )
   set.seed(31415)
   expect_equal(
@@ -647,6 +647,63 @@ test_that("test_covariance wrong method", {
   )
 })
 
+test_that("test_covariance AM", {
+  expect_equal(
+    test_covariance(
+      X = X_list,
+      nv = nv,
+      hypothesis = "equal-trace",
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_covariance(
+      X = X_list,
+      nv = nv,
+      hypothesis = "equal-trace",
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
+  )
+
+  expect_equal(
+    test_covariance(
+      X = X_list,
+      nv = nv,
+      hypothesis = "equal",
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_covariance(
+      X = X_list,
+      nv = nv,
+      hypothesis = "equal",
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
+  )
+
+  expect_equal(
+    test_covariance(
+      X = X_list,
+      nv = nv,
+      hypothesis = "equal-diagonals",
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_covariance(
+      X = X_list,
+      nv = nv,
+      hypothesis = "equal-diagonals",
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
+  )
+})
+
+
 ## Structure
 test_that("test_covariance_structure teststatistics", {
   expect_equal(
@@ -707,6 +764,111 @@ test_that("test_covariance_structure teststatistics", {
                               method = "BT")$Teststatistic,
     1.63921322978212
   )
+  expect_equal(
+    test_covariance_structure(X, structure = "constant-offdiagonal",
+                              method = "MC")$Teststatistic,
+    1.98912114172805
+  )
+  expect_equal(
+    test_covariance_structure(X, structure = "const-offdiag",
+                              method = "BT")$Teststatistic,
+    1.98912114172805
+  )
+
+  expect_equal(
+    test_covariance_structure(X, structure = "standard-toeplitz",
+                              method = "MC")$Teststatistic,
+    2.14686664888321
+  )
+  expect_equal(
+    test_covariance_structure(X, structure = "std-toep",
+                              method = "BT")$Teststatistic,
+    2.14686664888321
+  )
+
+  expect_equal(
+    test_covariance_structure(X, structure = "banded",
+                              bandwidth = 4,
+                              method = "MC")$Teststatistic,
+    5.09281161962977
+  )
+  expect_equal(
+    test_covariance_structure(X, structure = "band",
+                              bandwidth = 4,
+                              method = "BT")$Teststatistic,
+    5.09281161962977
+  )
+
+  expect_equal(
+    test_covariance_structure(X, structure = "banded-toeplitz",
+                              bandwidth = 3,
+                              method = "MC")$Teststatistic,
+    1.89115799397207
+  )
+  expect_equal(
+    test_covariance_structure(X, structure = "band-toep",
+                              bandwidth = 3,
+                              method = "BT")$Teststatistic,
+    1.89115799397207
+  )
+
+})
+
+test_that("test_covariance_structure bandwidth", {
+  expect_error(
+    test_covariance_structure(
+      X = X,
+      structure = "banded",
+      method = "MC"
+    )
+  )
+  expect_error(
+    test_covariance_structure(
+      X = X,
+      structure = "banded-toeplitz",
+      method = "MC"
+    )
+  )
+  expect_error(
+    test_covariance_structure(
+      X = X,
+      structure = "banded",
+      bandwidth = 0,
+      method = "MC"
+    )
+  )
+  expect_error(
+    test_covariance_structure(
+      X = X,
+      structure = "banded",
+      bandwidth = d - 1,
+      method = "MC"
+    )
+  )
+  expect_error(
+    test_covariance_structure(
+      X = X,
+      structure = "banded",
+      bandwidth = 1.5,
+      method = "MC"
+    )
+  )
+  expect_error(
+    test_covariance_structure(
+      X = X,
+      structure = "banded",
+      bandwidth = "1",
+      method = "MC"
+    )
+  )
+  expect_error(
+    test_covariance_structure(
+      X = X,
+      structure = "banded",
+      bandwidth = Inf,
+      method = "MC"
+    )
+  )
 })
 
 test_that("test_covariance_structure pvalue", {
@@ -718,7 +880,7 @@ test_that("test_covariance_structure pvalue", {
       method = "MC",
 
     )$pvalue,
-    0.129
+    0.131
   )
   set.seed(31415)
   expect_equal(
@@ -738,7 +900,7 @@ test_that("test_covariance_structure pvalue", {
       method = "MC",
 
     )$pvalue,
-    0.197
+    0.176
   )
   set.seed(31415)
   expect_equal(
@@ -778,7 +940,7 @@ test_that("test_covariance_structure pvalue", {
       method = "MC",
 
     )$pvalue,
-    0.033
+    0.041
   )
   set.seed(31415)
   expect_equal(
@@ -798,7 +960,7 @@ test_that("test_covariance_structure pvalue", {
       method = "MC",
 
     )$pvalue,
-    0.177
+    0.175
   )
   set.seed(31415)
   expect_equal(
@@ -818,7 +980,7 @@ test_that("test_covariance_structure pvalue", {
       method = "MC",
 
     )$pvalue,
-    0.18
+    0.195
   )
   set.seed(31415)
   expect_equal(
@@ -829,6 +991,176 @@ test_that("test_covariance_structure pvalue", {
 
     )$pvalue,
     0.232
+  )
+  set.seed(31415)
+  expect_equal(
+    test_covariance_structure(
+      X,
+      structure = "constant-offdiagonal",
+      method = "MC"
+    )$pvalue,
+    0.126
+  )
+
+  set.seed(31415)
+  expect_equal(
+    test_covariance_structure(
+      X,
+      structure = "const-offdiag",
+      method = "BT"
+    )$pvalue,
+    0.174
+  )
+
+  set.seed(31415)
+  expect_equal(
+    test_covariance_structure(
+      X,
+      structure = "standard-toeplitz",
+      method = "MC"
+    )$pvalue,
+    0.109
+  )
+
+  set.seed(31415)
+  expect_equal(
+    test_covariance_structure(
+      X,
+      structure = "std-toep",
+      method = "BT"
+    )$pvalue,
+    0.165
+  )
+
+  set.seed(31415)
+  expect_equal(
+    test_covariance_structure(
+      X,
+      structure = "banded",
+      bandwidth = 4,
+      method = "MC"
+    )$pvalue,
+    0.012
+  )
+
+  set.seed(31415)
+  expect_equal(
+    test_covariance_structure(
+      X,
+      structure = "band",
+      bandwidth = 4,
+      method = "BT"
+    )$pvalue,
+    0.063
+  )
+
+  set.seed(31415)
+  expect_equal(
+    test_covariance_structure(
+      X,
+      structure = "banded-toeplitz",
+      bandwidth = 3,
+      method = "MC"
+    )$pvalue,
+    0.173
+  )
+
+  set.seed(31415)
+  expect_equal(
+    test_covariance_structure(
+      X,
+      structure = "band-toep",
+      bandwidth = 3,
+      method = "BT"
+    )$pvalue,
+    0.196
+  )
+
+})
+
+test_that("test_covariance_structure AM", {
+  expect_equal(
+    test_covariance_structure(
+      X,
+      structure = "cs",
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_covariance_structure(
+      X,
+      structure = "cs",
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
+  )
+
+  expect_equal(
+    test_covariance_structure(
+      X,
+      structure = "constant-offdiagonal",
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_covariance_structure(
+      X,
+      structure = "constant-offdiagonal",
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
+  )
+
+  expect_equal(
+    test_covariance_structure(
+      X,
+      structure = "standard-toeplitz",
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_covariance_structure(
+      X,
+      structure = "standard-toeplitz",
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
+  )
+
+  expect_equal(
+    test_covariance_structure(
+      X,
+      structure = "banded",
+      bandwidth = 4,
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_covariance_structure(
+      X,
+      structure = "banded",
+      bandwidth = 4,
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
+  )
+
+  expect_equal(
+    test_covariance_structure(
+      X,
+      structure = "banded-toeplitz",
+      bandwidth = 3,
+      AM = 0,
+      method = "MC"
+    )$Teststatistic,
+    test_covariance_structure(
+      X,
+      structure = "banded-toeplitz",
+      bandwidth = 3,
+      AM = 1,
+      method = "MC"
+    )$Teststatistic,
+    tolerance = 1e-10
   )
 })
 
@@ -865,7 +1197,7 @@ test_that("test_covariance_structure input list", {
       repetitions = 1000
     )
   )
-  expect_equal(res_list$pvalue, 0.177)
+  expect_equal(res_list$pvalue, 0.175)
 
   set.seed(31415)
   expect_equal(
@@ -875,7 +1207,7 @@ test_that("test_covariance_structure input list", {
       method = "mc",
       repetitions = 1000
     )$pvalue,
-    0.177
+    0.175
   )
 })
 
@@ -893,7 +1225,14 @@ test_that("test_covariance_structure wrong dimension / hypothesis", {
   ))
 })
 
-
+test_that("test_covariance_structure constant-offdiagonal dimension too small", {
+  expect_error(test_covariance_structure(
+  X[,1:2],
+  structure = "constant-offdiagonal",
+  AM = 0,
+  method = "MC")
+)
+})
 
 ## Base
 C <- matrix(c(1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1),
@@ -1008,42 +1347,78 @@ test_that("print covtest", {
 
 
 ## Missing values
+expect_missing_warning <- function(expr) {
+  warnings <- character()
+
+  value <- withCallingHandlers(
+    expr,
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+
+  expect_true(
+    any(grepl("removed", warnings)),
+    info = paste(warnings, collapse = "\n")
+  )
+
+  invisible(value)
+}
+
+expect_missing_error <- function(expr) {
+  warnings <- character()
+
+  expect_error(
+    withCallingHandlers(
+      expr,
+      warning = function(w) {
+        warnings <<- c(warnings, conditionMessage(w))
+        invokeRestart("muffleWarning")
+      }
+    )
+  )
+
+  expect_true(
+    any(grepl("removed", warnings)),
+    info = paste(warnings, collapse = "\n")
+  )
+}
+
 test_that("missing values one group", {
-  matrix <- matrix(
+  X_miss <- matrix(
     c(1, NA, 3, NA, NA, NA, 2, 4, NA, NA, 6, 7, 1, 2, 3, 4, 5, 6),
     nrow = 3,
     byrow = TRUE
   )
 
-  expect_warning(
-    expect_error(
-      test_covariance(
-        X = matrix,
-        nv = NULL,
-        hypothesis = "uncorrelated"
-      )
+  expect_missing_error(
+    test_covariance(
+      X = X_miss,
+      nv = NULL,
+      hypothesis = "uncorrelated"
     )
   )
 
-  matrix <- matrix(
+  X_miss <- matrix(
     c(NA, NA, NA, NA, 1, NA, 2, 4, 4, NA, 6, 7),
     nrow = 3,
     byrow = TRUE
   )
 
-  expect_warning(
-    expect_warning(
-      test_covariance(
-        X = matrix,
-        nv = NULL,
-        hypothesis = "uncorrelated"
-      )
+  res <- expect_missing_warning(
+    test_covariance(
+      X = X_miss,
+      nv = NULL,
+      hypothesis = "uncorrelated"
     )
   )
+
+  expect_true(inherits(res, "CovTest"))
 })
 
-test_that("missing values mutliple groups", {
-  X <- list(
+test_that("missing values multiple groups", {
+  X_miss <- list(
     matrix1 = t(matrix(
       c(1, NA, 3, NA, 2, NA, 2, 4, 1, NA, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9),
       nrow = 3,
@@ -1066,15 +1441,17 @@ test_that("missing values mutliple groups", {
     ))
   )
 
-  expect_warning(
+  res <- expect_missing_warning(
     test_covariance(
-      X = X,
+      X = X_miss,
       nv = c(7, 4, 4, 4),
       hypothesis = "equal"
     )
   )
 
-  X <- list(
+  expect_true(inherits(res, "CovTest"))
+
+  X_miss <- list(
     matrix1 = t(matrix(
       c(1, NA, 3, NA, 2, NA, 2, 4, 1, NA, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9),
       nrow = 3,
@@ -1097,15 +1474,15 @@ test_that("missing values mutliple groups", {
     ))
   )
 
-  expect_warning(
-    expect_warning(
-      test_covariance(
-        X = X,
-        nv = c(7, 4, 4, 4),
-        hypothesis = "equal"
-      )
+  res <- expect_missing_warning(
+    test_covariance(
+      X = X_miss,
+      nv = c(7, 4, 4, 4),
+      hypothesis = "equal"
     )
   )
+
+  expect_true(inherits(res, "CovTest"))
 })
 
 ## wrong dimensions: only one subject, only one variable
@@ -1136,7 +1513,17 @@ test_that("test_covariance returns expected object structure", {
   )
 
   expect_true(is.list(res))
-  expect_true(all(c("Teststatistic", "pvalue") %in% names(res)))
+  expect_true(
+    all(c(
+      "Teststatistic",
+      "pvalue",
+      "C",
+      "Xi",
+      "AM",
+      "C_original",
+      "Xi_original"
+    ) %in% names(res))
+  )
   expect_type(res$Teststatistic, "double")
   expect_type(res$pvalue, "double")
   expect_length(res$Teststatistic, 1)
@@ -1243,3 +1630,25 @@ test_that("test_covariance checks Xi dimensions", {
   )
 })
 
+test_that("test_covariance wrong AM", {
+  expect_error(
+    test_covariance(
+      X = X_list[[1]],
+      nv = NULL,
+      hypothesis = "equal",
+      method = "mc",
+      AM = -1,
+      repetitions = 1000
+    )
+  )
+
+  expect_error(
+    test_covariance_structure(
+      X = X_list[[1]],
+      structure = "diagonal",
+      AM = 3,
+      method = "bt",
+      repetitions = 1000
+    )
+  )
+})

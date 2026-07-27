@@ -4,7 +4,14 @@
 \alias{test_covariance_structure}
 \title{Test for structure of data's covariance matrix}
 \usage{
-test_covariance_structure(X, structure, method = "BT", repetitions = 1000)
+test_covariance_structure(
+  X,
+  structure,
+  AM = 1,
+  method = "BT",
+  repetitions = 1000,
+  bandwidth = NA
+)
 }
 \arguments{
 \item{X}{a matrix or data frame containing the observation vectors as rows
@@ -13,15 +20,30 @@ test_covariance_structure(X, structure, method = "BT", repetitions = 1000)
 \item{structure}{a character specifying the structure regarding the
 covariance matrix should be checked. Options are "autoregressive" ("ar"),
 "FO-autoregressive" ("FO-ar"), "diagonal" ("diag"), "sphericity" ("spher"),
-"compoundsymmetry" ("cs") and "toeplitz" ("toep").}
+"compoundsymmetry" ("cs") and "toeplitz" ("toep"), "constant-offdiagonal"
+("const-offdiag"), "standard-toeplitz" ("std-toep"), "banded" ("band"), and
+"banded-toeplitz" ("band-toep"). For banded structures, all entries outside
+the specified bandwidth, i.e. from the bandwidth + 1-th off-diagonal onward,
+are assumed to be zero.}
+
+\item{AM}{Binary variable indicating whether the computations should use an
+alternative hypothesis matrix as proposed by
+\insertCite{Sattler2025;textual}{CovCorTest}. This matrix has fewer rows than
+the original hypothesis matrix while leaving the resulting test statistics
+unchanged. By default, this alternative matrix is used.}
 
 \item{method}{a character, to chose whether bootstrap("BT") or
 Monte-Carlo-technique("MC") is used, while bootstrap is the
 predefined method.}
 
 \item{repetitions}{a scalar, indicate the number of runs for the chosen
-method.
-The predefined value is 1,000, and the number should not be below 500.}
+method. The predefined value is 1,000, and the number should not be
+below 500.}
+
+\item{bandwidth}{Optional positive integer specifying the number of
+off-diagonals allowed to be non-zero for banded covariance structures.
+Only used for "banded" and "banded-toeplitz" structures,
+with default \code{NA}.}
 }
 \value{
 an object of the class \code{\link{CovTest}}

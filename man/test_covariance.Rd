@@ -9,6 +9,7 @@ test_covariance(
   nv = NULL,
   C = NULL,
   Xi = NULL,
+  AM = 1,
   hypothesis = NULL,
   A = NULL,
   method = "MC",
@@ -28,6 +29,12 @@ hypotheses. Must match dimensions with \code{Xi}.}
 
 \item{Xi}{(Optional) A numeric vector used in combination with \code{C} to
 specify a custom hypothesis.}
+
+\item{AM}{Binary variable indicating whether the computations should use an
+alternative hypothesis matrix as proposed by
+\insertCite{Sattler2025;textual}{CovCorTest}. This matrix has fewer rows than
+the original hypothesis matrix while leaving the resulting test statistics
+unchanged. By default, this alternative matrix is used.}
 
 \item{hypothesis}{A character specifying one of the predefined hypotheses:
 \itemize{
@@ -77,8 +84,8 @@ C <- matrix(c(1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,1),
             nrow = 1, ncol = 21)
 Xi <- 2
 set.seed(31415)
-test_covariance(X = X, nv = NULL, C = C, Xi = Xi, method = "BT",
-            repetitions = 1000)
+test_covariance(X = X, nv = NULL, C = C, Xi = Xi, AM = 1,
+                method = "BT", repetitions = 1000)
 }
 \references{
 Sattler, P., Bathke, A. C., and Pauly, M. (2022).  "Testing hypotheses about covariance matrices in general MANOVA designs."

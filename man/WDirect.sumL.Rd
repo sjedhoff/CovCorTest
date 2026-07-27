@@ -2,7 +2,9 @@
 % Please edit documentation in R/utils.R
 \name{WDirect.sumL}
 \alias{WDirect.sumL}
-\title{Weighted direct sums for lists}
+\title{Weighted direct sums for lists
+the corresponding components of a matrix w, containing the weights. These,
+now weighted matrices are put together to one larger block-diagonal matrix.}
 \usage{
 WDirect.sumL(X, w)
 }
@@ -15,7 +17,7 @@ WDirect.sumL(X, w)
 matrix
 }
 \description{
-Hereby the matrices which are part of a list are multiplied with
+Weighted direct sums for lists
 the corresponding components of a matrix w, containing the weights. These,
 now weighted matrices are put together to one larger block-diagonal matrix.
 }
