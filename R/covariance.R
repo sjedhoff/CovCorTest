@@ -317,7 +317,7 @@ test_covariance <- function(X, nv = NULL, C = NULL, Xi = NULL,
 #' # Load the data
 #' data("EEGwide", package = "MANOVA.RM")
 #'
-#' # Select only the males with the diagnosis AD
+#' # Select only the females with the diagnosis AD
 #' X <- as.matrix(EEGwide[EEGwide$sex == "W" & EEGwide$diagnosis == "AD",
 #'                           c("brainrate_temporal", "brainrate_frontal",
 #'                           "brainrate_central","complexity_temporal",

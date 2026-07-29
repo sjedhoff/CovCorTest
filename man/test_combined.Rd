@@ -34,7 +34,7 @@ data("EEGwide", package = "MANOVA.RM")
 
 vars <- colnames(EEGwide)[1:6]
 
-# Part the data into six groups of sex and diagnosis
+# Part the data into two diagnosis groups
 X_list <- list(EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="AD",vars],
                EEGwide[EEGwide$sex=="M" & EEGwide$diagnosis=="MCI",vars])
 

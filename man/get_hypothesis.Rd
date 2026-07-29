@@ -24,7 +24,7 @@ A list with two elements:
 \description{
 Computes a hypothesis matrix \code{C} and hypothesis vector \code{zeta} based on a given
 parameter vector \code{v0} and a matrix \code{V} representing the model structure
-(e.g., vectorised components of a linear covariance structure model).
+(e.g., vectorized components of a linear covariance structure model).
 }
 \details{
 The function extends \code{V} to full rank using \link{get_extended_matrix}, constructs a contrast

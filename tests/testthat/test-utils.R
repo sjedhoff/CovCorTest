@@ -84,6 +84,9 @@ test_that("CheckRepetitions rejects invalid values", {
   expect_error(CheckRepetitions(c(500, 1000)), "single positive integer")
   expect_error(CheckRepetitions("1000"), "single positive integer")
   expect_error(CheckRepetitions(NULL), "single positive integer")
+  expect_error(CheckRepetitions(500, NA))
+  expect_error(CheckRepetitions(500, 0))
+  expect_error(CheckRepetitions(500, c(1, 2)))
 })
 
 test_that("zero resampling p-values use the correct resolution", {
@@ -116,4 +119,16 @@ test_that("p-value formatting validates its inputs", {
     "between 0 and 1"
   )
 
+})
+expect_error(
+  CheckRepetitions(.Machine$integer.max + 1),
+  "single positive integer"
+)
+
+
+test_that("get_extended_matrix wrong input", {
+expect_error(get_extended_matrix(V, tol = NA))
+expect_error(get_extended_matrix(V, tol = -1))
+expect_error(get_extended_matrix(V, tol = c(1e-8, 1e-6)))
+expect_error(get_extended_matrix(V, tol = "small"))
 })

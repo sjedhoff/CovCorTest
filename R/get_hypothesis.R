@@ -86,7 +86,7 @@ get_extended_matrix <- function(V, tol = sqrt(.Machine$double.eps)) {
 #'
 #' Computes a hypothesis matrix `C` and hypothesis vector `zeta` based on a given
 #' parameter vector `v0` and a matrix `V` representing the model structure
-#' (e.g., vectorised components of a linear covariance structure model).
+#' (e.g., vectorized components of a linear covariance structure model).
 #'
 #' @param v0 A numeric vector of length `p` (number of parameters). Represents the
 #'   parameter vector at which the hypothesis is to be evaluated.
